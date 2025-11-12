@@ -1,0 +1,152 @@
+[
+  {
+    "segmentName": "High-Value Tech Enthusiasts",
+    "description": "Affluent consumers with demonstrated interest in technology products and services",
+    "targetUseCase": "Marketing",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID\nFROM PII p\nJOIN DATA d ON p.HOUSEHOLD_ID = d.HOUSEHOLD_ID\nJOIN BEHAVIORS b ON p.HOUSEHOLD_ID = b.HOUSEHOLD_ID\nWHERE d.INCOME_RANGE >= 100000\nAND b.CATEGORY IN ('Technology', 'Electronics', 'Gaming')\nAND p.EMAIL IS NOT NULL",
+    "status": "approved",
+    "estimatedSize": 2500000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-11-01T10:30:00.000Z"
+  },
+  {
+    "segmentName": "Mobile-First Millennials",
+    "description": "Mobile-engaged millennials aged 25-40 with active smartphone usage",
+    "targetUseCase": "Customer Acquisition",
+    "sqlQuery": "SELECT DISTINCT m.HOUSEHOLD_ID, m.ADDRESS_ID\nFROM MAIDS m\nJOIN DATA d ON m.HOUSEHOLD_ID = d.HOUSEHOLD_ID\nWHERE d.AGE BETWEEN 25 AND 40\nAND m.LASTSEENDATE >= DATEADD(day, -30, GETDATE())\nAND m.DEVICE_TYPE = 'Mobile'",
+    "status": "approved",
+    "estimatedSize": 3200000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-11-01T11:15:00.000Z"
+  },
+  {
+    "segmentName": "Premium Email Subscribers",
+    "description": "High-quality email addresses with verified domains and recent engagement",
+    "targetUseCase": "Marketing",
+    "sqlQuery": "SELECT DISTINCT e.HOUSEHOLD_ID, e.ADDRESS_ID, e.EMAIL\nFROM EMAIL e\nJOIN DATA d ON e.HOUSEHOLD_ID = d.HOUSEHOLD_ID\nWHERE e.EMAILQUALITYLEVEL >= 8\nAND e.DOMAIN NOT IN ('gmail.com', 'yahoo.com', 'hotmail.com')\nAND e.LASTSEENDATE >= DATEADD(month, -6, GETDATE())",
+    "status": "approved",
+    "estimatedSize": 1800000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-11-01T09:45:00.000Z"
+  },
+  {
+    "segmentName": "Suburban Homeowners - Family Focus",
+    "description": "Homeowning families in suburban areas with children",
+    "targetUseCase": "Sales",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID\nFROM PII p\nJOIN DATA d ON p.HOUSEHOLD_ID = d.HOUSEHOLD_ID\nWHERE d.HOME_OWNER = 1\nAND d.DWELLING_TYPE = 'Single Family'\nAND d.PRESENCE_OF_CHILDREN = 1\nAND d.URBAN_DENSITY = 'Suburban'",
+    "status": "approved",
+    "estimatedSize": 4500000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-11-01T14:20:00.000Z"
+  },
+  {
+    "segmentName": "Luxury Auto Intenders",
+    "description": "High-income consumers showing purchase intent for luxury vehicles",
+    "targetUseCase": "Customer Acquisition",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID\nFROM PII p\nJOIN DATA d ON p.HOUSEHOLD_ID = d.HOUSEHOLD_ID\nJOIN BEHAVIORS b ON p.HOUSEHOLD_ID = b.HOUSEHOLD_ID\nWHERE d.INCOME_RANGE >= 150000\nAND b.CATEGORY = 'Automotive'\nAND b.SUBCATEGORY IN ('Luxury', 'Premium')\nAND b.INTENT_SCORE >= 75",
+    "status": "approved",
+    "estimatedSize": 850000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-10-30T16:30:00.000Z"
+  },
+  {
+    "segmentName": "Active Phone Contacts - Non-DNC",
+    "description": "Contactable phone numbers not on Do Not Call registry with recent activity",
+    "targetUseCase": "Sales",
+    "sqlQuery": "SELECT DISTINCT ph.HOUSEHOLD_ID, ph.ADDRESS_ID, ph.PHONE\nFROM PHONE ph\nJOIN DATA d ON ph.HOUSEHOLD_ID = d.HOUSEHOLD_ID\nWHERE ph.DNC = 0\nAND ph.PHONEQUALITYLEVEL >= 7\nAND ph.PHONETYPE IN (1, 3)\nAND ph.LASTSEENDATE >= DATEADD(month, -3, GETDATE())",
+    "status": "approved",
+    "estimatedSize": 5200000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-10-29T13:10:00.000Z"
+  },
+  {
+    "segmentName": "Health & Wellness Enthusiasts",
+    "description": "Consumers actively engaged with health, fitness, and wellness content",
+    "targetUseCase": "Marketing",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID\nFROM PII p\nJOIN BEHAVIORS b ON p.HOUSEHOLD_ID = b.HOUSEHOLD_ID\nWHERE b.CATEGORY IN ('Health', 'Fitness', 'Wellness', 'Nutrition')\nAND b.FREQUENCY >= 5\nAND b.RECENCY <= 30",
+    "status": "approved",
+    "estimatedSize": 2100000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-10-28T11:00:00.000Z"
+  },
+  {
+    "segmentName": "E-Commerce Heavy Buyers",
+    "description": "Frequent online shoppers with high transaction volume",
+    "targetUseCase": "Retention",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID\nFROM PII p\nJOIN BEHAVIORS b ON p.HOUSEHOLD_ID = b.HOUSEHOLD_ID\nWHERE b.CATEGORY = 'E-Commerce'\nAND b.TRANSACTION_COUNT >= 10\nAND b.LAST_PURCHASE_DATE >= DATEADD(month, -2, GETDATE())\nAND b.TOTAL_SPEND >= 500",
+    "status": "approved",
+    "estimatedSize": 1600000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-10-27T15:45:00.000Z"
+  },
+  {
+    "segmentName": "Gen Z Digital Natives",
+    "description": "18-24 year olds with high digital engagement across multiple platforms",
+    "targetUseCase": "Customer Acquisition",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID\nFROM PII p\nJOIN DATA d ON p.HOUSEHOLD_ID = d.HOUSEHOLD_ID\nJOIN MAIDS m ON p.HOUSEHOLD_ID = m.HOUSEHOLD_ID\nWHERE d.AGE BETWEEN 18 AND 24\nAND m.APP_USAGE_HOURS >= 20\nAND p.EMAIL IS NOT NULL",
+    "status": "approved",
+    "estimatedSize": 2800000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-10-26T10:20:00.000Z"
+  },
+  {
+    "segmentName": "Business Decision Makers",
+    "description": "B2B professionals in decision-making roles at mid to large companies",
+    "targetUseCase": "Sales",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID, e.EMAIL\nFROM PII p\nJOIN DATA d ON p.HOUSEHOLD_ID = d.HOUSEHOLD_ID\nJOIN EMAIL e ON p.HOUSEHOLD_ID = e.HOUSEHOLD_ID\nWHERE d.OCCUPATION IN ('Executive', 'Manager', 'Director')\nAND d.COMPANY_SIZE >= 100\nAND e.DOMAIN NOT IN ('gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com')",
+    "status": "approved",
+    "estimatedSize": 950000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-10-25T09:30:00.000Z"
+  },
+  {
+    "segmentName": "Travel Enthusiasts - Premium",
+    "description": "Affluent consumers with frequent travel behavior and premium booking patterns",
+    "targetUseCase": "Marketing",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID\nFROM PII p\nJOIN DATA d ON p.HOUSEHOLD_ID = d.HOUSEHOLD_ID\nJOIN BEHAVIORS b ON p.HOUSEHOLD_ID = b.HOUSEHOLD_ID\nWHERE d.INCOME_RANGE >= 100000\nAND b.CATEGORY IN ('Travel', 'Hotels', 'Airlines')\nAND b.PREMIUM_BOOKING = 1\nAND b.FREQUENCY >= 4",
+    "status": "approved",
+    "estimatedSize": 1200000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-10-24T14:15:00.000Z"
+  },
+  {
+    "segmentName": "Smart Home Early Adopters",
+    "description": "Tech-forward consumers with smart home device ownership and IoT engagement",
+    "targetUseCase": "Customer Acquisition",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID\nFROM PII p\nJOIN BEHAVIORS b ON p.HOUSEHOLD_ID = b.HOUSEHOLD_ID\nJOIN IP i ON p.HOUSEHOLD_ID = i.HOUSEHOLD_ID\nWHERE b.CATEGORY IN ('Smart Home', 'IoT', 'Home Automation')\nAND i.CONNECTED_DEVICES >= 5\nAND b.RECENCY <= 60",
+    "status": "approved",
+    "estimatedSize": 720000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-10-23T11:50:00.000Z"
+  },
+  {
+    "segmentName": "Financial Services Prospects",
+    "description": "Consumers showing interest in financial products and investment services",
+    "targetUseCase": "Sales",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID\nFROM PII p\nJOIN DATA d ON p.HOUSEHOLD_ID = d.HOUSEHOLD_ID\nJOIN BEHAVIORS b ON p.HOUSEHOLD_ID = b.HOUSEHOLD_ID\nWHERE d.INCOME_RANGE >= 75000\nAND b.CATEGORY IN ('Finance', 'Investment', 'Banking')\nAND b.INTENT_SCORE >= 60\nAND d.AGE >= 30",
+    "status": "approved",
+    "estimatedSize": 1900000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-10-22T13:25:00.000Z"
+  },
+  {
+    "segmentName": "Streaming Entertainment Subscribers",
+    "description": "Active subscribers to multiple streaming services with high engagement",
+    "targetUseCase": "Analytics",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID\nFROM PII p\nJOIN BEHAVIORS b ON p.HOUSEHOLD_ID = b.HOUSEHOLD_ID\nWHERE b.CATEGORY = 'Streaming'\nAND b.SUBSCRIPTION_COUNT >= 3\nAND b.MONTHLY_HOURS >= 40\nAND b.CHURN_RISK < 30",
+    "status": "approved",
+    "estimatedSize": 3400000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-10-21T16:40:00.000Z"
+  },
+  {
+    "segmentName": "Sustainable Living Advocates",
+    "description": "Environmentally conscious consumers with green purchasing behavior",
+    "targetUseCase": "Marketing",
+    "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID\nFROM PII p\nJOIN BEHAVIORS b ON p.HOUSEHOLD_ID = b.HOUSEHOLD_ID\nJOIN DATA d ON p.HOUSEHOLD_ID = d.HOUSEHOLD_ID\nWHERE b.CATEGORY IN ('Sustainable Products', 'Eco-Friendly', 'Renewable Energy')\nAND b.GREEN_PURCHASE_INDEX >= 70\nAND d.EDUCATION_LEVEL IN ('College Graduate', 'Post Graduate')",
+    "status": "approved",
+    "estimatedSize": 1350000,
+    "approvedBy": "demo-user",
+    "approvedAt": "2025-10-20T12:05:00.000Z"
+  }
+]
