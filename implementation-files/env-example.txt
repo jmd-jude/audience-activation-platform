@@ -1,0 +1,71 @@
+# Example Environment Variables for Snowflake Integration
+# Copy these values from your existing Cylyndyr .env file
+
+# =================================================================
+# SNOWFLAKE CONNECTION PARAMETERS
+# =================================================================
+
+# Your Snowflake account identifier (e.g., "xy12345.us-east-1")
+SNOWFLAKE_ACCOUNT=your-account.snowflakecomputing.com
+
+# Snowflake username
+SNOWFLAKE_USERNAME=your-username
+
+# Database name
+SNOWFLAKE_DATABASE=your-database-name
+
+# Warehouse name
+SNOWFLAKE_WAREHOUSE=your-warehouse-name
+
+# Schema name
+SNOWFLAKE_SCHEMA=your-schema-name
+
+# Private key content (the actual PEM key content)
+# Note: In production/Vercel, this should be the full PEM key including:
+# -----BEGIN PRIVATE KEY-----
+# (key content)
+# -----END PRIVATE KEY-----
+SNOWFLAKE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...\n-----END PRIVATE KEY-----"
+
+# =================================================================
+# OPTIONAL SNOWFLAKE PARAMETERS
+# =================================================================
+
+# Connection timeout in milliseconds (default: 30000)
+SNOWFLAKE_TIMEOUT=30000
+
+# Maximum number of connections in pool (default: 10)
+SNOWFLAKE_MAX_CONNECTIONS=10
+
+# =================================================================
+# EXISTING NEXT.JS/SUPABASE PARAMETERS
+# =================================================================
+# (Keep your existing environment variables)
+
+# Database URL for your Next.js app backend
+DATABASE_URL=your-supabase-or-postgres-url
+
+# Anthropic API key for LLM calls
+ANTHROPIC_API_KEY=your-anthropic-key
+
+# =================================================================
+# VERCEL DEPLOYMENT NOTES
+# =================================================================
+# When deploying to Vercel:
+# 1. Go to your project dashboard
+# 2. Settings → Environment Variables
+# 3. Add each variable above
+# 4. Mark sensitive ones like SNOWFLAKE_PRIVATE_KEY as "Sensitive"
+# 5. Make sure they're available for all environments (Production, Preview, Development)
+#
+# For the private key specifically:
+# - You can paste the full PEM content including newlines
+# - Vercel will handle the formatting correctly
+# - Test the connection in a preview deployment first
+
+# =================================================================
+# LOCAL DEVELOPMENT
+# =================================================================
+# For local development, save this as .env.local in your project root
+# Make sure .env.local is in your .gitignore file
+# Never commit actual credentials to version control

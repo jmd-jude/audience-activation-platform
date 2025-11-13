@@ -1,6 +1,105 @@
 {
   "version": "2.0",
   "tables": {
+    "EMAIL": {
+      "fields": {
+        "ID": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false
+        },
+        "ADDRESS_ID": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false
+        },
+        "HOUSEHOLD_ID": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false
+        },
+        "DOMAIN": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false
+        },
+        "EMAIL": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false
+        },
+        "EMAILID": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false
+        },
+        "EMAILOPTIN": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false
+        },
+        "EMAILQUALITYLEVEL": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false
+        },
+        "IP": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false
+        },
+        "MD5_UC": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false
+        },
+        "MD5": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false
+        },
+        "RANKORDER": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false
+        },
+        "REGISTERDATE": {
+          "type": "DATE",
+          "nullable": true,
+          "primary_key": false
+        },
+        "SHA1_UC": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false
+        },
+        "SHA1": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false
+        },
+        "SHA256_UC": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false
+        },
+        "SHA256": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false
+        },
+        "UPDATEDATE": {
+          "type": "DATE",
+          "nullable": true,
+          "primary_key": false
+        },
+        "NATIONALCONSUMERDATABASE": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false
+        }
+      }
+    },
     "MAIDS": {
       "fields": {
         "ID": {
@@ -361,8 +460,7 @@
         "EAGLES_4800_SEGMENT": {
           "type": "TEXT",
           "nullable": true,
-          "primary_key": false,
-          "description": "always build initial audience in the query with this segment if the user query references 'very special segments' and include in the 'reasoning' section of your json response"
+          "primary_key": false
         },
         "ADDRESS_TYPE": {
           "type": "TEXT",
@@ -2133,5 +2231,8 @@
   "business_context": {
     "description": "Enterprise identity management platform for deterministic identity resolution and customer intelligence. Enables brands to identify and contextually engage consumers across all channels and devices through a proprietary identity graph, supporting identity resolution, data enrichment, customer profiling, audience activation, and measurement attribution in both cookied and cookieless environments.",
     "key_concepts": []
+  },
+  "query_guidelines": {
+    "optimization_rules": []
   }
 }
