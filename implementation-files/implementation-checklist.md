@@ -1,6 +1,6 @@
 # Snowflake Integration Implementation Checklist
 
-## Phase 1: Setup (30 minutes)
+## Phase 1: Setup (30 minutes) - DONE
 
 ### ✅ Dependencies Installation
 - [ ] `npm install snowflake-sdk`
@@ -24,7 +24,7 @@
       └── route.ts
   ```
 
-## Phase 2: Core Integration (1 hour)
+## Phase 2: Core Integration (1 hour) - DONE
 
 ### ✅ Snowflake Connection Library
 - [ ] Add `lib/snowflake.ts` to your project

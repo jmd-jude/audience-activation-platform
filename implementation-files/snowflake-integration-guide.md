@@ -3,7 +3,7 @@
 ## Overview
 This guide walks through adding Snowflake database connectivity to your Next.js Audience Activation platform, enabling direct query execution similar to Cylyndyr's capabilities.
 
-## Phase 1: Environment Setup
+## Phase 1: Environment Setup - DONE
 
 ### 1. Install Required Dependencies
 ```bash
@@ -35,7 +35,7 @@ When you deploy to Vercel, you'll need to add these same environment variables t
 - Vercel Dashboard → Your Project → Settings → Environment Variables
 - Make sure to mark sensitive ones (like SNOWFLAKE_PRIVATE_KEY) as secret
 
-## Phase 2: Core Implementation Files
+## Phase 2: Core Implementation Files - DONE
 
 ### 1. Snowflake Connection Library (`lib/snowflake.ts`)
 This mirrors Cylyndyr's connection pattern but adapted for Node.js.
