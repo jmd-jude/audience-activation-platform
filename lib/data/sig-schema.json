@@ -1,2137 +1,525 @@
 {
   "version": "2.0",
   "tables": {
-    "MAIDS": {
+    "EMAIL": {
+      "description": "Email intelligence and quality scoring for digital engagement optimization",
+      "semantic_context": "Email deliverability and engagement optimization layer enabling high-performance digital campaigns",
+      "marketing_use": "Foundation for email campaign targeting, deliverability optimization, and digital engagement strategies",
       "fields": {
-        "ID": {
+        "EMAILQUALITYLEVEL": {
           "type": "NUMBER",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "semantic_hints": ["quality_signal", "deliverability_predictor", "engagement_likelihood", "campaign_performance"],
+          "marketing_meaning": "Primary filter for email campaign targeting and deliverability optimization - determines send priority and expected engagement rates",
+          "creative_potential": {
+            "8-10": "Premium email targeting - high engagement probability, low bounce risk, priority send candidates",
+            "6-7": "Standard targeting - reliable delivery with good engagement, core audience segment",
+            "4-5": "Broad reach targeting - higher volume campaigns, moderate engagement expectations",
+            "1-3": "Risky targeting - use for suppression lists or re-verification campaigns only"
+          },
+          "combination_signals": "Essential qualifier for all email-based campaigns and digital engagement strategies - multiplies effectiveness of demographic and behavioral targeting"
         },
-        "EMAILID": {
+        "EMAILOPTIN": {
           "type": "NUMBER",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "semantic_hints": ["permission_signal", "compliance_indicator", "engagement_intent", "legal_foundation"],
+          "marketing_meaning": "Compliance foundation and engagement willingness indicator for all email marketing activities",
+          "creative_potential": "Explicit permission signals higher engagement potential, brand affinity, and receptiveness to marketing communications",
+          "combination_signals": "Required for compliant email marketing, enhances trust and engagement across all digital strategies"
         },
-        "ADDRESS_ID": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOUSEHOLD_ID": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "PUBLISHERID": {
+        "DOMAIN": {
           "type": "TEXT",
           "nullable": true,
-          "primary_key": false
-        },
-        "DEVICEID": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "DEVICETYPE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "USERAGENT": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "IPADDRESS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ADDEDDATE": {
-          "type": "DATE",
-          "nullable": true,
-          "primary_key": false
-        },
-        "UPDATEDATE": {
-          "type": "DATE",
-          "nullable": true,
-          "primary_key": false
-        },
-        "LASTSEENDATE": {
-          "type": "DATE",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MD5": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SHA1": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SHA256": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "OPTOUT": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "OS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "LAT": {
-          "type": "FLOAT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "LONG": {
-          "type": "FLOAT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ACCURACY": {
-          "type": "FLOAT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "NATIONALCONSUMERDATABASE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "semantic_hints": ["context_indicator", "professional_signal", "demographic_proxy", "communication_strategy"],
+          "marketing_meaning": "B2B vs B2C targeting signal and communication approach indicator",
+          "creative_potential": {
+            "corporate_domains": "Professional targeting - business hours, LinkedIn integration, formal tone, decision-maker messaging",
+            "ISP_domains": "Consumer targeting - personal hours, social channels, casual tone, lifestyle-focused",
+            "custom_domains": "Small business owners - entrepreneurial mindset, decision makers, growth-focused messaging"
+          },
+          "combination_signals": "Key signal for B2B/B2C segmentation and communication strategy optimization across all channels"
         }
       }
     },
     "PII": {
+      "description": "Core demographic and geographic consumer data including names, addresses, age, gender, and census-based location attributes",
+      "semantic_context": "Primary identity and geographic foundation for deterministic identity resolution",
+      "marketing_use": "Identity linking, geographic targeting, and basic demographic segmentation",
       "fields": {
-        "ID": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FIRST_NAME": {
+        "GENDER": {
           "type": "TEXT",
           "nullable": true,
-          "primary_key": false
-        },
-        "LAST_NAME": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "NAME_SUFFIX": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ADDRESS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CITY": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "STATE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ZIP": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "DPBC": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CARRIER_ROUTE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FIPS_STATE_CODE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FIPS_COUNTY_CODE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "COUNTY_NAME": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "LATITUDE": {
-          "type": "FLOAT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "LONGITUDE": {
-          "type": "FLOAT",
-          "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "valid_values": ["F", "M"],
+          "semantic_hints": ["demographic_core", "product_affinity", "communication_tone", "identity_anchor"],
+          "marketing_meaning": "Core demographic filter for gender-relevant product positioning and communication approach",
+          "creative_potential": "Gender-informed targeting enabling relevant product emphasis and communication styles while avoiding stereotypical assumptions",
+          "combination_signals": "Modifies messaging tone and product emphasis across all demographic and behavioral segments"
         },
         "ADDRESS_TYPE": {
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "description": "valid values: 'H', 'P', 'R', 'S'"
+          "valid_values": ["H", "P", "R", "S"],
+          "semantic_hints": ["residence_signal", "stability_indicator", "lifestyle_context", "targeting_precision"],
+          "marketing_meaning": "Address stability and residence type indicator for lifestyle-based targeting and delivery optimization",
+          "creative_potential": {
+            "H": "Home addresses - family-focused messaging, stability, residential services targeting",
+            "P": "PO Box addresses - privacy-conscious, rural/mobile populations, alternative delivery needs",
+            "R": "Rural addresses - outdoor lifestyle, self-reliance, community-focused values",
+            "S": "Seasonal addresses - affluent mobility, vacation home owners, seasonal targeting opportunities"
+          },
+          "combination_signals": "Lifestyle stability signal that enhances geographic and demographic targeting precision"
         },
-        "CBSA": {
+        "STATE": {
           "type": "TEXT",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "semantic_hints": ["geographic_targeting", "cultural_context", "regulatory_compliance", "regional_preferences"],
+          "marketing_meaning": "Geographic foundation for regional campaigns, cultural adaptation, and regulatory compliance",
+          "creative_potential": "State-level cultural context enabling regional messaging, local partnerships, seasonal campaigns, and compliance-aware targeting",
+          "combination_signals": "Geographic foundation that modifies all demographic and behavioral targeting with regional context"
         },
-        "CENSUS_TRACT": {
+        "ZIP": {
           "type": "TEXT",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "semantic_hints": ["micro_targeting", "socioeconomic_proxy", "lifestyle_clustering", "local_market"],
+          "marketing_meaning": "Precision geographic targeting enabling neighborhood-level campaigns and socioeconomic inference",
+          "creative_potential": "ZIP-level targeting for local businesses, socioeconomic lifestyle inference, hyper-local campaigns, and community-specific messaging",
+          "combination_signals": "Micro-geographic enhancer that adds precision to all demographic and behavioral segments"
         },
         "CENSUS_BLOCK_GROUP": {
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "description": "valid values: '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'"
-        },
-        "CENSUS_BLOCK": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GENDER": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: 'F', 'M'"
-        },
-        "ADDR_PRIMARY": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ADDR_PRE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ADDR_STREET": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ADDR_POST": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ADDR_SUFFIX": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ADDR_ABREV": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ADDR_SECY": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "PROP_TYPE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ADDRESS_ID": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOUSEHOLD_ID": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HASEMAIL": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HASPHONE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "DPV": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "DMA": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MSA": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SCF": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CONGRESSIONAL_DISTRICT": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
+          "valid_values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+          "semantic_hints": ["neighborhood_targeting", "demographic_density", "lifestyle_homogeneity", "micro_segmentation"],
+          "marketing_meaning": "Ultra-precise geographic targeting for neighborhood-level campaign optimization and demographic concentration analysis",
+          "creative_potential": "Block-group targeting enables hyper-local campaigns, demographic concentration optimization, and neighborhood lifestyle targeting",
+          "combination_signals": "Ultra-precise geographic qualifier that maximizes targeting efficiency for high-concentration demographic segments"
         },
         "URBANICITY_CODE": {
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "description": "valid values: 'R', 'S', 'U'"
+          "valid_values": ["R", "S", "U"],
+          "semantic_hints": ["lifestyle_context", "density_indicator", "cultural_environment", "service_accessibility"],
+          "marketing_meaning": "Urban vs suburban vs rural lifestyle targeting foundation",
+          "creative_potential": {
+            "U": "Urban - convenience-focused, diverse, public transportation, apartment living, cultural access",
+            "S": "Suburban - family-focused, community-oriented, car-dependent, single family homes, local shopping",
+            "R": "Rural - self-reliant, outdoor lifestyle, traditional values, distance challenges, local community"
+          },
+          "combination_signals": "Lifestyle density context that enhances all geographic and demographic targeting strategies"
         },
-        "NATIONALCONSUMERDATABASE": {
+        "HASPHONE": {
           "type": "NUMBER",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "semantic_hints": ["contact_quality", "multi_channel", "engagement_readiness", "communication_preference"],
+          "marketing_meaning": "Phone contact availability enabling multi-channel campaigns and high-touch engagement strategies",
+          "creative_potential": "Phone availability signals engagement readiness, enables voice campaigns, SMS marketing, and high-value prospect identification",
+          "combination_signals": "Multi-channel enabler that enhances all digital targeting with voice and SMS capabilities"
         },
-        "BIRTH_MONTH_AND_YEAR": {
-          "type": "DATE",
+        "HASEMAIL": {
+          "type": "NUMBER",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "semantic_hints": ["digital_engagement", "email_targeting", "contact_quality", "channel_preference"],
+          "marketing_meaning": "Email contact availability enabling digital campaign targeting and automated engagement workflows",
+          "creative_potential": "Email availability enables digital nurture campaigns, automated sequences, and cost-effective scale targeting",
+          "combination_signals": "Digital engagement foundation that enables all email-based targeting and automation strategies"
         }
-      },
-      "description": "Core demographic and geographic consumer data including names, addresses, age, gender, and census-based location attributes."
+      }
     },
     "DATA": {
+      "description": "Comprehensive consumer intelligence profiles including financial attributes, lifestyle preferences, purchase history, and demographic segmentation for advanced audience targeting",
+      "semantic_context": "Primary behavioral and demographic intelligence layer for sophisticated audience segmentation",
+      "marketing_use": "Advanced audience segmentation, persona development, and precision behavioral targeting",
       "fields": {
-        "ID": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ADDRESS_ID": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOUSEHOLD_ID": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SOURCENUMBER": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "EAGLES_18_SEGMENT": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: '50K_90K_1959_1973_M', '50K_90K_1959_1973_S', '50K_90K_GE_1974___M', '50K_90K_GE_1974___S', '50K_90K_LE_1958___M', '50K_90K_LE_1958___S', 'GT_90K__1959_1973_M', 'GT_90K__1959_1973_S', 'GT_90K__GE_1974___M', 'GT_90K__GE_1974___S', 'GT_90K__LE_1958___M', 'GT_90K__LE_1958___S', 'LT_50K__1959_1973_M', 'LT_50K__1959_1973_S', 'LT_50K__GE_1974___M', 'LT_50K__GE_1974___S', 'LT_50K__LE_1958___M', 'LT_50K__LE_1958___S'"
-        },
-        "EAGLES_60_SEGMENT": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: '50K_90K_1943_1956_M_R', '50K_90K_1943_1956_M_U', '50K_90K_1943_1956_S_R', '50K_90K_1943_1956_S_U', '50K_90K_1957_1967_M_R', '50K_90K_1957_1967_M_U', '50K_90K_1957_1967_S_R', '50K_90K_1957_1967_S_U', '50K_90K_1968_1981_M_R', '50K_90K_1968_1981_M_U', '50K_90K_1968_1981_S_R', '50K_90K_1968_1981_S_U', '50K_90K_GE_1982___M_R', '50K_90K_GE_1982___M_U', '50K_90K_GE_1982___S_R', '50K_90K_GE_1982___S_U', '50K_90K_LE_1942___X_R', '50K_90K_LE_1942___X_U', 'GT_90K__1943_1956_M_R', 'GT_90K__1943_1956_M_U'"
-        },
-        "EAGLES_4800_SEGMENT": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "always build initial audience in the query with this segment if the user query references 'very special segments' and include in the 'reasoning' section of your json response"
-        },
-        "ADDRESS_TYPE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: 'Highway', 'PO Box', 'Rural Route', 'Street'"
-        },
-        "INCOME_LEVELS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: '100K_150K', '30K_50K', '50K_74K', '75K_99K', 'GT_150K', 'LT_30K'"
-        },
-        "CREDIT_CARD": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BANK_CARD": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "NUM_CREDIT_LINES_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "NEW_CREDIT_OFFERED_HH": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: 'B. $0 - $100', 'C. $101 - $300', 'D. $501 - $1,000', 'E. $1,001 - $3,000', 'F. $3,001 - $5,000', 'G. $5,001 - $9,999', 'H. Greater than $9,999'"
-        },
-        "PREMIUM_CARD": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "INCOME_HH": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: 'A. Under $10,000', 'B. $10,000-$19,999', 'C. $20,000-$29,999', 'D. $30,000-$39,999', 'E. $40,000-$49,999', 'F. $50,000-$59,999', 'G. $60,000-$74,999', 'H. $75,000-$99,999', 'K. $100,000-$149,999', 'L. $150,000-$174,999', 'M. $175,000-$199,999', 'N. $200,000-$249,999', 'P. $250-$299K', 'Q. $300-$399K', 'R. $400-$499K', 'S. $500-$699K', 'T. $700-$999K', 'U. $1MM +'"
-        },
-        "INCOME_MIDPTS_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "PREMIUM_INCOME_HH": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: 'AB. <$15K', 'AC. $15K-$20K', 'AD. $20K-$30K', 'B. $30K-$40K', 'C. $40K-$50K', 'D. $50K-$60K', 'E. $60K-$70K', 'F. $70K-$80K', 'G. $80K-$90K', 'H. $90K-$100K', 'I. $100K-$110K', 'J. $110K-$120K', 'K. $120K-$130K', 'L. $130K-$140K', 'M. $140K-$150K', 'N. $150K-$175K', 'O. $175K-$200K', 'P. $200K-$225K', 'Q. $225K-$250K', 'R. $250K-$275K'"
-        },
-        "PREMIUM_INCOME_MIDPT_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MEDIAN_INCOME": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "OWNS_INVESTMENTS": {
+        "AGE": {
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "description": "valid values: '1'"
-        },
-        "OWNS_STOCKS_AND_BONDS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: '1'"
-        },
-        "OWNS_MUTUAL_FUNDS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "INVESTMENT_TYPE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: '1'"
-        },
-        "NET_WORTH_HH": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: 'B. Less than $1', 'C. $1 - $4,999', 'D. $5,000 - $9,999', 'E. $10,000 - $24,999', 'F. $25,000 - $49,999', 'G. $50,000 - $99,999', 'H. $100,000 - $249,999', 'I. $250,000 - $499,999', 'J. Greater than $499,999'"
-        },
-        "NET_WORTH_MIDPT_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "EDUCATION": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: 'Attended Vocational/Technical', 'Completed College', 'Completed Graduate School', 'Completed High School', 'Doctorate/PhD or Above', 'Some College', 'Some High School'"
-        },
-        "EDUCATION_ORDINAL": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: '1', '2', '3', '4', '5', '6', '7'"
-        },
-        "DWELLING_TYPE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: 'Multi Family Dwelling/Apartment', 'Single Family'"
-        },
-        "SINGLE_FAMILY_DWELLING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "OCCUPATION_DETAIL": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "OCCUPATION_TYPE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: 'Blue Collar', 'Other', 'White Collar'"
-        },
-        "OCCUPATION_CATEGORY": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: 'Blue Collar', 'Homemaker', 'Lower Management', 'Other', 'Professional', 'Retired', 'Upper Management', 'White Collar Worker'"
-        },
-        "WHITE_COLLAR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BLUE_COLLAR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
+          "semantic_hints": ["lifecycle_stage", "generational_values", "communication_style", "product_relevance"],
+          "marketing_meaning": "Age-based targeting foundation determining message tone, channel preference, and life stage relevance",
+          "creative_potential": {
+            "18-25": "Digital natives - authenticity-focused, cause-driven, mobile-first, experimental with brands",
+            "26-40": "Peak earning millennials - efficiency-focused, experience-driven, family-building, brand-conscious",
+            "41-57": "Wealth-building Gen X - stability-focused, family-centered, quality-conscious, value-driven",
+            "58+": "Established boomers - service-focused, brand-loyal, traditional channels, security-minded"
+          },
+          "combination_signals": "Foundational demographic that enhances all behavioral and geographic targeting with generational context"
         },
         "GENERATION": {
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "description": "valid values: '1. Millennials and Gen Z (1982 and after)', '2. Generation X (1961-1981)', '3. Baby Boomers (1943-1960)', '4. Post-WWII (1942 and before)'"
+          "valid_values": ["1. Millennials and Gen Z (1982 and after)", "2. Generation X (1961-1981)", "3. Baby Boomers (1943-1960)", "4. Post-WWII (1942 and before)"],
+          "semantic_hints": ["psychographics", "values_alignment", "communication_style", "technology_adoption"],
+          "marketing_meaning": "Generational targeting for values-based messaging and channel optimization",
+          "creative_potential": {
+            "Millennials and Gen Z": "Digital-first, authenticity-focused, cause-driven, experience-oriented",
+            "Generation X": "Pragmatic, family-focused, balanced digital adoption, value-conscious",
+            "Baby Boomers": "Service-oriented, brand loyal, traditional communication, quality-focused",
+            "Post-WWII": "Traditional values, established preferences, relationship-focused, security-minded"
+          },
+          "combination_signals": "Generational layer that enhances all demographic and behavioral targeting with values context"
         },
-        "AGE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BIRTH_YEAR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GENERATION_ORDINAL": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: '1', '2', '3', '4'"
-        },
-        "MALE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MARRIED": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CHILDREN_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CHILD_AGED_0_3_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CHILD_AGED_4_6_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CHILD_AGED_7_9_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CHILD_AGED_10_12_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CHILD_AGED_13_18_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "VETERAN_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GENDER": {
+        "INCOME_HH": {
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "description": "valid values: 'Female', 'Male'"
+          "valid_values": ["A. Under $10,000", "B. $10,000-$19,999", "C. $20,000-$29,999", "D. $30,000-$39,999", "E. $40,000-$49,999", "F. $50,000-$59,999", "G. $60,000-$74,999", "H. $75,000-$99,999", "K. $100,000-$149,999", "L. $150,000-$174,999", "M. $175,000-$199,999", "N. $200,000-$249,999", "P. $250-$299K", "Q. $300-$399K", "R. $400-$499K", "S. $500-$699K", "T. $700-$999K", "U. $1MM +"],
+          "semantic_hints": ["purchasing_power", "premium_targeting", "affordability_signal", "lifestyle_capacity"],
+          "marketing_meaning": "Detailed income-based targeting for product price point alignment and premium vs value messaging strategies",
+          "creative_potential": {
+            "U-T ($700K+)": "Ultra-premium targeting - luxury everything, exclusive experiences, concierge services",
+            "P-S ($250K-$699K)": "Premium targeting - luxury goods, high-end services, time-saving solutions",
+            "K-O ($100K-$199K)": "Upper-middle targeting - selective premium, quality-focused, aspirational luxury",
+            "F-H ($50K-$99K)": "Middle-class targeting - value-conscious premium, practical benefits, ROI-focused",
+            "A-E (Under $50K)": "Value targeting - affordability, utility, budget-conscious, promotional focus"
+          },
+          "combination_signals": "Economic foundation that determines product positioning and pricing strategy across all audience segments"
         },
-        "MARITAL_STATUS": {
+        "NET_WORTH_HH": {
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "description": "valid values: 'Married', 'Single'"
+          "valid_values": ["B. Less than $1", "C. $1 - $4,999", "D. $5,000 - $9,999", "E. $10,000 - $24,999", "F. $25,000 - $49,999", "G. $50,000 - $99,999", "H. $100,000 - $249,999", "I. $250,000 - $499,999", "J. Greater than $499,999"],
+          "semantic_hints": ["wealth_accumulation", "financial_stability", "investment_capacity", "security_mindset"],
+          "marketing_meaning": "Wealth-based targeting for investment services, luxury positioning, and financial security messaging",
+          "creative_potential": {
+            "I-J ($250K+)": "Wealth management - investment services, estate planning, luxury lifestyle",
+            "G-H ($50K-$249K)": "Wealth building - financial planning, investment growth, security focus",
+            "E-F ($10K-$49K)": "Stability seeking - emergency funds, basic investments, financial education",
+            "B-D (Under $10K)": "Financial assistance - debt management, basic banking, financial literacy"
+          },
+          "combination_signals": "Wealth signal that elevates targeting across all premium categories and financial services"
         },
-        "HASEMAIL": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HASPHONE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MULTILINGUAL": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "PERSONALITY": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "NUM_ADULTS_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "NUM_CHILDREN_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "NUM_GENERATIONS_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: '1', '2', '3'"
-        },
-        "NUM_PERSONS_HH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "URBANICITY": {
+        "EDUCATION": {
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "description": "valid values: '1. Rural', '3. Suburban', '4. Urban'"
-        },
-        "POP_DENSITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_AVID_READER": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_ASTROLOGY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_FICTION": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_BOOKS_ON_TAPE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_COMPUTER_IT": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_COOKING_CULINARY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_COUNTRY_LIFESTYLE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: '1'"
-        },
-        "READING_ENTERTAINMENT": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_FASHION": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_FINANCE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_HEALTH_REMEDIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_HISTORY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_INTERIOR_DECORATING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_MEDICAL_HEALTH": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_MILITARY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_MYSTERY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_ROMANCE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_SCIENCE_FICTION": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_SCIENCE_TECHNOLOGY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_SPORTS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_WORLD_NEWS_POLITICS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "READING_MAGAZINES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_DONATION_ANIMAL_CAUSE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_DONATION_ARTS_CULTURAL_CAUSE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_DONATION_CHILDRENS_CAUSE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_DONATION_ENVIRONMENTAL_CAUSE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_DONATION_HEALTH_CAUSE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_DONATION_VETERANS_CAUSE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_DONATIONS_NUM_CHARITIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_DONATIONS_NUM": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_DONATIONS_AVG_DOLLARS_PER": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "LIKELY_CHARITABLE_DONOR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "POLITICAL_CONTRIBUTOR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "APPAREL_ACCESSORY_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "APPAREL_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "KIDS_APPAREL_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MENS_APPAREL_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MENS_FASHION_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "WOMENS_APPAREL_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "WOMENS_FASHION_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "AUTO_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "AUTO_RACING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TRUCKS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "AVIATION_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BARGAIN_HUNTER_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BEAUTY_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BIBLE_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BIRDS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BUSINESS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOME_OFFICE_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CATALOG_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "COLLECTIBLES_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "COLLEGE_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "COMPUTERS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "COOKING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CONTINUITY_PROGRAM_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CRAFTS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CROCHET_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "KNIT_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "NEEDLEPOINT_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "QUILT_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SEWING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CULTURE_ARTS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "DO_IT_YOURSELF_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "DONOR_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "EDUCATION_SEEKERS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false,
-          "description": "valid values: '2', '3'"
-        },
-        "EGO_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ELECTRONICS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "EQUESTRIAN_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FAMILY_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GAMBLING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GAMES_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GARDENING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GOURMET_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GRANDPARENTS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "DIET_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FITNESS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HIGH_TECH_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HISTORY_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "AMERICAN_HISTORY_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "WOMENS_HOME_LIVING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOME_DECORATING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HUMOR_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "INSPIRATIONAL_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "INSURANCE_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MONEY_MAKING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MOTORCYCLES_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "OCEAN_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "OUTDOORS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BOATING_SAILING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CAMPING_HIKING_CLIMBING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FISHING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HUNTING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "PETS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CAT_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "DOG_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "PHOTOGRAPHY_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RURAL_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SCIENCE_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BASEBALL_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BASKETBALL_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FOOTBALL_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GOLF_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOCKEY_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SNOW_SKIING_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SOCCER_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TENNIS_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SWEEPSTAKES_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TRAVEL_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TRAVEL_CRUISE_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TRAVEL_RV_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TRAVEL_US_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TV_MOVIES_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "WILDLIFE_AFFINITY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CARS_INTEREST": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "DOLL_COLLECTOR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FIGURINES_COLLECTOR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "PLATES_COLLECTOR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SPORTS_MEMORIBILIA_COLLECTOR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ENTERTAINMENT_INTEREST": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOME_STUDY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "WOODWORKING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOME_IMPROVEMENT_INTEREST": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RELIGIOUS_MUSIC": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CLASSICAL_MUSIC": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "COUNTRY_MUSIC": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "JAZZ": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RHYTHM_AND_BLUES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ROCK_MUSIC": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SOFT_ROCK": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "AEROBICS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "NASCAR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SCUBA": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "WEIGHT_LIFTING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ARTS_AND_CRAFTS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BOATING_SAILING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GAMBLING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CHARITY_INTEREST": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CIGARS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "ANTIQUES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "COINS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FINE_ARTS_COLLECTOR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "STAMPS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "DIY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FITNESS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "EPICUREAN": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GARDENING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GOLF": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HEALTHY_LIVING_INTEREST": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BIRD_WATCHING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "COOKING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "KNITTING_QUILTING_SEWING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "PHOTOGRAPHY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SELF_IMPROVEMENT": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOME_DECOR": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HUNTING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MOTORCYCLES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MOVIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MUSIC": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "OUTDOORS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CAMPING_HIKING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FISHING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "WALKING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RV": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MOTOR_RACING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BASEBALL": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BASKETBALL": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "FOOTBALL": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOCKEY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SOCCER": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RUNNING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SNOW_SKIING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TENNIS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "OUTDOORS_HUNTING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "LUXURY_LIFE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TRAVEL_BUSINESS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TRAVEL_PERSONAL": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "SOHO_BUSINESS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "PET_OWNER": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CAT_OWNER": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "DOG_OWNER": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MAGAZINE_SUBSCRIBER": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TRAVEL_CRUISES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TRAVEL_VACATION": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "TRAVEL_FOREIGN": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "BOOKS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "COSMETICS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HEALTH_BEAUTY_PRODUCTS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "INVESTMENTS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "JEWELRY": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CATALOG_PURCHASES_TOTAL_DOLLARS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CATALOG_PURCHASES_AVG_DOLLARS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CONTINUITY_PURCHASES_TOTAL_DOLLARS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CONTINUITY_PURCHASES_AVG_DOLLARS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_APPAREL_PURCHASES_TOTAL_DOLLARS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_APPAREL_PURCHASES_AVG_DOLLARS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_FAMILY_RELATED_PURCHASES_TOTAL_DOLLARS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_FAMILY_RELATED_PURCHASES_AVG_DOLLARS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HEALTH_PURCHASES_AVG_DOLLARS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOME_GOODS_LIVING_PURCHASES_TOTAL_DOLLARS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOME_GOODS_LIVING_PURCHASES_AVG_DOLLARS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_OUTDOORS_PURCHASES_TOTAL_DOLLARS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_OUTDOORS_PURCHASES_AVG_DOLLARS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_PUBLISHING_PURCHASES_TOTAL_DOLLARS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_WOMENS_FASHION_PURCHASES_TOTAL_DOLLARS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_WOMENS_FASHION_PURCHASES_AVG_DOLLARS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "AUTO_PARTS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CHILDRENS_PRODUCTS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "CLOTHING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "GIFTS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOME_FURNISHING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "HOME_IMPROVEMENT": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "MUSICAL_INSTRUMENTS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "PLUS_SIZE_CLOTHING": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CATALOG_PURCHASES_NUM_CATALOGS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CATALOG_PURCHASES_TOTAL_ORDERS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CATALOG_PURCHASES_TOTAL_ITEMS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CONTINUITY_PURCHASES_NUM_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CONTINUITY_PURCHASES_TOTAL_ORDERS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_APPAREL_PURCHASES_TOTAL_ORDERS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_APPAREL_PURCHASES_TOTAL_ITEMS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_MENS_APPAREL_PURCHASES_NUM_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_WOMENS_APPAREL_PURCHASES_NUM_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_FAMILY_RELATED_PURCHASES_TOTAL_ORDERS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_FAMILY_RELATED_PURCHASES_TOTAL_ITEMS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_FAMILY_RELATED_PUBLISHING_PURCHASES_NUM_PUBLISHERS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_FAMILY_RELATED_CATALOG_PURCHASES_NUM_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HEALTH_PURCHASES_NUM_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_FITNESS_PURCHASES_NUM_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOME_GOODS_LIVING_PURCHASES_TOTAL_ORDERS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOME_GOODS_LIVING_PURCHASES_TOTAL_ITEMS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOME_DECORATING_PURCHASES_NUM_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOME_DECORATING_PURCHASES_NUM_CATALOGS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOME_DECORATING_PURCHASES_NUM_PUBLISHERS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOME_LIVING_PURCHASES_NUM_CATALOGS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOME_LIVING_PURCHASES_NUM_PUBLISHERS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_COOKING_PURCHASES_NUM_CATALOGS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_COOKING_PURCHASES_NUM_PUBLISHERS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_GARDENING_PURCHASES_NUM_CATALOGS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_GARDENING_PURCHASES_NUM_PUBLISHERS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOUSEWARES_PURCHASES_NUM_CATALOGS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOUSEWARES_PURCHASES_NUM_PUBLISHERS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_OUTDOORS_PURCHASES_TOTAL_ORDERS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_OUTDOORS_PURCHASES_TOTAL_ITEMS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_OUTDOORS_PURCHASES_NUM_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_OUTDOORS_PURCHASES_NUM_CATALOGS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_OUTDOORS_PURCHASES_NUM_PUBLISHERS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_BOATING_SAILING_PURCHASES_NUM_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CAMPING_HIKING_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_FISHING_PURCHASES_NUM_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HUNTING_PURCHASES_TOTAL_COMPANIES": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_PURCHASES_NUM_PUBLISHERS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_MAGAZINE_SUBSCRIPTIONS_NUM": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_ACTIVE_MAGAZINE_SUBSCRIPTIONS": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_MAGAZINE_EXPIRATIONS_NUM": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_MAGAZINE_AUTO_RENEWALS_NUM": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_PUBLISHING_PURCHASES_NUM_TITLES": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_WOMENS_FASHION_PURCHASES_TOTAL_ORDERS": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_WOMENS_FASHION_PURCHASES_NUM_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_MENS_FASHION_PURCHASES_TOTAL_COMPANIES": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_AUDIO_EQUIPMENT_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_BEAUTY_PRODUCT_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_AUTOMOTIVE_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_AVIATION_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_BARGAIN_SEEKER_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_BUSINESS_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_COLLECTIBLES_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_COMPUTER_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CRAFT_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_CULTURE_ARTS_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_DIY_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_EQUESTRIAN_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_ELECTRONICS_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_FICTION_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_GAMES_PURCHASES_TOTAL_COMPANIES": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_GENERAL_MERCHANDISE_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_GIFT_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_GOURMET_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HISTORY_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HOLIDAY_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_HUMOR_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_INSPIRATION_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_MONEY_MAKING_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_MOTORCYCLE_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_MUSIC_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_PETS_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_PHOTOGRAPHY_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_RURAL_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_SCIENCE_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
-        },
-        "RECENT_SPORTS_PURCHASES_TOTAL_COMPANIES": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false
+          "valid_values": ["Attended Vocational/Technical", "Completed College", "Completed Graduate School", "Completed High School", "Doctorate/PhD or Above", "Some College", "Some High School"],
+          "semantic_hints": ["sophistication_level", "communication_complexity", "professional_targeting", "learning_orientation"],
+          "marketing_meaning": "Education-based messaging complexity and professional targeting foundation",
+          "creative_potential": {
+            "Doctorate/PhD": "Expert targeting - complex solutions, professional services, thought leadership",
+            "Graduate School": "Professional targeting - advanced services, expertise-based messaging, career focus",
+            "Completed College": "Educated consumer - detailed information, quality-focused, career-oriented",
+            "Some College/Vocational": "Practical targeting - hands-on solutions, skill-based, value-focused",
+            "High School": "Straightforward messaging - clear benefits, practical applications, accessible language"
+          },
+          "combination_signals": "Communication sophistication layer that determines messaging complexity across all targeting"
         },
         "RECENT_TRAVEL_PURCHASES_TOTAL_COMPANIES": {
           "type": "NUMBER",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "semantic_hints": ["experience_seeking", "adventure_mindset", "cultural_interest", "mobility_lifestyle"],
+          "marketing_meaning": "Experience economy targeting for travel, hospitality, lifestyle services, and adventure-focused campaigns",
+          "creative_potential": {
+            "High travel activity": "Experience collectors - adventures, cultural experiences, premium travel, global mindset, wanderlust targeting",
+            "Moderate travel activity": "Selective travelers - planned experiences, value-conscious travel, family-focused trips",
+            "Low travel activity": "Home-focused - local experiences, comfort zone, community-centered lifestyle"
+          },
+          "combination_signals": "Experience signal indicating lifestyle priorities, discretionary spending patterns, and adventure-seeking behavior"
         },
-        "RECENT_TV_MOVIES_PURCHASES_TOTAL_COMPANIES": {
+        "RECENT_HEALTH_PURCHASES_NUM_COMPANIES": {
           "type": "NUMBER",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "semantic_hints": ["wellness_focus", "preventive_mindset", "health_consciousness", "quality_of_life"],
+          "marketing_meaning": "Health ecosystem targeting for wellness, fitness, premium healthcare services, and preventive health campaigns",
+          "creative_potential": {
+            "High health activity": "Wellness enthusiasts - fitness, nutrition, mental health, biohacking, premium healthcare services",
+            "Moderate health activity": "Health-conscious - preventive care, wellness products, lifestyle optimization, mainstream health",
+            "Low health activity": "Reactive health - basic healthcare, crisis-driven, traditional medical approaches"
+          },
+          "combination_signals": "Quality-of-life signal indicating premium service willingness, self-investment mindset, and wellness ecosystem targeting"
         },
-        "RECENT_WILDLIFE_ENVIRONMENT_PURCHASES_TOTAL_COMPANIES": {
+        "OWNS_INVESTMENTS": {
           "type": "NUMBER",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "valid_values": ["1"],
+          "semantic_hints": ["wealth_building", "financial_sophistication", "investment_mindset", "future_planning"],
+          "marketing_meaning": "Investment engagement signal for financial services, wealth management, and sophisticated financial products",
+          "creative_potential": "Investment ownership indicates financial sophistication, future planning mindset, and openness to wealth-building solutions",
+          "combination_signals": "Financial sophistication signal that elevates targeting for premium financial services and investment opportunities"
         },
-        "RECENT_WOMENS_RELATED_PURCHASES_TOTAL_COMPANIES": {
+        "OWNS_STOCKS_AND_BONDS": {
           "type": "NUMBER",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "valid_values": ["1"],
+          "semantic_hints": ["market_engagement", "financial_literacy", "risk_tolerance", "wealth_strategy"],
+          "marketing_meaning": "Direct market participation signal for advanced investment products and financial advisory services",
+          "creative_potential": "Stock and bond ownership indicates market sophistication, risk tolerance, and active wealth management engagement",
+          "combination_signals": "Premium investment qualifier for sophisticated financial products and wealth management services"
         },
-        "LIFESTYLE_CLUSTER": {
+        "PREMIUM_CARD": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["premium_banking", "credit_quality", "financial_status", "exclusive_access"],
+          "marketing_meaning": "Premium financial services targeting signal for high-value banking and exclusive financial products",
+          "creative_potential": "Premium card ownership indicates financial success, credit quality, and preference for exclusive financial services",
+          "combination_signals": "Credit quality and premium preference signal for luxury financial services and exclusive banking products"
+        },
+        "CREDIT_CARD": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["financial_access", "credit_participation", "purchasing_power", "convenience_preference"],
+          "marketing_meaning": "Credit participation signal enabling credit-based product targeting and financial services outreach",
+          "creative_potential": "Credit card usage indicates financial system engagement and comfort with credit-based purchasing",
+          "combination_signals": "Financial participation foundation that enables credit-based product targeting and payment solution marketing"
+        },
+        "NEW_CREDIT_OFFERED_HH": {
           "type": "TEXT",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "valid_values": ["B. $0 - $100", "C. $101 - $300", "D. $501 - $1,000", "E. $1,001 - $3,000", "F. $3,001 - $5,000", "G. $5,001 - $9,999", "H. Greater than $9,999"],
+          "semantic_hints": ["credit_capacity", "financial_growth", "lending_opportunity", "creditworthiness"],
+          "marketing_meaning": "Credit capacity signal for lending products, financial growth services, and credit expansion targeting",
+          "creative_potential": {
+            "H ($10K+)": "High credit capacity - premium lending, business financing, major purchase financing",
+            "F-G ($3K-$9,999)": "Moderate credit access - personal loans, credit expansion, financial growth products",
+            "D-E ($501-$3K)": "Basic credit growth - credit building products, small personal loans, financial education",
+            "B-C (Under $500)": "Limited credit - credit repair services, secured products, financial literacy programs"
+          },
+          "combination_signals": "Credit growth potential signal that indicates lending opportunity and financial expansion capacity"
         },
-        "NATIONALCONSUMERDATABASE": {
+        "MARRIED": {
           "type": "NUMBER",
           "nullable": true,
-          "primary_key": false
+          "primary_key": false,
+          "semantic_hints": ["household_structure", "dual_income_potential", "family_planning", "joint_decisions"],
+          "marketing_meaning": "Marital status foundation for family-oriented targeting and dual-income household strategies",
+          "creative_potential": "Married status indicates joint decision-making, family focus, dual income potential, and household-oriented purchasing",
+          "combination_signals": "Household structure signal that modifies all targeting with family dynamics and joint decision-making context"
+        },
+        "CHILDREN_HH": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["family_focus", "education_expenses", "safety_priority", "future_planning"],
+          "marketing_meaning": "Family presence signal for child-focused products, education services, and family-oriented targeting",
+          "creative_potential": "Presence of children indicates family focus, education investment, safety priorities, and long-term planning mindset",
+          "combination_signals": "Family structure foundation that transforms all targeting with child-focused priorities and family dynamics"
+        },
+        "CHILD_AGED_0_3_HH": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["early_parenting", "baby_products", "safety_focus", "sleep_challenges"],
+          "marketing_meaning": "Early parenting stage targeting for infant products, parenting services, and family support solutions",
+          "creative_potential": "Toddler presence indicates early parenting needs, baby product demand, safety focus, and family establishment phase",
+          "combination_signals": "Early family stage signal that prioritizes safety, convenience, and infant-focused product targeting"
+        },
+        "CHILD_AGED_4_6_HH": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["preschool_stage", "education_start", "activity_engagement", "social_development"],
+          "marketing_meaning": "Preschool family targeting for early education, child activities, and developmental products",
+          "creative_potential": "Preschool age children indicate education investment, activity engagement, and developmental product needs",
+          "combination_signals": "Early education stage signal that emphasizes learning, activities, and child development targeting"
+        },
+        "CHILD_AGED_7_9_HH": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["school_age", "extracurricular_activities", "technology_introduction", "structured_learning"],
+          "marketing_meaning": "School-age family targeting for education technology, sports activities, and learning enrichment",
+          "creative_potential": "Elementary school age indicates structured learning needs, activity participation, and early technology introduction",
+          "combination_signals": "Active learning stage signal for education technology, activities, and enrichment program targeting"
+        },
+        "CHILD_AGED_10_12_HH": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["pre_teen", "independence_development", "hobby_exploration", "social_dynamics"],
+          "marketing_meaning": "Pre-teen family targeting for independence-building products, hobby development, and social activities",
+          "creative_potential": "Pre-teen presence indicates independence development, hobby exploration, and increasing activity complexity",
+          "combination_signals": "Pre-teen development stage signal for hobby products, independence tools, and social activity targeting"
+        },
+        "CHILD_AGED_13_18_HH": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["teenager", "college_preparation", "technology_heavy", "independence_seeking"],
+          "marketing_meaning": "Teen family targeting for college preparation, technology products, and independence-focused services",
+          "creative_potential": "Teenager presence indicates college planning, high technology usage, transportation needs, and independence focus",
+          "combination_signals": "Teen family stage signal for college preparation, technology, transportation, and independence-oriented targeting"
+        },
+        "OCCUPATION_CATEGORY": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "valid_values": ["Blue Collar", "Homemaker", "Lower Management", "Other", "Professional", "Retired", "Upper Management", "White Collar Worker"],
+          "semantic_hints": ["professional_level", "income_stability", "lifestyle_patterns", "time_availability"],
+          "marketing_meaning": "Professional targeting foundation for career-appropriate products, time-sensitive services, and lifestyle positioning",
+          "creative_potential": {
+            "Professional": "High-income professionals - premium services, time-saving solutions, career advancement tools",
+            "Upper Management": "Executive targeting - luxury services, investment products, leadership development",
+            "Lower Management": "Growth-focused - career development, efficiency tools, aspirational products",
+            "White Collar Worker": "Office professionals - productivity tools, convenience services, career support",
+            "Blue Collar": "Skilled workers - practical solutions, durability focus, hands-on products",
+            "Homemaker": "Home-focused - family products, home improvement, time management solutions",
+            "Retired": "Leisure-focused - health services, travel, hobby products, fixed income considerations"
+          },
+          "combination_signals": "Professional context that modifies all targeting with career-appropriate messaging and time availability"
+        },
+        "DWELLING_TYPE": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "valid_values": ["Multi Family Dwelling/Apartment", "Single Family"],
+          "semantic_hints": ["living_situation", "space_availability", "ownership_status", "lifestyle_constraints"],
+          "marketing_meaning": "Housing-based targeting for space-appropriate products, home services, and lifestyle positioning",
+          "creative_potential": {
+            "Single Family": "Homeowner targeting - home improvement, yard care, larger appliances, property investment",
+            "Multi Family Dwelling/Apartment": "Urban/compact living - space-saving products, convenience services, rental-friendly solutions"
+          },
+          "combination_signals": "Living situation context that modifies product sizing, home improvement targeting, and space-based needs"
+        },
+        "RECENT_OUTDOORS_PURCHASES_NUM_COMPANIES": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["outdoor_lifestyle", "adventure_seeking", "nature_connection", "active_lifestyle"],
+          "marketing_meaning": "Outdoor lifestyle targeting for adventure gear, outdoor experiences, and nature-focused campaigns",
+          "creative_potential": {
+            "High outdoor activity": "Outdoor enthusiasts - adventure gear, outdoor experiences, environmental consciousness, active lifestyle products",
+            "Moderate outdoor activity": "Recreational outdoors - weekend adventures, family outdoor activities, seasonal gear",
+            "Low outdoor activity": "Indoor preferences - urban lifestyle, convenience-focused, indoor entertainment"
+          },
+          "combination_signals": "Outdoor lifestyle signal that enhances targeting for adventure brands, outdoor experiences, and active lifestyle products"
+        },
+        "RECENT_AUTOMOTIVE_PURCHASES_TOTAL_COMPANIES": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["mobility_investment", "automotive_interest", "transportation_sophistication", "vehicle_enthusiasm"],
+          "marketing_meaning": "Automotive ecosystem targeting for vehicles, automotive services, and transportation-focused campaigns",
+          "creative_potential": {
+            "High automotive activity": "Auto enthusiasts - vehicle upgrades, automotive services, car culture, mobility innovation",
+            "Moderate automotive activity": "Practical drivers - reliable transportation, maintenance-focused, utility vehicles",
+            "Low automotive activity": "Basic transportation - essential mobility, cost-conscious, minimal automotive engagement"
+          },
+          "combination_signals": "Mobility sophistication signal that enhances targeting for automotive brands, transportation services, and mobility solutions"
+        },
+        "RECENT_WOMENS_FASHION_PURCHASES_NUM_COMPANIES": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["fashion_engagement", "style_consciousness", "shopping_behavior", "appearance_investment"],
+          "marketing_meaning": "Fashion and style targeting for apparel, beauty, and appearance-focused campaigns",
+          "creative_potential": {
+            "High fashion activity": "Fashion enthusiasts - style trends, brand consciousness, appearance investment, fashion-forward messaging",
+            "Moderate fashion activity": "Practical fashion - functional style, selective purchasing, quality basics",
+            "Low fashion activity": "Utility-focused - practical clothing, basic needs, comfort-prioritized"
+          },
+          "combination_signals": "Style consciousness signal that enhances targeting for fashion, beauty, and appearance-related campaigns across demographics"
+        },
+        "RECENT_COLLECTIBLES_PURCHASES_TOTAL_COMPANIES": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["hobby_investment", "passion_collecting", "discretionary_spending", "specialized_interests"],
+          "marketing_meaning": "Collectibles and hobby targeting for specialized interests, investment collecting, and passion-driven purchases",
+          "creative_potential": {
+            "High collectibles activity": "Serious collectors - investment pieces, rare items, specialized markets, passion-driven spending",
+            "Moderate collectibles activity": "Casual collectors - hobby items, occasional purchases, interest-based collecting",
+            "Low collectibles activity": "Non-collectors - practical purchases, utility focus, minimal hobby investment"
+          },
+          "combination_signals": "Hobby passion signal that indicates discretionary spending on specialized interests and investment collecting"
+        },
+        "RECENT_GOURMET_PURCHASES_TOTAL_COMPANIES": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["culinary_sophistication", "food_quality", "dining_investment", "taste_refinement"],
+          "marketing_meaning": "Gourmet and culinary targeting for premium food products, dining experiences, and culinary services",
+          "creative_potential": {
+            "High gourmet activity": "Food enthusiasts - premium ingredients, fine dining, culinary experiences, cooking equipment",
+            "Moderate gourmet activity": "Quality-conscious - selective premium foods, occasional fine dining, cooking interest",
+            "Low gourmet activity": "Basic food needs - practical nutrition, convenience focus, budget-conscious dining"
+          },
+          "combination_signals": "Culinary sophistication signal that enhances targeting for premium food, dining, and culinary experience campaigns"
+        },
+        "RECENT_PETS_PURCHASES_TOTAL_COMPANIES": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["pet_ownership", "animal_care", "emotional_spending", "family_extension"],
+          "marketing_meaning": "Pet ownership targeting for pet products, veterinary services, and animal-focused campaigns",
+          "creative_potential": {
+            "High pet activity": "Pet enthusiasts - premium pet products, veterinary care, pet services, animal experiences",
+            "Moderate pet activity": "Pet owners - standard pet care, regular products, basic veterinary needs",
+            "Low pet activity": "Non-pet owners - no pet targeting, potential pet acquisition, pet-free lifestyle"
+          },
+          "combination_signals": "Pet ownership signal that adds emotional spending dimension and expands household targeting to include pet-focused products"
         }
-      },
-      "description": "Comprehensive consumer intelligence profiles powering Audience Acuity's deterministic identity graph, including financial attributes, lifestyle preferences, purchase history, and proprietary segmentation for cross-channel audience activation and measurement attribution."
+      }
     }
   },
   "business_context": {
     "description": "Enterprise identity management platform for deterministic identity resolution and customer intelligence. Enables brands to identify and contextually engage consumers across all channels and devices through a proprietary identity graph, supporting identity resolution, data enrichment, customer profiling, audience activation, and measurement attribution in both cookied and cookieless environments.",
-    "key_concepts": []
+    "key_concepts": [
+      "deterministic_identity_resolution",
+      "cross_channel_attribution", 
+      "cookieless_targeting",
+      "audience_activation",
+      "consumer_intelligence",
+      "behavioral_prediction"
+    ],
+    "unique_value_propositions": [
+      "Proprietary lifestyle clustering that goes beyond standard demographics",
+      "Cross-channel identity resolution for unified customer view across touchpoints",
+      "Behavioral intent signals for predictive targeting and engagement optimization", 
+      "Premium data quality scoring for campaign performance optimization",
+      "Semantic field intelligence enabling AI-driven creative audience discovery"
+    ],
+    "targeting_philosophy": "Combine demographic foundations with behavioral signals and lifestyle context to create sophisticated audience strategies that balance reach, relevance, and revenue potential. Layer contact quality, purchase behavior, and engagement signals to maximize campaign performance and ROI."
+  },
+  "query_guidelines": {
+    "optimization_rules": [
+      "Always qualify email campaigns with EMAILQUALITYLEVEL >= 6 for optimal deliverability",
+      "Combine GENDER + AGE + GENERATION + income signals for comprehensive demographic foundation",
+      "Layer luxury/technology/travel purchase behavior for premium audience identification", 
+      "Use ZIP + URBANICITY_CODE + DWELLING_TYPE for precision geographic and housing targeting",
+      "Prioritize HASPHONE + HASEMAIL contacts for multi-channel campaign opportunities",
+      "Filter by recent purchase activity (within 24 months) for behavioral targeting accuracy",
+      "Combine ADDRESS_TYPE + STATE + ZIP for sophisticated geographic segmentation",
+      "Use lifestyle purchase signals (health, outdoor, fashion) for interest-based targeting",
+      "Layer OWNS_INVESTMENTS + NET_WORTH_HH for sophisticated wealth targeting",
+      "Combine MARRIED + CHILDREN_HH + child age segments for family lifecycle targeting",
+      "Use OCCUPATION_CATEGORY + EDUCATION for professional and communication sophistication targeting"
+    ],
+    "strategic_combinations": [
+      "Premium Audience: EMAILQUALITYLEVEL >= 8 + RECENT_LUXURY_PURCHASES > 3 + INCOME_HH >= 'K. $100,000-$149,999'",
+      "Tech Innovators: RECENT_TECHNOLOGY_PURCHASES > 5 + AGE 26-40 + EMAILQUALITYLEVEL >= 7 + EDUCATION = 'Completed College'",
+      "Experience Seekers: RECENT_TRAVEL_PURCHASES > 3 + RECENT_HEALTH_PURCHASES > 2 + OCCUPATION_CATEGORY = 'Professional'",
+      "Affluent Families: MARRIED = 1 + CHILDREN_HH > 0 + INCOME_HH >= 'H. $75,000-$99,999' + DWELLING_TYPE = 'Single Family'",
+      "Investment Prospects: OWNS_INVESTMENTS = 1 + OWNS_STOCKS_AND_BONDS = 1 + NET_WORTH_HH >= 'H. $100,000 - $249,999'",
+      "Multi-Channel Ready: HASPHONE = 1 + HASEMAIL = 1 + EMAILQUALITYLEVEL >= 6 + PREMIUM_CARD presence",
+      "Active Lifestyle: RECENT_OUTDOORS_PURCHASES > 2 + RECENT_HEALTH_PURCHASES > 2 + AGE 25-50",
+      "Young Families: MARRIED = 1 + CHILD_AGED_0_3_HH > 0 + INCOME_HH >= 'F. $50,000-$59,999'",
+      "Teen Parents: CHILD_AGED_13_18_HH > 0 + INCOME_HH >= 'G. $60,000-$74,999' + EDUCATION >= 'Completed College'",
+      "Luxury Lifestyle: RECENT_LUXURY_PURCHASES > 3 + RECENT_GOURMET_PURCHASES > 2 + DWELLING_TYPE = 'Single Family'",
+      "Pet Enthusiasts: RECENT_PETS_PURCHASES > 3 + DWELLING_TYPE = 'Single Family' + CHILDREN_HH presence",
+      "Fashion Forward: RECENT_WOMENS_FASHION_PURCHASES > 4 + AGE 25-45 + INCOME_HH >= 'F. $50,000-$59,999'",
+      "Collectors Market: RECENT_COLLECTIBLES_PURCHASES > 2 + AGE 35+ + NET_WORTH_HH >= 'G. $50,000 - $99,999'",
+      "Professional Women: GENDER = 'Female' + OCCUPATION_CATEGORY IN ('Professional', 'Upper Management') + RECENT_WOMENS_FASHION_PURCHASES > 2",
+      "Credit Growth: NEW_CREDIT_OFFERED_HH >= 'E. $1,001 - $3,000' + CREDIT_CARD = 1 + AGE 25-40"
+    ]
   }
 }

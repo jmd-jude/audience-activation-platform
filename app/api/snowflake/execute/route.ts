@@ -46,13 +46,13 @@ export async function POST(request: NextRequest) {
         }
       });
 
-    } catch (queryError) {
+    } catch (queryError: any) {
       console.error('Query execution error:', queryError);
 
       return NextResponse.json(
         {
           error: 'Query execution failed',
-          details: queryError.message,
+          details: queryError.message || 'Unknown error',
           success: false
         },
         { status: 400 }
@@ -62,13 +62,13 @@ export async function POST(request: NextRequest) {
       await snowflake.disconnect();
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('API route error:', error);
 
     return NextResponse.json(
       {
         error: 'Internal server error',
-        details: error.message,
+        details: error.message || 'Unknown error',
         success: false
       },
       { status: 500 }

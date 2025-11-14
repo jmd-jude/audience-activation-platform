@@ -35,14 +35,14 @@ export async function POST(request: NextRequest) {
         }
       });
 
-    } catch (validationError) {
+    } catch (validationError: any) {
       console.error('Validation error:', validationError);
 
       return NextResponse.json({
         success: false,
         validation: {
           isValid: false,
-          errors: [validationError.message],
+          errors: [validationError.message || 'Unknown validation error'],
           warnings: [],
           suggestions: []
         }
@@ -52,13 +52,13 @@ export async function POST(request: NextRequest) {
       await snowflake.disconnect();
     }
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Validation API error:', error);
 
     return NextResponse.json(
       {
         error: 'Validation failed',
-        details: error.message,
+        details: error.message || 'Unknown error',
         success: false
       },
       { status: 500 }

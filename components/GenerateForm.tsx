@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,11 @@ interface GenerateFormProps {
     useCase: string;
     additionalContext?: string;
   }) => Promise<void>;
+  initialValues?: {
+    naturalLanguageInput?: string;
+    useCase?: string;
+    additionalContext?: string;
+  };
 }
 
 const useCases = [
@@ -24,11 +29,30 @@ const useCases = [
   'Retention',
 ];
 
-export function GenerateForm({ onGenerate }: GenerateFormProps) {
-  const [naturalLanguageInput, setNaturalLanguageInput] = useState('');
-  const [useCase, setUseCase] = useState('');
-  const [additionalContext, setAdditionalContext] = useState('');
+export function GenerateForm({ onGenerate, initialValues }: GenerateFormProps) {
+  const [naturalLanguageInput, setNaturalLanguageInput] = useState(initialValues?.naturalLanguageInput || '');
+  const [useCase, setUseCase] = useState(initialValues?.useCase || '');
+  const [additionalContext, setAdditionalContext] = useState(initialValues?.additionalContext || '');
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Update form state when initialValues changes (for discovery handoff)
+  // We watch individual properties instead of the whole object to avoid unnecessary re-renders
+  useEffect(() => {
+    console.log('GenerateForm received initialValues:', initialValues);
+    if (initialValues?.naturalLanguageInput) {
+      console.log('Setting naturalLanguageInput to:', initialValues.naturalLanguageInput);
+      setNaturalLanguageInput(initialValues.naturalLanguageInput);
+    }
+    if (initialValues?.useCase) {
+      console.log('Setting useCase to:', initialValues.useCase);
+      setUseCase(initialValues.useCase);
+    }
+    if (initialValues?.additionalContext) {
+      console.log('Setting additionalContext to:', initialValues.additionalContext);
+      setAdditionalContext(initialValues.additionalContext);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValues?.naturalLanguageInput, initialValues?.useCase, initialValues?.additionalContext]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

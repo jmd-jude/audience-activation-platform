@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Home, Sparkles, Library, BarChart3 } from 'lucide-react';
+import { Home, Sparkles, Library, BarChart3, Lightbulb } from 'lucide-react';
 
 const navItems = [
   { name: 'Dashboard', href: '/', icon: Home },
+  { name: 'Discover', href: '/discover', icon: Lightbulb },
   { name: 'Generate', href: '/generate', icon: Sparkles },
   { name: 'Library', href: '/library', icon: Library },
 ];

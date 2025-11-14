@@ -86,8 +86,8 @@ export class SnowflakeConnection {
           }
         });
 
-      } catch (error) {
-        reject(new Error(`Connection setup failed: ${error.message}`));
+      } catch (error: any) {
+        reject(new Error(`Connection setup failed: ${error.message || 'Unknown error'}`));
       }
     });
   }
@@ -132,8 +132,8 @@ export class SnowflakeConnection {
         });
       });
 
-    } catch (error) {
-      throw new Error(`Query execution error: ${error.message}`);
+    } catch (error: any) {
+      throw new Error(`Query execution error: ${error.message || 'Unknown error'}`);
     }
   }
 
@@ -174,10 +174,10 @@ export class SnowflakeConnection {
         });
       });
 
-    } catch (error) {
+    } catch (error: any) {
       return {
         isValid: false,
-        errors: [`Validation failed: ${error.message}`],
+        errors: [`Validation failed: ${error.message || 'Unknown error'}`],
         warnings: []
       };
     }

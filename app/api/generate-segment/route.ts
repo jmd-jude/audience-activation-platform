@@ -116,11 +116,11 @@ export async function POST(request: NextRequest) {
           console.log(`Segment analysis complete: ${actualSegmentSize} records found`);
         }
 
-      } catch (executionError) {
+      } catch (executionError: any) {
         console.error('Query execution failed:', executionError);
         snowflakeValidation = {
           isValid: false,
-          errors: [executionError.message],
+          errors: [executionError.message || 'Unknown execution error'],
           warnings: []
         };
       } finally {

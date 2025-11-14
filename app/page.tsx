@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SegmentCard } from '@/components/SegmentCard';
 import { formatNumber, formatDate } from '@/lib/utils';
-import { Sparkles, Library, TrendingUp, CheckCircle2, Clock, Loader2 } from 'lucide-react';
+import { Sparkles, Library, TrendingUp, CheckCircle2, Clock, Loader2, Lightbulb } from 'lucide-react';
 
 interface Segment {
   id: string;
@@ -165,8 +165,12 @@ export default function DashboardPage() {
               <CardDescription>Get started with common tasks</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-4">
-                <Button onClick={() => router.push('/generate')}>
+              <div className="flex flex-wrap gap-4">
+                <Button onClick={() => router.push('/discover')}>
+                  <Lightbulb className="h-4 w-4 mr-2" />
+                  Discover Audiences
+                </Button>
+                <Button onClick={() => router.push('/generate')} variant="outline">
                   <Sparkles className="h-4 w-4 mr-2" />
                   Generate New Segment
                 </Button>
