@@ -49,31 +49,6 @@
       "semantic_context": "Primary identity and geographic foundation for deterministic identity resolution",
       "marketing_use": "Identity linking, geographic targeting, and basic demographic segmentation",
       "fields": {
-        "GENDER": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "valid_values": ["F", "M"],
-          "semantic_hints": ["demographic_core", "product_affinity", "communication_tone", "identity_anchor"],
-          "marketing_meaning": "Core demographic filter for gender-relevant product positioning and communication approach",
-          "creative_potential": "Gender-informed targeting enabling relevant product emphasis and communication styles while avoiding stereotypical assumptions",
-          "combination_signals": "Modifies messaging tone and product emphasis across all demographic and behavioral segments"
-        },
-        "ADDRESS_TYPE": {
-          "type": "TEXT",
-          "nullable": true,
-          "primary_key": false,
-          "valid_values": ["H", "P", "R", "S"],
-          "semantic_hints": ["residence_signal", "stability_indicator", "lifestyle_context", "targeting_precision"],
-          "marketing_meaning": "Address stability and residence type indicator for lifestyle-based targeting and delivery optimization",
-          "creative_potential": {
-            "H": "Home addresses - family-focused messaging, stability, residential services targeting",
-            "P": "PO Box addresses - privacy-conscious, rural/mobile populations, alternative delivery needs",
-            "R": "Rural addresses - outdoor lifestyle, self-reliance, community-focused values",
-            "S": "Seasonal addresses - affluent mobility, vacation home owners, seasonal targeting opportunities"
-          },
-          "combination_signals": "Lifestyle stability signal that enhances geographic and demographic targeting precision"
-        },
         "STATE": {
           "type": "TEXT",
           "nullable": true,
@@ -115,24 +90,6 @@
             "R": "Rural - self-reliant, outdoor lifestyle, traditional values, distance challenges, local community"
           },
           "combination_signals": "Lifestyle density context that enhances all geographic and demographic targeting strategies"
-        },
-        "HASPHONE": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false,
-          "semantic_hints": ["contact_quality", "multi_channel", "engagement_readiness", "communication_preference"],
-          "marketing_meaning": "Phone contact availability enabling multi-channel campaigns and high-touch engagement strategies",
-          "creative_potential": "Phone availability signals engagement readiness, enables voice campaigns, SMS marketing, and high-value prospect identification",
-          "combination_signals": "Multi-channel enabler that enhances all digital targeting with voice and SMS capabilities"
-        },
-        "HASEMAIL": {
-          "type": "NUMBER",
-          "nullable": true,
-          "primary_key": false,
-          "semantic_hints": ["digital_engagement", "email_targeting", "contact_quality", "channel_preference"],
-          "marketing_meaning": "Email contact availability enabling digital campaign targeting and automated engagement workflows",
-          "creative_potential": "Email availability enables digital nurture campaigns, automated sequences, and cost-effective scale targeting",
-          "combination_signals": "Digital engagement foundation that enables all email-based targeting and automation strategies"
         }
       }
     },
@@ -154,6 +111,59 @@
             "58+": "Established boomers - service-focused, brand-loyal, traditional channels, security-minded"
           },
           "combination_signals": "Foundational demographic that enhances all behavioral and geographic targeting with generational context"
+        },
+        "GENDER": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "valid_values": ["Female", "Male"],
+          "semantic_hints": ["demographic_core", "product_affinity", "communication_tone", "identity_anchor"],
+          "marketing_meaning": "Core demographic filter for gender-relevant product positioning and communication approach",
+          "creative_potential": "Gender-informed targeting enabling relevant product emphasis and communication styles while avoiding stereotypical assumptions",
+          "combination_signals": "Modifies messaging tone and product emphasis across all demographic and behavioral segments"
+        },
+        "ADDRESS_TYPE": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "valid_values": ["H", "P", "R", "S"],
+          "semantic_hints": ["residence_signal", "stability_indicator", "lifestyle_context", "targeting_precision"],
+          "marketing_meaning": "Address stability and residence type indicator for lifestyle-based targeting and delivery optimization",
+          "creative_potential": {
+            "H": "Home addresses - family-focused messaging, stability, residential services targeting",
+            "P": "PO Box addresses - privacy-conscious, rural/mobile populations, alternative delivery needs",
+            "R": "Rural addresses - outdoor lifestyle, self-reliance, community-focused values",
+            "S": "Seasonal addresses - affluent mobility, vacation home owners, seasonal targeting opportunities"
+          },
+          "combination_signals": "Lifestyle stability signal that enhances geographic and demographic targeting precision"
+        },
+        "HASPHONE": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["contact_quality", "multi_channel", "engagement_readiness", "communication_preference"],
+          "marketing_meaning": "Phone contact availability enabling multi-channel campaigns and high-touch engagement strategies",
+          "creative_potential": "Phone availability signals engagement readiness, enables voice campaigns, SMS marketing, and high-value prospect identification",
+          "combination_signals": "Multi-channel enabler that enhances all digital targeting with voice and SMS capabilities"
+        },
+        "HASEMAIL": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "semantic_hints": ["digital_engagement", "email_targeting", "contact_quality", "channel_preference"],
+          "marketing_meaning": "Email contact availability enabling digital campaign targeting and automated engagement workflows",
+          "creative_potential": "Email availability enables digital nurture campaigns, automated sequences, and cost-effective scale targeting",
+          "combination_signals": "Digital engagement foundation that enables all email-based targeting and automation strategies"
+        },
+        "MARITAL_STATUS": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "valid_values": ["Married", "Single"],
+          "semantic_hints": ["household_structure", "dual_income_potential", "joint_decision_making", "family_lifecycle"],
+          "marketing_meaning": "Core household composition signal enabling family-oriented targeting and relationship-based messaging strategies",
+          "creative_potential": {"Married": "Joint decision-making households - family-focused messaging, dual-income positioning, shared experience marketing, relationship-oriented products, household-level targeting", "Single": "Individual decision-makers - personal independence messaging, self-focused benefits, individual lifestyle targeting, flexible scheduling, self-care positioning"},
+          "combination_signals": "Household structure foundation that modifies all targeting with relationship context, decision-making dynamics, and family-oriented vs individual-focused messaging"
         },
         "GENERATION": {
           "type": "TEXT",
@@ -505,21 +515,21 @@
       "Use OCCUPATION_CATEGORY + EDUCATION for professional and communication sophistication targeting"
     ],
     "strategic_combinations": [
-      "Premium Audience: EMAILQUALITYLEVEL >= 8 + RECENT_LUXURY_PURCHASES > 3 + INCOME_HH >= 'K. $100,000-$149,999'",
+      "Premium Audience: EMAILQUALITYLEVEL >= 8 + RECENT_LUXURY_PURCHASES > 3 + INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', ...)",
       "Tech Innovators: RECENT_TECHNOLOGY_PURCHASES > 5 + AGE 26-40 + EMAILQUALITYLEVEL >= 7 + EDUCATION = 'Completed College'",
       "Experience Seekers: RECENT_TRAVEL_PURCHASES > 3 + RECENT_HEALTH_PURCHASES > 2 + OCCUPATION_CATEGORY = 'Professional'",
-      "Affluent Families: MARRIED = 1 + CHILDREN_HH > 0 + INCOME_HH >= 'H. $75,000-$99,999' + DWELLING_TYPE = 'Single Family'",
-      "Investment Prospects: OWNS_INVESTMENTS = 1 + OWNS_STOCKS_AND_BONDS = 1 + NET_WORTH_HH >= 'H. $100,000 - $249,999'",
+      "Affluent Families: MARRIED = 1 + CHILDREN_HH > 0 + INCOME_HH IN ('H. $75,000-$99,999', 'K. $100,000-$149,999', ...) + DWELLING_TYPE = 'Single Family'",
+      "Investment Prospects: OWNS_INVESTMENTS = 1 + OWNS_STOCKS_AND_BONDS = 1 + NET_WORTH_HH IN ('H. $100,000 - $249,999', 'I. $250,000 - $499,999', 'J. Greater than $499,999')",
       "Multi-Channel Ready: HASPHONE = 1 + HASEMAIL = 1 + EMAILQUALITYLEVEL >= 6 + PREMIUM_CARD presence",
       "Active Lifestyle: RECENT_OUTDOORS_PURCHASES > 2 + RECENT_HEALTH_PURCHASES > 2 + AGE 25-50",
-      "Young Families: MARRIED = 1 + CHILD_AGED_0_3_HH > 0 + INCOME_HH >= 'F. $50,000-$59,999'",
-      "Teen Parents: CHILD_AGED_13_18_HH > 0 + INCOME_HH >= 'G. $60,000-$74,999' + EDUCATION >= 'Completed College'",
+      "Young Families: MARRIED = 1 + CHILD_AGED_0_3_HH > 0 + INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', ...)",
+      "Teen Parents: CHILD_AGED_13_18_HH > 0 + INCOME_HH IN ('G. $60,000-$74,999', 'H. $75,000-$99,999', ...) + EDUCATION = 'Completed College'",
       "Luxury Lifestyle: RECENT_LUXURY_PURCHASES > 3 + RECENT_GOURMET_PURCHASES > 2 + DWELLING_TYPE = 'Single Family'",
       "Pet Enthusiasts: RECENT_PETS_PURCHASES > 3 + DWELLING_TYPE = 'Single Family' + CHILDREN_HH presence",
-      "Fashion Forward: RECENT_WOMENS_FASHION_PURCHASES > 4 + AGE 25-45 + INCOME_HH >= 'F. $50,000-$59,999'",
-      "Collectors Market: RECENT_COLLECTIBLES_PURCHASES > 2 + AGE 35+ + NET_WORTH_HH >= 'G. $50,000 - $99,999'",
+      "Fashion Forward: RECENT_WOMENS_FASHION_PURCHASES > 4 + AGE 25-45 + INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', ...)",
+      "Collectors Market: RECENT_COLLECTIBLES_PURCHASES > 2 + AGE 35+ + NET_WORTH_HH IN ('G. $50,000 - $99,999', 'H. $100,000 - $249,999', ...)",
       "Professional Women: GENDER = 'Female' + OCCUPATION_CATEGORY IN ('Professional', 'Upper Management') + RECENT_WOMENS_FASHION_PURCHASES > 2",
-      "Credit Growth: NEW_CREDIT_OFFERED_HH >= 'E. $1,001 - $3,000' + CREDIT_CARD = 1 + AGE 25-40"
+      "Credit Growth: NEW_CREDIT_OFFERED_HH IN ('E. $1,001 - $3,000', 'F. $3,001 - $5,000', ...) + CREDIT_CARD = 1 + AGE 25-40"
     ]
   }
 }

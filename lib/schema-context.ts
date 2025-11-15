@@ -4,6 +4,7 @@ interface SchemaField {
   type: string;
   nullable: boolean;
   primary_key: boolean;
+  valid_values?: string[];
 }
 
 interface SchemaTable {
@@ -79,6 +80,7 @@ export function isValidField(tableName: string, fieldName: string): boolean {
 
 /**
  * Builds a compact schema summary for prompts with token limits
+ * Includes valid_values for fields that have them defined
  */
 export function buildCompactSchemaContext(): string {
   let context = 'Available Tables:\n';
@@ -86,8 +88,28 @@ export function buildCompactSchemaContext(): string {
   const tables = Object.keys(schema.tables);
   for (const tableName of tables) {
     const table = schema.tables[tableName];
-    const fieldNames = Object.keys(table.fields);
-    context += `- ${tableName}: ${fieldNames.join(', ')}\n`;
+    context += `\n${tableName}:\n`;
+
+    const fields = Object.entries(table.fields);
+    for (const [fieldName, fieldInfo] of fields) {
+      // Include field name and type
+      context += `  - ${fieldName} (${fieldInfo.type})`;
+
+      // Include valid_values if they exist
+      if (fieldInfo.valid_values && fieldInfo.valid_values.length > 0) {
+        // For short lists (≤5 values), show all values inline
+        if (fieldInfo.valid_values.length <= 5) {
+          context += `: [${fieldInfo.valid_values.map(v => `"${v}"`).join(', ')}]`;
+        } else {
+          // For longer lists, show first 3 and last 2 with count
+          const firstThree = fieldInfo.valid_values.slice(0, 3).map(v => `"${v}"`);
+          const lastTwo = fieldInfo.valid_values.slice(-2).map(v => `"${v}"`);
+          context += `: [${firstThree.join(', ')}, ... (${fieldInfo.valid_values.length} values) ..., ${lastTwo.join(', ')}]`;
+        }
+      }
+
+      context += '\n';
+    }
   }
 
   return context;

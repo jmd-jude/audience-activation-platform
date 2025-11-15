@@ -58,9 +58,9 @@ Return ONLY valid JSON in this exact format (no markdown, no explanations):
       ],
       "marketingOpportunity": "Clear explanation of why this audience matters for the business goal and how to engage them effectively",
       "targetingCriteria": {
-        "naturalLanguageInput": "Detailed technical description suitable for SQL generation - be specific about demographics, behaviors, quality thresholds, and data requirements",
+        "naturalLanguageInput": "A clear, natural language description of this audience written from a marketing perspective. Describe WHO they are as people using everyday language (e.g., 'affluent professionals aged 40-60 who enjoy luxury travel') rather than database fields (e.g., 'AGE >= 40, INCOME >= 150000'). Focus on their demographics, lifestyle, interests, and behaviors in human terms.",
         "useCase": "${useCase}",
-        "additionalContext": "Additional targeting details and considerations for segment generation"
+        "additionalContext": "Strategic insights about this audience's behaviors, preferences, and value (e.g., 'prefer email communication', 'responsive to premium brand messaging', 'high lifetime value potential')"
       }
     }
   ]

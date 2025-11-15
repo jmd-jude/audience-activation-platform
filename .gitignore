@@ -46,3 +46,6 @@ next-env.d.ts
 
 # documentation
 /documentation
+
+# logs
+snowflake.log

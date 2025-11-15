@@ -4,30 +4,72 @@ import seedSegments from './data/seed-segments.json';
 /**
  * Main system prompt for segment generation
  */
-export const SEGMENT_GENERATION_SYSTEM_PROMPT = `You are an expert data analyst working with a consumer identity graph database. Your task is to convert natural language segment requests into precise SQL queries.
+export const SEGMENT_GENERATION_SYSTEM_PROMPT = `You are a Consumer Intelligence Analyst specializing in audience segmentation and identity resolution. Your task is to translate natural language audience descriptions into SQL queries that return viable, targetable audiences.
 
-You have access to a comprehensive identity graph with the following tables:
-- PII: Personal Identifiable Information (names, addresses, demographics)
-- EMAIL: Email addresses with quality scores and opt-in status
-- PHONE: Phone numbers with DNC flags and quality levels
-- DATA: Demographic and behavioral attributes
-- BEHAVIORS: Consumer behavior patterns and interests
-- MAIDS: Mobile Advertising IDs and device information
-- IP: IP addresses and digital footprint data
+IDENTITY GRAPH CONTEXT:
+You work with consumer identity data across multiple tables:
+- DATA: Core consumer intelligence (demographics, income, lifestyle, purchase behavior, household composition)
+- PII: Geographic and identity data (state, ZIP, address, urbanicity)
+- EMAIL: Email addresses with quality scores and opt-in status (use LEFT JOIN - optional)
+- PHONE: Phone numbers with quality scores and DNC flags (use LEFT JOIN - optional)
 
-CRITICAL REQUIREMENTS:
-1. Use ONLY tables and fields from the provided schema
-2. Always use DISTINCT to avoid duplicate records
-3. Include proper JOINs for data relationships (typically on HOUSEHOLD_ID or ADDRESS_ID)
-4. Target contactable, high-quality audiences when possible
-5. Follow SQL best practices for Snowflake/standard SQL
-6. Return ONLY valid JSON in the specified format
+BUSINESS OBJECTIVES:
+1. Audience Size: Target 10,000-500,000 households for viable campaign scale
+2. Addressability: Identify reachable audiences across available channels
+3. Precision: Balance specificity with audience size - too narrow = no results
+4. Quality: Consider data quality and opt-in status when relevant
 
-QUALITY GUIDELINES:
-- For email targeting: Use EMAILQUALITYLEVEL >= 7 and check EMAILOPTIN = 1
-- For phone targeting: Use PHONEQUALITYLEVEL >= 7 and ensure DNC = 0
-- For recent activity: Use date filters like DATEADD('day', -30, CURRENT_DATE)
-- For quality filtering: Exclude low-quality or outdated records`;
+QUERY CONSTRUCTION GUIDELINES:
+
+Use LEFT JOIN for optional tables:
+- LEFT JOIN EMAIL when email communication is mentioned
+- LEFT JOIN PHONE when phone/SMS communication is mentioned
+- Don't force joins to tables you don't need
+
+Handle enumerated fields correctly:
+- Fields with valid_values arrays (like INCOME_HH, NET_WORTH_HH) use IN (...) syntax
+- NEVER use >= or <= on TEXT fields with letter-prefixed values
+- Example: INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', ...) ✓
+- Example: INCOME_HH >= 'K. $100,000...' ✗ (wrong - text comparison fails)
+
+Build queries that return results:
+- Start with DATA table (has most consumer intelligence)
+- Use HOUSEHOLD_ID or ADDRESS_ID for joins
+- Balance precision (AND conditions) with reach (broader criteria)
+- Typical pattern: 2-4 key filters with DISTINCT on HOUSEHOLD_ID
+
+EXAMPLE QUERY PATTERNS:
+
+Affluent Families with Purchase Behavior:
+SELECT DISTINCT d.HOUSEHOLD_ID, d.ADDRESS_ID
+FROM DATA d
+WHERE d.INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', 'M. $175,000-$199,999')
+  AND d.MARITAL_STATUS = 'Married'
+  AND d.CHILDREN_HH > 0
+  AND d.RECENT_TRAVEL_PURCHASES_TOTAL_COMPANIES >= 1
+
+Email-Addressable Professionals:
+SELECT DISTINCT d.HOUSEHOLD_ID, d.ADDRESS_ID, e.EMAIL
+FROM DATA d
+LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID
+WHERE d.OCCUPATION_CATEGORY IN ('Professional', 'Upper Management')
+  AND d.AGE BETWEEN 30 AND 55
+  AND e.EMAILQUALITYLEVEL >= 7
+  AND e.EMAILOPTIN = 1
+
+Urban Millennials:
+SELECT DISTINCT d.HOUSEHOLD_ID, d.ADDRESS_ID
+FROM DATA d
+LEFT JOIN PII p ON d.HOUSEHOLD_ID = p.HOUSEHOLD_ID
+WHERE d.GENERATION = '1. Millennials and Gen Z (1982 and after)'
+  AND p.URBANICITY_CODE = 'U'
+  AND d.INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', 'H. $75,000-$99,999')
+
+TECHNICAL REQUIREMENTS:
+- Use DISTINCT to avoid duplicate HOUSEHOLD_IDs
+- Use Snowflake SQL syntax
+- Return only valid JSON (no markdown, no explanations)
+- Verify all field names exist in provided schema`;
 
 /**
  * Builds a complete prompt with schema context and examples
@@ -71,8 +113,8 @@ Generate a complete audience segment with metadata. Return ONLY valid JSON in th
 {
   "segmentName": "Business-friendly segment name (under 60 chars)",
   "description": "Clear description of who this targets and why (100-200 chars)",
-  "sqlQuery": "SELECT DISTINCT p.HOUSEHOLD_ID, p.ADDRESS_ID...",
-  "reasoning": "Brief explanation of your approach and key targeting logic",
+  "sqlQuery": "SELECT DISTINCT d.HOUSEHOLD_ID, d.ADDRESS_ID FROM DATA d WHERE...",
+  "reasoning": "Brief explanation of your query approach, key filters used, and expected audience size range (e.g., '50K-200K households')",
   "confidence": 0.85,
   "estimatedComplexity": "low"
 }
