@@ -9,7 +9,7 @@ AI Data Activation Platform is a Next.js application that transforms natural lan
 ## Development Commands
 
 ### Core Commands
-- `npm run dev` - Start development server (runs on http://localhost:3000)
+- `npm run dev` - Start development server (runs on http://localhost:3002)
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
@@ -52,12 +52,11 @@ AI Data Activation Platform is a Next.js application that transforms natural lan
 - System prompt in `lib/prompts.ts` defines role, schema rules, and quality guidelines
 - `buildPromptWithContext()` dynamically includes:
   - Compact schema context from identity graph
-  - 3 few-shot examples from `lib/data/seed-segments.json`
   - User's natural language input and use case
 - Prompts enforce JSON response format with specific schema
 
 **Schema Context System**:
-- Identity graph has 3 core tables: PII, DATA, MAIDS
+- Identity graph has 3 core tables: PII, DATA, EMAIL
 - Tables typically join on `HOUSEHOLD_ID` or `ADDRESS_ID`
 - Quality scoring fields: `EMAILQUALITYLEVEL`, `PHONEQUALITYLEVEL` (recommend >= 7)
 - Compliance fields: `DNC` (Do Not Call), `EMAILOPTIN`
