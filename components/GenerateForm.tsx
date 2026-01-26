@@ -76,9 +76,9 @@ export function GenerateForm({ onGenerate, initialValues }: GenerateFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Describe Your Audience</CardTitle>
+        <CardTitle>Describe Your Target Audience</CardTitle>
         <CardDescription>
-          Describe your target audience in natural language, and AI will generate the SQL query
+          Describe your target audience in natural language
         </CardDescription>
       </CardHeader>
       <CardContent>

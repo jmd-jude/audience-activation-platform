@@ -22,7 +22,7 @@ export function Navigation() {
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <BarChart3 className="h-6 w-6 text-primary" />
-              <span className="text-xl">SIG Data Activation</span>
+              <span className="text-xl">SIG Data Activation Platform</span>
             </Link>
 
             <div className="hidden md:flex items-center gap-1">

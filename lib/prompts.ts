@@ -1,5 +1,9 @@
-import { buildCompactSchemaContext } from './schema-context';
-import seedSegments from './data/seed-segments.json';
+import {
+  buildCompactSchemaContext,
+  buildSemanticContext,
+  buildStrategicPatternsContext,
+  getTargetingPhilosophy
+} from './schema-context';
 
 /**
  * Main system prompt for segment generation
@@ -7,11 +11,12 @@ import seedSegments from './data/seed-segments.json';
 export const SEGMENT_GENERATION_SYSTEM_PROMPT = `You are a Consumer Intelligence Analyst specializing in audience segmentation and identity resolution. Your task is to translate natural language audience descriptions into SQL queries that return viable, targetable audiences.
 
 IDENTITY GRAPH CONTEXT:
-You work with consumer identity data across multiple tables:
-- DATA: Core consumer intelligence (demographics, income, lifestyle, purchase behavior, household composition)
+You work with consumer identity data across 3 tables:
+- DATA: Core consumer intelligence (demographics, income, lifestyle, purchase behavior, household composition, contactability flags)
 - PII: Geographic and identity data (state, ZIP, address, urbanicity)
 - EMAIL: Email addresses with quality scores and opt-in status (use LEFT JOIN - optional)
-- PHONE: Phone numbers with quality scores and DNC flags (use LEFT JOIN - optional)
+
+NOTE: Phone contactability is tracked via DATA.HASPHONE (1 = has phone, 0 = no phone). There is NO separate PHONE table.
 
 BUSINESS OBJECTIVES:
 1. Audience Size: Target 10,000-500,000 households for viable campaign scale
@@ -23,14 +28,31 @@ QUERY CONSTRUCTION GUIDELINES:
 
 Use LEFT JOIN for optional tables:
 - LEFT JOIN EMAIL when email communication is mentioned
-- LEFT JOIN PHONE when phone/SMS communication is mentioned
+- LEFT JOIN PII when geographic targeting (STATE, ZIP, URBANICITY_CODE) is needed
+
+For phone/SMS targeting:
+- Use DATA.HASPHONE = 1 (no PHONE table exists)
+- Example: WHERE d.HASPHONE = 1 AND d.INCOME_HH IN (...)
+- For multi-channel: WHERE d.HASPHONE = 1 AND d.HASEMAIL = 1 (EMAIL table not required if just checking flag)
 - Don't force joins to tables you don't need
 
-Handle enumerated fields correctly:
-- Fields with valid_values arrays (like INCOME_HH, NET_WORTH_HH) use IN (...) syntax
-- NEVER use >= or <= on TEXT fields with letter-prefixed values
-- Example: INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', ...) ✓
-- Example: INCOME_HH >= 'K. $100,000...' ✗ (wrong - text comparison fails)
+CRITICAL ENUMERATED FIELD RULES:
+- ANY field with valid_values in the schema MUST use IN (...) syntax
+- NEVER use >, <, >=, <= on fields with valid_values
+- ONLY use values that exist in the valid_values array
+- When mapping natural language to values:
+  * "Affluent/High income" → INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', 'M. $175,000-$199,999', 'N. $200,000+')
+  * "Middle income" → INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', 'H. $75,000-$99,999')
+  * "Young adults" → AGE BETWEEN 18 AND 35 (AGE is numeric, not enumerated)
+  * "Millennials" → GENERATION = '1. Millennials and Gen Z (1982 and after)'
+
+AVOID OVER-FILTERING:
+- Start with 2-3 key filters, not 5-7
+- Balance specificity with reach
+- If you're unsure, be MORE inclusive rather than less
+- Example: For "affluent families", use:
+  ✓ INCOME_HH IN ('K...', 'L...', 'M...', 'N...') AND CHILDREN_HH > 0
+  ✗ Don't also add: AND AGE BETWEEN 35 AND 55 AND NET_WORTH_HH IN (...) AND HOMEOWNER = 1
 
 Build queries that return results:
 - Start with DATA table (has most consumer intelligence)
@@ -72,7 +94,8 @@ TECHNICAL REQUIREMENTS:
 - Verify all field names exist in provided schema`;
 
 /**
- * Builds a complete prompt with schema context and examples
+ * Builds a complete prompt with schema context and semantic intelligence
+ * Uses schema-derived patterns instead of separate example files
  */
 export function buildPromptWithContext(
   userInput: string,
@@ -80,28 +103,20 @@ export function buildPromptWithContext(
   additionalContext?: string
 ): string {
   const schemaContext = buildCompactSchemaContext();
-
-  // Select 3 example segments to use as few-shot learning
-  const exampleSegments = seedSegments.slice(0, 3);
-  const examplesFormatted = exampleSegments
-    .map(
-      (seg, idx) => `
-Example ${idx + 1}:
-Description: "${seg.description}"
-Use Case: ${seg.targetUseCase}
-Generated SQL:
-${seg.sqlQuery}
-`
-    )
-    .join('\n');
+  const semanticContext = buildSemanticContext();
+  const strategicPatterns = buildStrategicPatternsContext();
+  const targetingPhilosophy = getTargetingPhilosophy();
 
   const prompt = `${SEGMENT_GENERATION_SYSTEM_PROMPT}
 
 DATABASE SCHEMA:
 ${schemaContext}
 
-EXAMPLE SEGMENTS:
-${examplesFormatted}
+${semanticContext}
+
+${strategicPatterns}
+
+${targetingPhilosophy ? `TARGETING PHILOSOPHY:\n${targetingPhilosophy}\n` : ''}
 
 USER REQUEST:
 Target Description: ${userInput}

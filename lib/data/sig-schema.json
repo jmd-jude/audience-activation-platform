@@ -10,7 +10,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["quality_signal", "deliverability_predictor", "engagement_likelihood", "campaign_performance"],
           "marketing_meaning": "Primary filter for email campaign targeting and deliverability optimization - determines send priority and expected engagement rates",
           "creative_potential": {
             "8-10": "Premium email targeting - high engagement probability, low bounce risk, priority send candidates",
@@ -24,7 +23,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["permission_signal", "compliance_indicator", "engagement_intent", "legal_foundation"],
           "marketing_meaning": "Compliance foundation and engagement willingness indicator for all email marketing activities",
           "creative_potential": "Explicit permission signals higher engagement potential, brand affinity, and receptiveness to marketing communications",
           "combination_signals": "Required for compliant email marketing, enhances trust and engagement across all digital strategies"
@@ -33,7 +31,6 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["context_indicator", "professional_signal", "demographic_proxy", "communication_strategy"],
           "marketing_meaning": "B2B vs B2C targeting signal and communication approach indicator",
           "creative_potential": {
             "corporate_domains": "Professional targeting - business hours, LinkedIn integration, formal tone, decision-maker messaging",
@@ -53,7 +50,6 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["geographic_targeting", "cultural_context", "regulatory_compliance", "regional_preferences"],
           "marketing_meaning": "Geographic foundation for regional campaigns, cultural adaptation, and regulatory compliance",
           "creative_potential": "State-level cultural context enabling regional messaging, local partnerships, seasonal campaigns, and compliance-aware targeting",
           "combination_signals": "Geographic foundation that modifies all demographic and behavioral targeting with regional context"
@@ -62,7 +58,6 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["micro_targeting", "socioeconomic_proxy", "lifestyle_clustering", "local_market"],
           "marketing_meaning": "Precision geographic targeting enabling neighborhood-level campaigns and socioeconomic inference",
           "creative_potential": "ZIP-level targeting for local businesses, socioeconomic lifestyle inference, hyper-local campaigns, and community-specific messaging",
           "combination_signals": "Micro-geographic enhancer that adds precision to all demographic and behavioral segments"
@@ -71,8 +66,18 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
-          "semantic_hints": ["neighborhood_targeting", "demographic_density", "lifestyle_homogeneity", "micro_segmentation"],
+          "valid_values": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9"
+          ],
           "marketing_meaning": "Ultra-precise geographic targeting for neighborhood-level campaign optimization and demographic concentration analysis",
           "creative_potential": "Block-group targeting enables hyper-local campaigns, demographic concentration optimization, and neighborhood lifestyle targeting",
           "combination_signals": "Ultra-precise geographic qualifier that maximizes targeting efficiency for high-concentration demographic segments"
@@ -81,8 +86,11 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["R", "S", "U"],
-          "semantic_hints": ["lifestyle_context", "density_indicator", "cultural_environment", "service_accessibility"],
+          "valid_values": [
+            "R",
+            "S",
+            "U"
+          ],
           "marketing_meaning": "Urban vs suburban vs rural lifestyle targeting foundation",
           "creative_potential": {
             "U": "Urban - convenience-focused, diverse, public transportation, apartment living, cultural access",
@@ -102,7 +110,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["lifecycle_stage", "generational_values", "communication_style", "product_relevance"],
           "marketing_meaning": "Age-based targeting foundation determining message tone, channel preference, and life stage relevance",
           "creative_potential": {
             "18-25": "Digital natives - authenticity-focused, cause-driven, mobile-first, experimental with brands",
@@ -116,8 +123,10 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["Female", "Male"],
-          "semantic_hints": ["demographic_core", "product_affinity", "communication_tone", "identity_anchor"],
+          "valid_values": [
+            "Female",
+            "Male"
+          ],
           "marketing_meaning": "Core demographic filter for gender-relevant product positioning and communication approach",
           "creative_potential": "Gender-informed targeting enabling relevant product emphasis and communication styles while avoiding stereotypical assumptions",
           "combination_signals": "Modifies messaging tone and product emphasis across all demographic and behavioral segments"
@@ -126,8 +135,12 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["H", "P", "R", "S"],
-          "semantic_hints": ["residence_signal", "stability_indicator", "lifestyle_context", "targeting_precision"],
+          "valid_values": [
+            "H",
+            "P",
+            "R",
+            "S"
+          ],
           "marketing_meaning": "Address stability and residence type indicator for lifestyle-based targeting and delivery optimization",
           "creative_potential": {
             "H": "Home addresses - family-focused messaging, stability, residential services targeting",
@@ -141,7 +154,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["contact_quality", "multi_channel", "engagement_readiness", "communication_preference"],
           "marketing_meaning": "Phone contact availability enabling multi-channel campaigns and high-touch engagement strategies",
           "creative_potential": "Phone availability signals engagement readiness, enables voice campaigns, SMS marketing, and high-value prospect identification",
           "combination_signals": "Multi-channel enabler that enhances all digital targeting with voice and SMS capabilities"
@@ -150,7 +162,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["digital_engagement", "email_targeting", "contact_quality", "channel_preference"],
           "marketing_meaning": "Email contact availability enabling digital campaign targeting and automated engagement workflows",
           "creative_potential": "Email availability enables digital nurture campaigns, automated sequences, and cost-effective scale targeting",
           "combination_signals": "Digital engagement foundation that enables all email-based targeting and automation strategies"
@@ -159,18 +170,27 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["Married", "Single"],
-          "semantic_hints": ["household_structure", "dual_income_potential", "joint_decision_making", "family_lifecycle"],
+          "valid_values": [
+            "Married",
+            "Single"
+          ],
           "marketing_meaning": "Core household composition signal enabling family-oriented targeting and relationship-based messaging strategies",
-          "creative_potential": {"Married": "Joint decision-making households - family-focused messaging, dual-income positioning, shared experience marketing, relationship-oriented products, household-level targeting", "Single": "Individual decision-makers - personal independence messaging, self-focused benefits, individual lifestyle targeting, flexible scheduling, self-care positioning"},
+          "creative_potential": {
+            "Married": "Joint decision-making households - family-focused messaging, dual-income positioning, shared experience marketing, relationship-oriented products, household-level targeting",
+            "Single": "Individual decision-makers - personal independence messaging, self-focused benefits, individual lifestyle targeting, flexible scheduling, self-care positioning"
+          },
           "combination_signals": "Household structure foundation that modifies all targeting with relationship context, decision-making dynamics, and family-oriented vs individual-focused messaging"
         },
         "GENERATION": {
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["1. Millennials and Gen Z (1982 and after)", "2. Generation X (1961-1981)", "3. Baby Boomers (1943-1960)", "4. Post-WWII (1942 and before)"],
-          "semantic_hints": ["psychographics", "values_alignment", "communication_style", "technology_adoption"],
+          "valid_values": [
+            "1. Millennials and Gen Z (1982 and after)",
+            "2. Generation X (1961-1981)",
+            "3. Baby Boomers (1943-1960)",
+            "4. Post-WWII (1942 and before)"
+          ],
           "marketing_meaning": "Generational targeting for values-based messaging and channel optimization",
           "creative_potential": {
             "Millennials and Gen Z": "Digital-first, authenticity-focused, cause-driven, experience-oriented",
@@ -184,8 +204,26 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["A. Under $10,000", "B. $10,000-$19,999", "C. $20,000-$29,999", "D. $30,000-$39,999", "E. $40,000-$49,999", "F. $50,000-$59,999", "G. $60,000-$74,999", "H. $75,000-$99,999", "K. $100,000-$149,999", "L. $150,000-$174,999", "M. $175,000-$199,999", "N. $200,000-$249,999", "P. $250-$299K", "Q. $300-$399K", "R. $400-$499K", "S. $500-$699K", "T. $700-$999K", "U. $1MM +"],
-          "semantic_hints": ["purchasing_power", "premium_targeting", "affordability_signal", "lifestyle_capacity"],
+          "valid_values": [
+            "A. Under $10,000",
+            "B. $10,000-$19,999",
+            "C. $20,000-$29,999",
+            "D. $30,000-$39,999",
+            "E. $40,000-$49,999",
+            "F. $50,000-$59,999",
+            "G. $60,000-$74,999",
+            "H. $75,000-$99,999",
+            "K. $100,000-$149,999",
+            "L. $150,000-$174,999",
+            "M. $175,000-$199,999",
+            "N. $200,000-$249,999",
+            "P. $250-$299K",
+            "Q. $300-$399K",
+            "R. $400-$499K",
+            "S. $500-$699K",
+            "T. $700-$999K",
+            "U. $1MM +"
+          ],
           "marketing_meaning": "Detailed income-based targeting for product price point alignment and premium vs value messaging strategies",
           "creative_potential": {
             "U-T ($700K+)": "Ultra-premium targeting - luxury everything, exclusive experiences, concierge services",
@@ -200,8 +238,17 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["B. Less than $1", "C. $1 - $4,999", "D. $5,000 - $9,999", "E. $10,000 - $24,999", "F. $25,000 - $49,999", "G. $50,000 - $99,999", "H. $100,000 - $249,999", "I. $250,000 - $499,999", "J. Greater than $499,999"],
-          "semantic_hints": ["wealth_accumulation", "financial_stability", "investment_capacity", "security_mindset"],
+          "valid_values": [
+            "B. Less than $1",
+            "C. $1 - $4,999",
+            "D. $5,000 - $9,999",
+            "E. $10,000 - $24,999",
+            "F. $25,000 - $49,999",
+            "G. $50,000 - $99,999",
+            "H. $100,000 - $249,999",
+            "I. $250,000 - $499,999",
+            "J. Greater than $499,999"
+          ],
           "marketing_meaning": "Wealth-based targeting for investment services, luxury positioning, and financial security messaging",
           "creative_potential": {
             "I-J ($250K+)": "Wealth management - investment services, estate planning, luxury lifestyle",
@@ -215,8 +262,15 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["Attended Vocational/Technical", "Completed College", "Completed Graduate School", "Completed High School", "Doctorate/PhD or Above", "Some College", "Some High School"],
-          "semantic_hints": ["sophistication_level", "communication_complexity", "professional_targeting", "learning_orientation"],
+          "valid_values": [
+            "Attended Vocational/Technical",
+            "Completed College",
+            "Completed Graduate School",
+            "Completed High School",
+            "Doctorate/PhD or Above",
+            "Some College",
+            "Some High School"
+          ],
           "marketing_meaning": "Education-based messaging complexity and professional targeting foundation",
           "creative_potential": {
             "Doctorate/PhD": "Expert targeting - complex solutions, professional services, thought leadership",
@@ -231,7 +285,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["experience_seeking", "adventure_mindset", "cultural_interest", "mobility_lifestyle"],
           "marketing_meaning": "Experience economy targeting for travel, hospitality, lifestyle services, and adventure-focused campaigns",
           "creative_potential": {
             "High travel activity": "Experience collectors - adventures, cultural experiences, premium travel, global mindset, wanderlust targeting",
@@ -244,7 +297,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["wellness_focus", "preventive_mindset", "health_consciousness", "quality_of_life"],
           "marketing_meaning": "Health ecosystem targeting for wellness, fitness, premium healthcare services, and preventive health campaigns",
           "creative_potential": {
             "High health activity": "Wellness enthusiasts - fitness, nutrition, mental health, biohacking, premium healthcare services",
@@ -257,8 +309,9 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["1"],
-          "semantic_hints": ["wealth_building", "financial_sophistication", "investment_mindset", "future_planning"],
+          "valid_values": [
+            "1"
+          ],
           "marketing_meaning": "Investment engagement signal for financial services, wealth management, and sophisticated financial products",
           "creative_potential": "Investment ownership indicates financial sophistication, future planning mindset, and openness to wealth-building solutions",
           "combination_signals": "Financial sophistication signal that elevates targeting for premium financial services and investment opportunities"
@@ -267,8 +320,9 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["1"],
-          "semantic_hints": ["market_engagement", "financial_literacy", "risk_tolerance", "wealth_strategy"],
+          "valid_values": [
+            "1"
+          ],
           "marketing_meaning": "Direct market participation signal for advanced investment products and financial advisory services",
           "creative_potential": "Stock and bond ownership indicates market sophistication, risk tolerance, and active wealth management engagement",
           "combination_signals": "Premium investment qualifier for sophisticated financial products and wealth management services"
@@ -277,7 +331,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["premium_banking", "credit_quality", "financial_status", "exclusive_access"],
           "marketing_meaning": "Premium financial services targeting signal for high-value banking and exclusive financial products",
           "creative_potential": "Premium card ownership indicates financial success, credit quality, and preference for exclusive financial services",
           "combination_signals": "Credit quality and premium preference signal for luxury financial services and exclusive banking products"
@@ -286,7 +339,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["financial_access", "credit_participation", "purchasing_power", "convenience_preference"],
           "marketing_meaning": "Credit participation signal enabling credit-based product targeting and financial services outreach",
           "creative_potential": "Credit card usage indicates financial system engagement and comfort with credit-based purchasing",
           "combination_signals": "Financial participation foundation that enables credit-based product targeting and payment solution marketing"
@@ -295,8 +347,15 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["B. $0 - $100", "C. $101 - $300", "D. $501 - $1,000", "E. $1,001 - $3,000", "F. $3,001 - $5,000", "G. $5,001 - $9,999", "H. Greater than $9,999"],
-          "semantic_hints": ["credit_capacity", "financial_growth", "lending_opportunity", "creditworthiness"],
+          "valid_values": [
+            "B. $0 - $100",
+            "C. $101 - $300",
+            "D. $501 - $1,000",
+            "E. $1,001 - $3,000",
+            "F. $3,001 - $5,000",
+            "G. $5,001 - $9,999",
+            "H. Greater than $9,999"
+          ],
           "marketing_meaning": "Credit capacity signal for lending products, financial growth services, and credit expansion targeting",
           "creative_potential": {
             "H ($10K+)": "High credit capacity - premium lending, business financing, major purchase financing",
@@ -310,7 +369,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["household_structure", "dual_income_potential", "family_planning", "joint_decisions"],
           "marketing_meaning": "Marital status foundation for family-oriented targeting and dual-income household strategies",
           "creative_potential": "Married status indicates joint decision-making, family focus, dual income potential, and household-oriented purchasing",
           "combination_signals": "Household structure signal that modifies all targeting with family dynamics and joint decision-making context"
@@ -319,7 +377,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["family_focus", "education_expenses", "safety_priority", "future_planning"],
           "marketing_meaning": "Family presence signal for child-focused products, education services, and family-oriented targeting",
           "creative_potential": "Presence of children indicates family focus, education investment, safety priorities, and long-term planning mindset",
           "combination_signals": "Family structure foundation that transforms all targeting with child-focused priorities and family dynamics"
@@ -328,7 +385,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["early_parenting", "baby_products", "safety_focus", "sleep_challenges"],
           "marketing_meaning": "Early parenting stage targeting for infant products, parenting services, and family support solutions",
           "creative_potential": "Toddler presence indicates early parenting needs, baby product demand, safety focus, and family establishment phase",
           "combination_signals": "Early family stage signal that prioritizes safety, convenience, and infant-focused product targeting"
@@ -337,7 +393,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["preschool_stage", "education_start", "activity_engagement", "social_development"],
           "marketing_meaning": "Preschool family targeting for early education, child activities, and developmental products",
           "creative_potential": "Preschool age children indicate education investment, activity engagement, and developmental product needs",
           "combination_signals": "Early education stage signal that emphasizes learning, activities, and child development targeting"
@@ -346,7 +401,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["school_age", "extracurricular_activities", "technology_introduction", "structured_learning"],
           "marketing_meaning": "School-age family targeting for education technology, sports activities, and learning enrichment",
           "creative_potential": "Elementary school age indicates structured learning needs, activity participation, and early technology introduction",
           "combination_signals": "Active learning stage signal for education technology, activities, and enrichment program targeting"
@@ -355,7 +409,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["pre_teen", "independence_development", "hobby_exploration", "social_dynamics"],
           "marketing_meaning": "Pre-teen family targeting for independence-building products, hobby development, and social activities",
           "creative_potential": "Pre-teen presence indicates independence development, hobby exploration, and increasing activity complexity",
           "combination_signals": "Pre-teen development stage signal for hobby products, independence tools, and social activity targeting"
@@ -364,7 +417,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["teenager", "college_preparation", "technology_heavy", "independence_seeking"],
           "marketing_meaning": "Teen family targeting for college preparation, technology products, and independence-focused services",
           "creative_potential": "Teenager presence indicates college planning, high technology usage, transportation needs, and independence focus",
           "combination_signals": "Teen family stage signal for college preparation, technology, transportation, and independence-oriented targeting"
@@ -373,8 +425,16 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["Blue Collar", "Homemaker", "Lower Management", "Other", "Professional", "Retired", "Upper Management", "White Collar Worker"],
-          "semantic_hints": ["professional_level", "income_stability", "lifestyle_patterns", "time_availability"],
+          "valid_values": [
+            "Blue Collar",
+            "Homemaker",
+            "Lower Management",
+            "Other",
+            "Professional",
+            "Retired",
+            "Upper Management",
+            "White Collar Worker"
+          ],
           "marketing_meaning": "Professional targeting foundation for career-appropriate products, time-sensitive services, and lifestyle positioning",
           "creative_potential": {
             "Professional": "High-income professionals - premium services, time-saving solutions, career advancement tools",
@@ -391,8 +451,10 @@
           "type": "TEXT",
           "nullable": true,
           "primary_key": false,
-          "valid_values": ["Multi Family Dwelling/Apartment", "Single Family"],
-          "semantic_hints": ["living_situation", "space_availability", "ownership_status", "lifestyle_constraints"],
+          "valid_values": [
+            "Multi Family Dwelling/Apartment",
+            "Single Family"
+          ],
           "marketing_meaning": "Housing-based targeting for space-appropriate products, home services, and lifestyle positioning",
           "creative_potential": {
             "Single Family": "Homeowner targeting - home improvement, yard care, larger appliances, property investment",
@@ -404,7 +466,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["outdoor_lifestyle", "adventure_seeking", "nature_connection", "active_lifestyle"],
           "marketing_meaning": "Outdoor lifestyle targeting for adventure gear, outdoor experiences, and nature-focused campaigns",
           "creative_potential": {
             "High outdoor activity": "Outdoor enthusiasts - adventure gear, outdoor experiences, environmental consciousness, active lifestyle products",
@@ -417,7 +478,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["mobility_investment", "automotive_interest", "transportation_sophistication", "vehicle_enthusiasm"],
           "marketing_meaning": "Automotive ecosystem targeting for vehicles, automotive services, and transportation-focused campaigns",
           "creative_potential": {
             "High automotive activity": "Auto enthusiasts - vehicle upgrades, automotive services, car culture, mobility innovation",
@@ -430,7 +490,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["fashion_engagement", "style_consciousness", "shopping_behavior", "appearance_investment"],
           "marketing_meaning": "Fashion and style targeting for apparel, beauty, and appearance-focused campaigns",
           "creative_potential": {
             "High fashion activity": "Fashion enthusiasts - style trends, brand consciousness, appearance investment, fashion-forward messaging",
@@ -443,7 +502,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["hobby_investment", "passion_collecting", "discretionary_spending", "specialized_interests"],
           "marketing_meaning": "Collectibles and hobby targeting for specialized interests, investment collecting, and passion-driven purchases",
           "creative_potential": {
             "High collectibles activity": "Serious collectors - investment pieces, rare items, specialized markets, passion-driven spending",
@@ -456,7 +514,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["culinary_sophistication", "food_quality", "dining_investment", "taste_refinement"],
           "marketing_meaning": "Gourmet and culinary targeting for premium food products, dining experiences, and culinary services",
           "creative_potential": {
             "High gourmet activity": "Food enthusiasts - premium ingredients, fine dining, culinary experiences, cooking equipment",
@@ -469,7 +526,6 @@
           "type": "NUMBER",
           "nullable": true,
           "primary_key": false,
-          "semantic_hints": ["pet_ownership", "animal_care", "emotional_spending", "family_extension"],
           "marketing_meaning": "Pet ownership targeting for pet products, veterinary services, and animal-focused campaigns",
           "creative_potential": {
             "High pet activity": "Pet enthusiasts - premium pet products, veterinary care, pet services, animal experiences",
@@ -477,6 +533,106 @@
             "Low pet activity": "Non-pet owners - no pet targeting, potential pet acquisition, pet-free lifestyle"
           },
           "combination_signals": "Pet ownership signal that adds emotional spending dimension and expands household targeting to include pet-focused products"
+        },
+        "GOLF_AFFINITY": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Affluent lifestyle signal for luxury brands, financial services, country club culture, and executive targeting",
+          "creative_potential": {
+            "1": "Golf enthusiast - country club lifestyle, luxury brands, executive networking, premium leisure, wealth indicators"
+          },
+          "combination_signals": "Premium lifestyle qualifier that strongly correlates with high income, investment activity, and luxury purchase behavior"
+        },
+        "FITNESS_AFFINITY": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Active lifestyle signal for wellness brands, athletic apparel, gym memberships, and health-conscious targeting",
+          "creative_potential": {
+            "1": "Fitness-focused - gym culture, athletic wear, nutrition products, wellness apps, active lifestyle brands"
+          },
+          "combination_signals": "Health-consciousness indicator that enhances wellness, apparel, and lifestyle brand targeting"
+        },
+        "TRAVEL_AFFINITY": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Experience-seeking signal for travel brands, hospitality, credit cards with travel rewards, and adventure targeting",
+          "creative_potential": {
+            "1": "Travel enthusiast - wanderlust mindset, experience over things, cultural curiosity, premium hospitality, adventure seeking"
+          },
+          "combination_signals": "Experience economy indicator that enhances hospitality, airline, and premium credit card targeting"
+        },
+        "COOKING_AFFINITY": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Home culinary signal for kitchen brands, meal kits, cookware, specialty foods, and foodie targeting",
+          "creative_potential": {
+            "1": "Home chef - kitchen investment, quality ingredients, cooking equipment, recipe content, food experiences"
+          },
+          "combination_signals": "Culinary engagement signal that enhances gourmet, kitchen, and home lifestyle targeting"
+        },
+        "LIKELY_CHARITABLE_DONOR": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Values-driven signal for nonprofits, cause marketing, CSR campaigns, and purpose-driven brand targeting",
+          "creative_potential": {
+            "1": "Philanthropic mindset - cause-driven, community-focused, values-aligned purchasing, social responsibility"
+          },
+          "combination_signals": "Values indicator that enhances nonprofit fundraising, cause marketing, and socially-conscious brand targeting"
+        },
+        "RECENT_DONATION_ENVIRONMENTAL_CAUSE": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Sustainability signal for eco-brands, green products, ESG investments, and environmental cause targeting",
+          "creative_potential": {
+            "1": "Environmental advocate - sustainability-focused, eco-conscious purchasing, green brands, climate awareness"
+          },
+          "combination_signals": "Sustainability qualifier for eco-friendly products, green investments, and environmental nonprofit targeting"
+        },
+        "PET_OWNER": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Direct pet household signal for pet industry targeting - cleaner than purchase inference",
+          "creative_potential": {
+            "1": "Pet household - pet products, veterinary services, pet insurance, pet-friendly travel, animal welfare"
+          },
+          "combination_signals": "Household composition signal that unlocks pet industry targeting and indicates nurturing household dynamics"
+        },
+        "DOG_OWNER": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Dog-specific targeting for canine products, outdoor lifestyle correlation, and active household signal",
+          "creative_potential": {
+            "1": "Dog household - outdoor activity, walking/exercise routines, yard usage, loyalty-focused, family-oriented"
+          },
+          "combination_signals": "Active lifestyle indicator - dog owners over-index on outdoor activities, home ownership, and family focus"
+        },
+        "CAT_OWNER": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Cat-specific targeting for feline products, indoor lifestyle correlation, and independent household signal",
+          "creative_potential": {
+            "1": "Cat household - indoor comfort, independent lifestyle, urban-friendly, lower maintenance, cozy home focus"
+          },
+          "combination_signals": "Indoor lifestyle indicator - cat owners over-index on apartment living, urban density, and home comfort products"
+        },
+        "HOME_IMPROVEMENT_INTEREST": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Homeowner engagement signal for hardware, contractors, home services, and property investment targeting",
+          "creative_potential": {
+            "1": "Active homeowner - DIY projects, contractor services, home value investment, property pride, renovation interest"
+          },
+          "combination_signals": "Property investment indicator that strongly correlates with single-family dwelling, higher income, and long-term residence"
         }
       }
     }
@@ -485,7 +641,7 @@
     "description": "Enterprise identity management platform for deterministic identity resolution and customer intelligence. Enables brands to identify and contextually engage consumers across all channels and devices through a proprietary identity graph, supporting identity resolution, data enrichment, customer profiling, audience activation, and measurement attribution in both cookied and cookieless environments.",
     "key_concepts": [
       "deterministic_identity_resolution",
-      "cross_channel_attribution", 
+      "cross_channel_attribution",
       "cookieless_targeting",
       "audience_activation",
       "consumer_intelligence",
@@ -494,7 +650,7 @@
     "unique_value_propositions": [
       "Proprietary lifestyle clustering that goes beyond standard demographics",
       "Cross-channel identity resolution for unified customer view across touchpoints",
-      "Behavioral intent signals for predictive targeting and engagement optimization", 
+      "Behavioral intent signals for predictive targeting and engagement optimization",
       "Premium data quality scoring for campaign performance optimization",
       "Semantic field intelligence enabling AI-driven creative audience discovery"
     ],
@@ -504,7 +660,7 @@
     "optimization_rules": [
       "Always qualify email campaigns with EMAILQUALITYLEVEL >= 6 for optimal deliverability",
       "Combine GENDER + AGE + GENERATION + income signals for comprehensive demographic foundation",
-      "Layer luxury/technology/travel purchase behavior for premium audience identification", 
+      "Layer luxury/technology/travel purchase behavior for premium audience identification",
       "Use ZIP + URBANICITY_CODE + DWELLING_TYPE for precision geographic and housing targeting",
       "Prioritize HASPHONE + HASEMAIL contacts for multi-channel campaign opportunities",
       "Filter by recent purchase activity (within 24 months) for behavioral targeting accuracy",
@@ -529,7 +685,13 @@
       "Fashion Forward: RECENT_WOMENS_FASHION_PURCHASES > 4 + AGE 25-45 + INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', ...)",
       "Collectors Market: RECENT_COLLECTIBLES_PURCHASES > 2 + AGE 35+ + NET_WORTH_HH IN ('G. $50,000 - $99,999', 'H. $100,000 - $249,999', ...)",
       "Professional Women: GENDER = 'Female' + OCCUPATION_CATEGORY IN ('Professional', 'Upper Management') + RECENT_WOMENS_FASHION_PURCHASES > 2",
-      "Credit Growth: NEW_CREDIT_OFFERED_HH IN ('E. $1,001 - $3,000', 'F. $3,001 - $5,000', ...) + CREDIT_CARD = 1 + AGE 25-40"
+      "Credit Growth: NEW_CREDIT_OFFERED_HH IN ('E. $1,001 - $3,000', 'F. $3,001 - $5,000', ...) + CREDIT_CARD = 1 + AGE 25-40",
+      "Country Club Affluent: GOLF_AFFINITY = 1 + INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', ...) + OWNS_INVESTMENTS = 1",
+      "Wellness Warriors: FITNESS_AFFINITY = 1 + RECENT_HEALTH_PURCHASES > 2 + AGE 25-55",
+      "Eco-Conscious Consumers: RECENT_DONATION_ENVIRONMENTAL_CAUSE = 1 + EDUCATION IN ('Completed College', 'Completed Graduate School') + INCOME_HH >= 'F. $50,000-$59,999'",
+      "Dog Family Households: DOG_OWNER = 1 + CHILDREN_HH > 0 + DWELLING_TYPE = 'Single Family'",
+      "Home Improvers: HOME_IMPROVEMENT_INTEREST = 1 + DWELLING_TYPE = 'Single Family' + INCOME_HH IN ('G. $60,000-$74,999', 'H. $75,000-$99,999', ...)",
+      "Charitable High-Net-Worth: LIKELY_CHARITABLE_DONOR = 1 + NET_WORTH_HH IN ('I. $250,000 - $499,999', 'J. Greater than $499,999') + AGE 45+"
     ]
   }
 }

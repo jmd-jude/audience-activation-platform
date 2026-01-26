@@ -100,6 +100,17 @@ export async function POST(request: NextRequest) {
           const countResult = await snowflake.executeQuery(countQuery);
           actualSegmentSize = countResult.rows[0]?.SEGMENT_SIZE || 0;
 
+          // Debug logging for zero-result queries
+          if (actualSegmentSize === 0) {
+            console.warn('⚠️ ZERO RESULTS - Debugging info:');
+            console.warn('Generated SQL:', generatedSegment.sqlQuery);
+            console.warn('User input:', naturalLanguageInput);
+            console.warn('Use case:', useCase);
+            if (additionalContext) {
+              console.warn('Additional context:', additionalContext);
+            }
+          }
+
           // Execute a preview query to get sample data
           const previewQuery = `${generatedSegment.sqlQuery} LIMIT 10`;
 

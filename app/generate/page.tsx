@@ -136,6 +136,7 @@ function GeneratePageContent() {
           targetUseCase: generatedSegment.useCase,
           sqlQuery: generatedSegment.sqlQuery,
           status,
+          estimatedSize: validationResults?.audienceSize || null,
         }),
       });
 

@@ -46,6 +46,7 @@ next-env.d.ts
 
 # documentation
 /documentation
+/lib/data/old_SCHEMA.json
 
 # logs
 snowflake.log

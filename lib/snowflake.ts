@@ -39,7 +39,6 @@ export class SnowflakeConnection {
 
   /**
    * Establish connection to Snowflake using private key authentication
-   * Mirrors Cylyndyr's authentication pattern
    */
   private async connect(): Promise<any> {
     if (this.connection) {

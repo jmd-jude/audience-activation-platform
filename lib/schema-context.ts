@@ -5,15 +5,35 @@ interface SchemaField {
   nullable: boolean;
   primary_key: boolean;
   valid_values?: string[];
+  marketing_meaning?: string;
+  creative_potential?: string | Record<string, string>;
+  semantic_hints?: string[];
 }
 
 interface SchemaTable {
+  description?: string;
+  semantic_context?: string;
+  marketing_use?: string;
   fields: Record<string, SchemaField>;
+}
+
+interface QueryGuidelines {
+  optimization_rules?: string[];
+  strategic_combinations?: string[];
+}
+
+interface BusinessContext {
+  description?: string;
+  key_concepts?: string[];
+  unique_value_propositions?: string[];
+  targeting_philosophy?: string;
 }
 
 interface Schema {
   version: string;
   tables: Record<string, SchemaTable>;
+  business_context?: BusinessContext;
+  query_guidelines?: QueryGuidelines;
 }
 
 const schema = sigSchema as Schema;
@@ -113,4 +133,77 @@ export function buildCompactSchemaContext(): string {
   }
 
   return context;
+}
+
+/**
+ * Builds semantic intelligence context from schema
+ * Extracts marketing_meaning and creative_potential for key fields
+ */
+export function buildSemanticContext(): string {
+  let context = 'FIELD INTELLIGENCE (What these fields mean for targeting):\n\n';
+
+  const tables = Object.keys(schema.tables);
+  for (const tableName of tables) {
+    const table = schema.tables[tableName];
+    const fieldsWithMeaning: string[] = [];
+
+    const fields = Object.entries(table.fields);
+    for (const [fieldName, fieldInfo] of fields) {
+      // Only include fields that have marketing_meaning
+      if (fieldInfo.marketing_meaning) {
+        let fieldContext = `${fieldName}: ${fieldInfo.marketing_meaning}`;
+
+        // Add creative_potential if it exists and is an object with value mappings
+        if (fieldInfo.creative_potential && typeof fieldInfo.creative_potential === 'object') {
+          const mappings = Object.entries(fieldInfo.creative_potential)
+            .map(([key, value]) => `  • ${key}: ${value}`)
+            .join('\n');
+          fieldContext += `\n${mappings}`;
+        }
+
+        fieldsWithMeaning.push(fieldContext);
+      }
+    }
+
+    if (fieldsWithMeaning.length > 0) {
+      context += `${tableName}:\n${fieldsWithMeaning.join('\n\n')}\n\n`;
+    }
+  }
+
+  return context;
+}
+
+/**
+ * Gets strategic query combinations from schema
+ * These are proven patterns for common targeting scenarios
+ */
+export function getStrategicCombinations(): string[] {
+  return schema.query_guidelines?.strategic_combinations || [];
+}
+
+/**
+ * Builds strategic patterns context for prompts
+ * Shows proven query patterns that work well together
+ */
+export function buildStrategicPatternsContext(): string {
+  const combinations = getStrategicCombinations();
+
+  if (combinations.length === 0) {
+    return '';
+  }
+
+  let context = 'PROVEN TARGETING PATTERNS (use these as templates):\n\n';
+
+  combinations.forEach((combo, idx) => {
+    context += `${idx + 1}. ${combo}\n`;
+  });
+
+  return context;
+}
+
+/**
+ * Gets the targeting philosophy from schema
+ */
+export function getTargetingPhilosophy(): string {
+  return schema.business_context?.targeting_philosophy || '';
 }
