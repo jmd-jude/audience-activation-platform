@@ -76,10 +76,7 @@ export function GenerateForm({ onGenerate, initialValues }: GenerateFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Describe Your Target Audience</CardTitle>
-        <CardDescription>
-          Describe your target audience in natural language
-        </CardDescription>
+        <CardTitle>Describe Your Target Audience in Natural Language</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">

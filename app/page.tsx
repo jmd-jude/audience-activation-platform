@@ -86,7 +86,7 @@ export default function DashboardPage() {
 
   const recentSegments = segments
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 5);
+    .slice(0, 9);
 
   return (
     <div className="container mx-auto px-4 py-8">
