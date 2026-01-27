@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SIG Data Activation Platform",
-  description: "Transform natural language into audience segments with AI",
+  title: "Data Activation Platform",
+  description: "Transform natural language into audience segments",
 };
 
 export default function RootLayout({

@@ -633,6 +633,76 @@
             "1": "Active homeowner - DIY projects, contractor services, home value investment, property pride, renovation interest"
           },
           "combination_signals": "Property investment indicator that strongly correlates with single-family dwelling, higher income, and long-term residence"
+        },
+        "VETERAN_HH": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Military veteran household signal for patriotic brands, veteran services, and military-adjacent targeting",
+          "creative_potential": {
+            "1": "Veteran household - patriotic messaging, military discounts, service-oriented brands, VA services, military-adjacent products, honor/duty/service themes"
+          },
+          "combination_signals": "Service and sacrifice indicator that enhances targeting for insurance, financial services, home buying, and brands with military discount programs"
+        },
+        "LUXURY_LIFE": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Direct luxury lifestyle signal indicating preference for premium experiences and high-end products beyond income indicators",
+          "creative_potential": {
+            "1": "Luxury lifestyle - premium brands, exclusive experiences, concierge services, aspirational messaging, quality over price positioning"
+          },
+          "combination_signals": "Premium preference indicator that validates luxury targeting independent of income - behavioral proof of willingness to pay for quality and exclusivity"
+        },
+        "SOHO_BUSINESS": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Small office/home office business signal for B2B targeting, entrepreneurship, and business services",
+          "creative_potential": {
+            "1": "SOHO business operator - entrepreneurial mindset, business services needs, productivity tools, professional development, small business solutions"
+          },
+          "combination_signals": "B2B qualifier that unlocks small business targeting for SaaS, office supplies, business insurance, accounting services, and professional tools"
+        },
+        "GAMBLING": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Gaming and gambling interest signal for casino marketing, sports betting, and entertainment gaming",
+          "creative_potential": {
+            "1": "Gaming enthusiast - casino experiences, sports betting, lottery, poker, fantasy sports, gaming entertainment, risk-tolerant entertainment spending"
+          },
+          "combination_signals": "Entertainment risk-tolerance indicator that enhances targeting for gaming brands, sports betting platforms, casino resorts, and entertainment experiences"
+        },
+        "GRANDPARENTS_AFFINITY": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Grandparent household signal for multigenerational marketing, gift-giving, and legacy-focused targeting",
+          "creative_potential": {
+            "1": "Grandparent household - gift-giving for grandchildren, family experiences, legacy planning, education savings, multigenerational travel, family-focused purchases"
+          },
+          "combination_signals": "Multigenerational family signal that enhances targeting for toys, education products, family experiences, legacy financial products, and gift-giving occasions"
+        },
+        "FOOTBALL": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Football interest signal for sports marketing, merchandise, game-day experiences, and sports entertainment",
+          "creative_potential": {
+            "1": "Football fan - NFL/college football engagement, sports merchandise, game-day gatherings, sports bars, fantasy football, sports betting, team loyalty"
+          },
+          "combination_signals": "Sports enthusiasm indicator that enhances targeting for sports merchandise, entertainment, food and beverage brands, and seasonal sports marketing campaigns"
+        },
+        "READING_FINANCE": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Financial content interest signal for investment services, financial education, and money management targeting",
+          "creative_potential": {
+            "1": "Finance reader - investment interest, financial literacy, money management focus, market awareness, wealth-building mindset, financial news consumer"
+          },
+          "combination_signals": "Financial engagement indicator that enhances targeting for investment platforms, financial advisors, business news, and wealth management services - shows active interest beyond just having assets"
         }
       }
     }
@@ -691,7 +761,14 @@
       "Eco-Conscious Consumers: RECENT_DONATION_ENVIRONMENTAL_CAUSE = 1 + EDUCATION IN ('Completed College', 'Completed Graduate School') + INCOME_HH >= 'F. $50,000-$59,999'",
       "Dog Family Households: DOG_OWNER = 1 + CHILDREN_HH > 0 + DWELLING_TYPE = 'Single Family'",
       "Home Improvers: HOME_IMPROVEMENT_INTEREST = 1 + DWELLING_TYPE = 'Single Family' + INCOME_HH IN ('G. $60,000-$74,999', 'H. $75,000-$99,999', ...)",
-      "Charitable High-Net-Worth: LIKELY_CHARITABLE_DONOR = 1 + NET_WORTH_HH IN ('I. $250,000 - $499,999', 'J. Greater than $499,999') + AGE 45+"
+      "Charitable High-Net-Worth: LIKELY_CHARITABLE_DONOR = 1 + NET_WORTH_HH IN ('I. $250,000 - $499,999', 'J. Greater than $499,999') + AGE 45+",
+      "Veteran Homeowners: VETERAN_HH = 1 + DWELLING_TYPE = 'Single Family' + INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', 'H. $75,000-$99,999')",
+      "Luxury Lifestyle Verified: LUXURY_LIFE = 1 + RECENT_TRAVEL_PURCHASES_TOTAL_COMPANIES > 2 + RECENT_GOURMET_PURCHASES_TOTAL_COMPANIES > 1",
+      "Small Business Owners: SOHO_BUSINESS = 1 + EDUCATION IN ('Completed College', 'Completed Graduate School') + HASPHONE = 1 + HASEMAIL = 1",
+      "Sports Betting Prospects: GAMBLING = 1 + FOOTBALL = 1 + AGE 25-54 + GENDER = 'Male'",
+      "Grandparent Gift-Givers: GRANDPARENTS_AFFINITY = 1 + NET_WORTH_HH IN ('G. $50,000 - $99,999', 'H. $100,000 - $249,999', 'I. $250,000 - $499,999') + HASEMAIL = 1",
+      "Football Superfans: FOOTBALL = 1 + RECENT_SPORTS_PURCHASES_TOTAL_COMPANIES > 2 + DWELLING_TYPE = 'Single Family'",
+      "Financially Engaged Investors: READING_FINANCE = 1 + OWNS_INVESTMENTS = 1 + OWNS_STOCKS_AND_BONDS = 1 + INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', 'M. $175,000-$199,999')"
     ]
   }
 }
