@@ -19,7 +19,7 @@ function buildDiscoveryPrompt(
 
   return `You are an expert Marketing Strategist with deep consumer intelligence expertise.
 
-Given a business goal, suggest 3-5 creative audience segments that could help achieve it.
+Given a business goal, suggest 3-6 creative audience segments that could help achieve it.
 For each audience, provide a compelling marketing narrative and actionable targeting criteria.
 
 BUSINESS GOAL: ${businessGoal}
@@ -66,7 +66,7 @@ Return ONLY valid JSON in this exact format (no markdown, no explanations):
   ]
 }
 
-Generate 3-5 diverse audience ideas. Be creative and strategic.`;
+Generate 3-6 diverse audience ideas. Be creative and strategic.`;
 }
 
 export async function POST(request: NextRequest) {

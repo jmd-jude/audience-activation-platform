@@ -39,39 +39,46 @@ For phone/SMS targeting:
 CRITICAL ENUMERATED FIELD RULES:
 - ANY field with valid_values in the schema MUST use IN (...) syntax
 - NEVER use >, <, >=, <= on fields with valid_values
-- ONLY use values that exist in the valid_values array
+- **ONLY use EXACT values from the valid_values array - NEVER paraphrase, abbreviate, or invent values**
+- If a value doesn't match exactly, the query returns ZERO results
+- Copy values character-for-character from the schema, including prefixes like "A.", "B.", etc.
 - When mapping natural language to values:
-  * "Affluent/High income" → INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', 'M. $175,000-$199,999', 'N. $200,000+')
+  * "Affluent/High income" → INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', 'M. $175,000-$199,999', 'N. $200,000-$249,999', 'P. $250-$299K', 'Q. $300-$399K', 'R. $400-$499K', 'S. $500-$699K', 'T. $700-$999K', 'U. $1MM +')
   * "Middle income" → INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', 'H. $75,000-$99,999')
   * "Young adults" → AGE BETWEEN 18 AND 35 (AGE is numeric, not enumerated)
   * "Millennials" → GENERATION = '1. Millennials and Gen Z (1982 and after)'
 
-AVOID OVER-FILTERING:
-- Start with 2-3 key filters, not 5-7
-- Balance specificity with reach
-- If you're unsure, be MORE inclusive rather than less
-- Example: For "affluent families", use:
-  ✓ INCOME_HH IN ('K...', 'L...', 'M...', 'N...') AND CHILDREN_HH > 0
-  ✗ Don't also add: AND AGE BETWEEN 35 AND 55 AND NET_WORTH_HH IN (...) AND HOMEOWNER = 1
+CRITICAL - KEEP QUERIES SIMPLE:
+- MAXIMUM 4 WHERE conditions. This is a hard limit.
+- Extract only the PRIMARY audience definition (who they are at their core).
+- Ignore secondary qualifiers and nice-to-haves from the user's request.
+- A broad audience that can be narrowed later is BETTER than a tiny over-filtered one.
+- If the user mentions 6 attributes, pick the 2-3 most defining ones and omit the rest.
+- Example: For "affluent married millennials in urban areas who travel and have premium cards":
+  ✓ USE: INCOME_HH IN (...high values...) AND GENERATION = '1. Millennials...' AND MARITAL_STATUS = 'Married'
+  ✗ SKIP: urbanicity, travel purchases, premium card - these are secondary
 
 Build queries that return results:
 - Start with DATA table (has most consumer intelligence)
-- Use HOUSEHOLD_ID or ADDRESS_ID for joins
+- Use HOUSEHOLD_ID for all table joins (HOUSEHOLD_ID links DATA, PII, and EMAIL tables)
+- Always include d.ID, d.HOUSEHOLD_ID, and e.MD5 in SELECT for activation capabilities
+- Always LEFT JOIN EMAIL to get MD5 for digital activation
 - Balance precision (AND conditions) with reach (broader criteria)
-- Typical pattern: 2-4 key filters with DISTINCT on HOUSEHOLD_ID
+- Typical pattern: 2-4 key filters with DISTINCT on d.ID
 
 EXAMPLE QUERY PATTERNS:
 
 Affluent Families with Purchase Behavior:
-SELECT DISTINCT d.HOUSEHOLD_ID, d.ADDRESS_ID
+SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5
 FROM DATA d
+LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID
 WHERE d.INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', 'M. $175,000-$199,999')
   AND d.MARITAL_STATUS = 'Married'
   AND d.CHILDREN_HH > 0
   AND d.RECENT_TRAVEL_PURCHASES_TOTAL_COMPANIES >= 1
 
 Email-Addressable Professionals:
-SELECT DISTINCT d.HOUSEHOLD_ID, d.ADDRESS_ID, e.EMAIL
+SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5
 FROM DATA d
 LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID
 WHERE d.OCCUPATION_CATEGORY IN ('Professional', 'Upper Management')
@@ -80,8 +87,9 @@ WHERE d.OCCUPATION_CATEGORY IN ('Professional', 'Upper Management')
   AND e.EMAILOPTIN = 1
 
 Urban Millennials:
-SELECT DISTINCT d.HOUSEHOLD_ID, d.ADDRESS_ID
+SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5
 FROM DATA d
+LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID
 LEFT JOIN PII p ON d.HOUSEHOLD_ID = p.HOUSEHOLD_ID
 WHERE d.GENERATION = '1. Millennials and Gen Z (1982 and after)'
   AND p.URBANICITY_CODE = 'U'
@@ -128,7 +136,7 @@ Generate a complete audience segment with metadata. Return ONLY valid JSON in th
 {
   "segmentName": "Business-friendly segment name (under 60 chars)",
   "description": "Clear description of who this targets and why (100-200 chars)",
-  "sqlQuery": "SELECT DISTINCT d.HOUSEHOLD_ID, d.ADDRESS_ID FROM DATA d WHERE...",
+  "sqlQuery": "SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5 FROM DATA d LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID WHERE...",
   "reasoning": "Brief explanation of your query approach, key filters used, and expected audience size range (e.g., '50K-200K households')",
   "confidence": 0.85,
   "estimatedComplexity": "low"
@@ -162,35 +170,4 @@ Return a JSON response with:
   "suggestions": ["list of improvement suggestions"],
   "improvedSQL": "improved version if issues found, or null"
 }`;
-}
-
-/**
- * Prompt for generating segment variations
- */
-export function buildVariationPrompt(originalSegment: {
-  segmentName: string;
-  description: string;
-  sqlQuery: string;
-}): string {
-  return `Given this audience segment:
-
-Name: ${originalSegment.segmentName}
-Description: ${originalSegment.description}
-SQL Query:
-${originalSegment.sqlQuery}
-
-Generate 3 variations of this segment that target related but distinct audiences. Each variation should:
-- Target a different demographic or behavioral subset
-- Use similar targeting logic but with different parameters
-- Be clearly differentiated from the original
-
-Return as JSON array:
-[
-  {
-    "segmentName": "...",
-    "description": "...",
-    "sqlQuery": "...",
-    "differentiationReason": "How this differs from the original"
-  }
-]`;
 }

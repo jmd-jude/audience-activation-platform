@@ -227,7 +227,18 @@ function GeneratePageContent() {
               {/* SQL Query */}
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold">Generated SQL Query</h3>
-                <SQLEditor value={generatedSegment.sqlQuery} readOnly />
+                <SQLEditor
+                  value={generatedSegment.sqlQuery}
+                  onChange={(newSql) => {
+                    if (newSql !== undefined) {
+                      setGeneratedSegment(prev => prev ? { ...prev, sqlQuery: newSql } : null);
+                      // Clear stale validation results when SQL is edited
+                      if (validationResults) {
+                        setValidationResults(null);
+                      }
+                    }
+                  }}
+                />
               </div>
 
               {/* Validation Results */}

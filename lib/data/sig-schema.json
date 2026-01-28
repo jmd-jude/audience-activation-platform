@@ -6,6 +6,11 @@
       "semantic_context": "Email deliverability and engagement optimization layer enabling high-performance digital campaigns",
       "marketing_use": "Foundation for email campaign targeting, deliverability optimization, and digital engagement strategies",
       "fields": {
+        "ID": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false
+        },
         "EMAILQUALITYLEVEL": {
           "type": "NUMBER",
           "nullable": true,
@@ -46,6 +51,11 @@
       "semantic_context": "Primary identity and geographic foundation for deterministic identity resolution",
       "marketing_use": "Identity linking, geographic targeting, and basic demographic segmentation",
       "fields": {
+        "ID": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false
+        },
         "STATE": {
           "type": "TEXT",
           "nullable": true,
@@ -106,6 +116,11 @@
       "semantic_context": "Primary behavioral and demographic intelligence layer for sophisticated audience segmentation",
       "marketing_use": "Advanced audience segmentation, persona development, and precision behavioral targeting",
       "fields": {
+        "ID": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false
+        },
         "AGE": {
           "type": "NUMBER",
           "nullable": true,
