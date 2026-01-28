@@ -39,47 +39,10 @@ interface Schema {
 const schema = sigSchema as Schema;
 
 /**
- * Builds a formatted schema context string for Claude API prompts
- * Returns schema information in a readable format for the AI model
- */
-export function buildSchemaContext(): string {
-  let context = 'SIG IDENTITY GRAPH SCHEMA\n';
-  context += '='.repeat(50) + '\n\n';
-
-  const tables = Object.keys(schema.tables);
-
-  for (const tableName of tables) {
-    const table = schema.tables[tableName];
-    context += `TABLE: ${tableName}\n`;
-    context += '-'.repeat(30) + '\n';
-    context += 'Fields:\n';
-
-    const fields = Object.entries(table.fields);
-    for (const [fieldName, fieldInfo] of fields) {
-      const nullable = fieldInfo.nullable ? 'NULL' : 'NOT NULL';
-      const pk = fieldInfo.primary_key ? ' [PRIMARY KEY]' : '';
-      context += `  - ${fieldName} (${fieldInfo.type}) ${nullable}${pk}\n`;
-    }
-    context += '\n';
-  }
-
-  return context;
-}
-
-/**
  * Returns list of valid table names in the schema
  */
 export function getValidTables(): string[] {
   return Object.keys(schema.tables);
-}
-
-/**
- * Returns fields for a specific table
- * @param tableName - Name of the table to get fields for
- */
-export function getFieldsForTable(tableName: string): Record<string, SchemaField> | null {
-  const table = schema.tables[tableName];
-  return table ? table.fields : null;
 }
 
 /**

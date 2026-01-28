@@ -742,48 +742,11 @@
     "targeting_philosophy": "Combine demographic foundations with behavioral signals and lifestyle context to create sophisticated audience strategies that balance reach, relevance, and revenue potential. Layer contact quality, purchase behavior, and engagement signals to maximize campaign performance and ROI."
   },
   "query_guidelines": {
-    "optimization_rules": [
-      "Always qualify email campaigns with EMAILQUALITYLEVEL >= 6 for optimal deliverability",
-      "Combine GENDER + AGE + GENERATION + income signals for comprehensive demographic foundation",
-      "Layer luxury/technology/travel purchase behavior for premium audience identification",
-      "Use ZIP + URBANICITY_CODE + DWELLING_TYPE for precision geographic and housing targeting",
-      "Prioritize HASPHONE + HASEMAIL contacts for multi-channel campaign opportunities",
-      "Filter by recent purchase activity (within 24 months) for behavioral targeting accuracy",
-      "Combine ADDRESS_TYPE + STATE + ZIP for sophisticated geographic segmentation",
-      "Use lifestyle purchase signals (health, outdoor, fashion) for interest-based targeting",
-      "Layer OWNS_INVESTMENTS + NET_WORTH_HH for sophisticated wealth targeting",
-      "Combine MARRIED + CHILDREN_HH + child age segments for family lifecycle targeting",
-      "Use OCCUPATION_CATEGORY + EDUCATION for professional and communication sophistication targeting"
-    ],
+    "optimization_rules": [],
     "strategic_combinations": [
-      "Premium Audience: EMAILQUALITYLEVEL >= 8 + RECENT_LUXURY_PURCHASES > 3 + INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', ...)",
-      "Tech Innovators: RECENT_TECHNOLOGY_PURCHASES > 5 + AGE 26-40 + EMAILQUALITYLEVEL >= 7 + EDUCATION = 'Completed College'",
-      "Experience Seekers: RECENT_TRAVEL_PURCHASES > 3 + RECENT_HEALTH_PURCHASES > 2 + OCCUPATION_CATEGORY = 'Professional'",
-      "Affluent Families: MARRIED = 1 + CHILDREN_HH > 0 + INCOME_HH IN ('H. $75,000-$99,999', 'K. $100,000-$149,999', ...) + DWELLING_TYPE = 'Single Family'",
-      "Investment Prospects: OWNS_INVESTMENTS = 1 + OWNS_STOCKS_AND_BONDS = 1 + NET_WORTH_HH IN ('H. $100,000 - $249,999', 'I. $250,000 - $499,999', 'J. Greater than $499,999')",
-      "Multi-Channel Ready: HASPHONE = 1 + HASEMAIL = 1 + EMAILQUALITYLEVEL >= 6 + PREMIUM_CARD presence",
-      "Active Lifestyle: RECENT_OUTDOORS_PURCHASES > 2 + RECENT_HEALTH_PURCHASES > 2 + AGE 25-50",
-      "Young Families: MARRIED = 1 + CHILD_AGED_0_3_HH > 0 + INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', ...)",
-      "Teen Parents: CHILD_AGED_13_18_HH > 0 + INCOME_HH IN ('G. $60,000-$74,999', 'H. $75,000-$99,999', ...) + EDUCATION = 'Completed College'",
-      "Luxury Lifestyle: RECENT_LUXURY_PURCHASES > 3 + RECENT_GOURMET_PURCHASES > 2 + DWELLING_TYPE = 'Single Family'",
-      "Pet Enthusiasts: RECENT_PETS_PURCHASES > 3 + DWELLING_TYPE = 'Single Family' + CHILDREN_HH presence",
-      "Fashion Forward: RECENT_WOMENS_FASHION_PURCHASES > 4 + AGE 25-45 + INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', ...)",
-      "Collectors Market: RECENT_COLLECTIBLES_PURCHASES > 2 + AGE 35+ + NET_WORTH_HH IN ('G. $50,000 - $99,999', 'H. $100,000 - $249,999', ...)",
-      "Professional Women: GENDER = 'Female' + OCCUPATION_CATEGORY IN ('Professional', 'Upper Management') + RECENT_WOMENS_FASHION_PURCHASES > 2",
-      "Credit Growth: NEW_CREDIT_OFFERED_HH IN ('E. $1,001 - $3,000', 'F. $3,001 - $5,000', ...) + CREDIT_CARD = 1 + AGE 25-40",
-      "Country Club Affluent: GOLF_AFFINITY = 1 + INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', ...) + OWNS_INVESTMENTS = 1",
-      "Wellness Warriors: FITNESS_AFFINITY = 1 + RECENT_HEALTH_PURCHASES > 2 + AGE 25-55",
-      "Eco-Conscious Consumers: RECENT_DONATION_ENVIRONMENTAL_CAUSE = 1 + EDUCATION IN ('Completed College', 'Completed Graduate School') + INCOME_HH >= 'F. $50,000-$59,999'",
-      "Dog Family Households: DOG_OWNER = 1 + CHILDREN_HH > 0 + DWELLING_TYPE = 'Single Family'",
-      "Home Improvers: HOME_IMPROVEMENT_INTEREST = 1 + DWELLING_TYPE = 'Single Family' + INCOME_HH IN ('G. $60,000-$74,999', 'H. $75,000-$99,999', ...)",
-      "Charitable High-Net-Worth: LIKELY_CHARITABLE_DONOR = 1 + NET_WORTH_HH IN ('I. $250,000 - $499,999', 'J. Greater than $499,999') + AGE 45+",
-      "Veteran Homeowners: VETERAN_HH = 1 + DWELLING_TYPE = 'Single Family' + INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', 'H. $75,000-$99,999')",
-      "Luxury Lifestyle Verified: LUXURY_LIFE = 1 + RECENT_TRAVEL_PURCHASES_TOTAL_COMPANIES > 2 + RECENT_GOURMET_PURCHASES_TOTAL_COMPANIES > 1",
-      "Small Business Owners: SOHO_BUSINESS = 1 + EDUCATION IN ('Completed College', 'Completed Graduate School') + HASPHONE = 1 + HASEMAIL = 1",
-      "Sports Betting Prospects: GAMBLING = 1 + FOOTBALL = 1 + AGE 25-54 + GENDER = 'Male'",
-      "Grandparent Gift-Givers: GRANDPARENTS_AFFINITY = 1 + NET_WORTH_HH IN ('G. $50,000 - $99,999', 'H. $100,000 - $249,999', 'I. $250,000 - $499,999') + HASEMAIL = 1",
-      "Football Superfans: FOOTBALL = 1 + RECENT_SPORTS_PURCHASES_TOTAL_COMPANIES > 2 + DWELLING_TYPE = 'Single Family'",
-      "Financially Engaged Investors: READING_FINANCE = 1 + OWNS_INVESTMENTS = 1 + OWNS_STOCKS_AND_BONDS = 1 + INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', 'M. $175,000-$199,999')"
+    "Income + Generation = affluent demographic foundation",
+    "Marital Status + Children = family targeting",
+    "Occupation + Education = professional targeting"
     ]
   }
 }
