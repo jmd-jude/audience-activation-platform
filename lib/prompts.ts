@@ -115,7 +115,23 @@ export function buildPromptWithContext(
   const strategicPatterns = buildStrategicPatternsContext();
   const targetingPhilosophy = getTargetingPhilosophy();
 
+  const isLookalike = useCase === 'Lookalike Audience';
+
+  const taskContext = isLookalike
+    ? `The user has described their IDEAL CUSTOMER PROFILE. Generate SQL to find LOOKALIKE audiences - households that share similar demographic, behavioral, and lifestyle characteristics but represent net-new prospects.
+
+LOOKALIKE STRATEGY:
+- Identify the core defining signals from the profile (income level, lifestyle indicators, purchase behaviors)
+- Build queries that capture these patterns but cast a slightly wider net
+- Focus on households with similar "signal clusters" not exact matches
+- Frame the segment name and description as "Similar to..." or "Lookalike..."
+
+CRITICAL: Honor explicit user constraints. If the user specifies geography (states, cities, metros), INCLUDE those geographic filters - lookalike means finding similar profiles WITHIN those areas, not removing the areas. Expand within stated constraints, not by removing them.`
+    : '';
+
   const prompt = `${SEGMENT_GENERATION_SYSTEM_PROMPT}
+
+${taskContext}
 
 DATABASE SCHEMA:
 ${schemaContext}
@@ -127,7 +143,7 @@ ${strategicPatterns}
 ${targetingPhilosophy ? `TARGETING PHILOSOPHY:\n${targetingPhilosophy}\n` : ''}
 
 USER REQUEST:
-Target Description: ${userInput}
+${isLookalike ? 'Customer Profile' : 'Target Description'}: ${userInput}
 Use Case: ${useCase}
 ${additionalContext ? `Additional Context: ${additionalContext}` : ''}
 

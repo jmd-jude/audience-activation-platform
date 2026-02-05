@@ -27,6 +27,7 @@ const useCases = [
   'Analytics',
   'Customer Acquisition',
   'Retention',
+  'Lookalike Audience',
 ];
 
 export function GenerateForm({ onGenerate, initialValues }: GenerateFormProps) {
@@ -86,7 +87,10 @@ export function GenerateForm({ onGenerate, initialValues }: GenerateFormProps) {
             </Label>
             <Textarea
               id="naturalLanguageInput"
-              placeholder="e.g., Affluent males aged 35-55 in urban areas who are interested in luxury cars and have high-quality email addresses"
+              placeholder={useCase === 'Lookalike Audience'
+                ? "Describe your best customers: e.g., Affluent males aged 35-55 in urban areas who travel internationally and have high email engagement"
+                : "e.g., Affluent males aged 35-55 in urban areas who are interested in luxury cars and have high-quality email addresses"
+              }
               value={naturalLanguageInput}
               onChange={(e) => setNaturalLanguageInput(e.target.value)}
               required
@@ -94,7 +98,10 @@ export function GenerateForm({ onGenerate, initialValues }: GenerateFormProps) {
               className="resize-none"
             />
             <p className="text-sm text-muted-foreground">
-              Be specific about demographics, behaviors, and contact requirements
+              {useCase === 'Lookalike Audience'
+                ? "Describe demographics, behaviors, and characteristics of your ideal customer profile"
+                : "Be specific about demographics, behaviors, and contact requirements"
+              }
             </p>
           </div>
 

@@ -31,6 +31,7 @@ const useCases = [
   'Analytics',
   'Customer Acquisition',
   'Retention',
+  'Lookalike Audience',
 ];
 
 export default function DiscoverPage() {
@@ -118,7 +119,10 @@ export default function DiscoverPage() {
               </Label>
               <Textarea
                 id="businessGoal"
-                placeholder="e.g., Increase premium product sales, reach eco-conscious consumers, drive holiday shopping engagement..."
+                placeholder={useCase === 'Lookalike Audience'
+                  ? "Describe your best customers: e.g., High-income professionals aged 40-55 who travel frequently, own luxury vehicles, and have premium credit cards"
+                  : "e.g., Increase premium product sales, reach eco-conscious consumers, drive holiday shopping engagement..."
+                }
                 value={businessGoal}
                 onChange={(e) => setBusinessGoal(e.target.value)}
                 required
@@ -126,7 +130,10 @@ export default function DiscoverPage() {
                 className="resize-none"
               />
               <p className="text-sm text-muted-foreground">
-                Focus on outcomes and objectives rather than technical requirements
+                {useCase === 'Lookalike Audience'
+                  ? "Be specific about demographics, behaviors, and purchase patterns of your ideal customers"
+                  : "Focus on outcomes and objectives rather than technical requirements"
+                }
               </p>
             </div>
 

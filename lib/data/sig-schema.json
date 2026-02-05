@@ -64,6 +64,34 @@
           "creative_potential": "State-level cultural context enabling regional messaging, local partnerships, seasonal campaigns, and compliance-aware targeting",
           "combination_signals": "Geographic foundation that modifies all demographic and behavioral targeting with regional context"
         },
+        "CITY": {
+          "type": "TEXT",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "City-level geographic targeting for metro-specific campaigns, local market activation, and urban center focus",
+          "creative_potential": "Direct city targeting enables local market campaigns, metro-specific messaging, city lifestyle positioning, and regional hub strategies",
+          "combination_signals": "City-level precision that enables metro targeting when combined with STATE for disambiguation (e.g., Springfield + state)"
+        },
+        "DMA": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Designated Market Area code - industry standard for media buying, TV advertising regions, and broadcast market targeting",
+          "creative_potential": {
+            "major_metros": "Top 25 DMAs cover ~55% of US households - ideal for national brand campaigns with regional customization",
+            "mid_tier_metros": "DMAs 26-100 offer efficient reach for regional brands and targeted expansion strategies",
+            "local_markets": "Smaller DMAs enable hyper-local media buys and community-focused campaigns"
+          },
+          "combination_signals": "Media planning foundation - combine with demographics for efficient media mix optimization and regional campaign activation"
+        },
+        "MSA": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Metropolitan Statistical Area code - census-defined metro regions for economic and demographic analysis",
+          "creative_potential": "MSA targeting enables economically-defined metro reach, urban core + suburban ring inclusion, and commuter market capture",
+          "combination_signals": "Census-aligned metro definition - useful when targeting entire economic regions rather than just city centers"
+        },
         "ZIP": {
           "type": "TEXT",
           "nullable": true,
@@ -578,6 +606,26 @@
             "1": "Travel enthusiast - wanderlust mindset, experience over things, cultural curiosity, premium hospitality, adventure seeking"
           },
           "combination_signals": "Experience economy indicator that enhances hospitality, airline, and premium credit card targeting"
+        },
+        "TRAVEL_CRUISES": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "Cruise travel signal for cruise lines, ocean travel, port destination marketing, and luxury maritime experiences",
+          "creative_potential": {
+            "1": "Cruise traveler - ocean voyages, all-inclusive mindset, port excursions, group travel comfort, floating resort lifestyle, multi-destination preference"
+          },
+          "combination_signals": "Premium travel segment - cruise travelers over-index on retirees, couples without children, higher net worth, and preference for planned itineraries"
+        },
+        "TRAVEL_FOREIGN": {
+          "type": "NUMBER",
+          "nullable": true,
+          "primary_key": false,
+          "marketing_meaning": "International travel signal for global tourism, passport holders, foreign currency services, and worldly consumer targeting",
+          "creative_potential": {
+            "1": "International traveler - global mindset, cultural exploration, passport-ready, foreign language interest, global brands, premium travel services"
+          },
+          "combination_signals": "Sophistication indicator - international travelers correlate with higher education, income, cultural curiosity, and openness to global brands"
         },
         "COOKING_AFFINITY": {
           "type": "NUMBER",

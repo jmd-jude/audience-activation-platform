@@ -17,12 +17,31 @@ function buildDiscoveryPrompt(
 ): string {
   const schemaContext = buildCompactSchemaContext();
 
+  const isLookalike = useCase === 'Lookalike Audience';
+
+  const modeInstructions = isLookalike
+    ? `The user has described their IDEAL CUSTOMER PROFILE (their best existing customers). Your task is to generate 3-6 LOOKALIKE AUDIENCES that would be statistically similar to this profile.
+
+LOOKALIKE OBJECTIVES:
+- Find broader populations with similar demographic and behavioral patterns
+- Expand beyond exact matches to discover net-new prospects who share core characteristics
+- Use multiple signal combinations to replicate the profile's defining attributes
+- Focus on audiences who HAVEN'T yet engaged with the user's brand
+
+CRITICAL: Honor explicit user constraints. If the user specifies geography (states, cities, metros), those are hard constraints - lookalike means finding similar profiles WITHIN those areas, not removing the areas. Expand within stated constraints, not by dropping them.
+
+FRAMING: Frame each audience as "Similar to..." or "Expansion of..." rather than "People who are exactly..."
+Example: "Affluent Travelers - Lookalike Expansion" not just "Affluent Travelers"
+
+For each audience, explain HOW it matches the seed profile's key signals (income, lifestyle, purchase behavior) while representing new prospect territory.`
+    : `Given a business goal, suggest 3-6 creative audience segments that could help achieve it.
+For each audience, provide a compelling marketing narrative and actionable targeting criteria.`;
+
   return `You are an expert Marketing Strategist with deep consumer intelligence expertise.
 
-Given a business goal, suggest 3-6 creative audience segments that could help achieve it.
-For each audience, provide a compelling marketing narrative and actionable targeting criteria.
+${modeInstructions}
 
-BUSINESS GOAL: ${businessGoal}
+${isLookalike ? 'CUSTOMER PROFILE' : 'BUSINESS GOAL'}: ${businessGoal}
 USE CASE: ${useCase}
 ${additionalContext ? `ADDITIONAL CONTEXT: ${additionalContext}` : ''}
 
