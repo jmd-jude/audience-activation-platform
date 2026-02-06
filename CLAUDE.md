@@ -4,7 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI Data Activation Platform is a Next.js application that transforms natural language descriptions into SQL audience segments using Claude AI. The platform allows users to generate, validate, review, and manage SQL queries for targeting consumer audiences based on a structured identity graph schema.
+AI Data Activation Platform is a Next.js application that transforms natural language into activated audience segments. The platform has a two-stage AI workflow:
+
+1. **Discovery** - AI acts as a strategic ideation partner, suggesting 3-6 creative audience concepts based on a business goal
+2. **Generation** - AI translates selected audience concepts into precise SQL queries against a Snowflake identity graph
+
+The platform validates queries in real-time against Snowflake, showing counts and sample data before activation.
 
 ## Development Commands
 
@@ -27,21 +32,24 @@ AI Data Activation Platform is a Next.js application that transforms natural lan
 
 ### Core Application Flow
 
-1. **Segment Generation Flow**:
-   - User enters natural language description in `/generate` page
-   - Request sent to `/api/generate-segment` API route
-   - API route calls Claude API with schema context and few-shot examples
-   - Claude generates structured JSON with `segmentName`, `description`, `sqlQuery`, `reasoning`, and `confidence`
-   - Generated SQL is validated against schema using `lib/sql-validator.ts`
-   - User reviews and saves as draft or approved segment
+1. **Audience Discovery Flow** (`/api/discover-audiences`):
+   - User provides business goal and use case
+   - AI acts as "Marketing Strategist" suggesting 3-6 creative audience concepts
+   - Each concept includes: name, description, key characteristics, marketing opportunity, and natural language targeting criteria
+   - AI is schema-aware and only suggests audiences achievable with available data
 
-2. **Schema-Aware Validation**:
-   - Identity graph schema loaded from `lib/data/sig-schema.json`
-   - Schema context builder (`lib/schema-context.ts`) formats schema for AI prompts
-   - SQL validator checks syntax, dangerous keywords, schema compliance, and field references
-   - Validation results shown in UI with errors/warnings
+2. **Segment Generation Flow** (`/api/generate-segment`):
+   - User selects an audience concept (or enters custom description)
+   - AI generates SQL query with `segmentName`, `description`, `sqlQuery`, `reasoning`, and `confidence`
+   - SQL validated client-side against schema using `lib/sql-validator.ts`
 
-3. **Data Layer**:
+3. **Snowflake Validation Flow** (`/api/snowflake/count`):
+   - User clicks "Validate Audience" to run query against live Snowflake
+   - Query is wrapped in CTE + COUNT(*) to get audience size without fetching all rows
+   - Separate LIMIT 10 query fetches sample data for preview
+   - Returns: audience size, execution time, sample rows with column metadata
+
+4. **Data Layer**:
    - Prisma ORM with SQLite database (`prisma/dev.db`)
    - Single `Segment` model tracks generated segments with status workflow (draft → approved → active)
    - Segments include metadata: `usageCount`, `estimatedSize`, `approvedBy`, `approvedAt`
@@ -71,9 +79,14 @@ AI Data Activation Platform is a Next.js application that transforms natural lan
 
 ```
 app/
-├── api/                    # API routes
-│   ├── generate-segment/   # Claude AI segment generation
-│   ├── validate-sql/       # SQL validation endpoint
+├── api/
+│   ├── discover-audiences/ # AI-powered audience ideation
+│   ├── generate-segment/   # Claude AI SQL generation
+│   ├── validate-sql/       # Client-side SQL validation
+│   ├── snowflake/
+│   │   ├── count/          # Get audience size + sample data (primary validation)
+│   │   ├── validate/       # EXPLAIN-based query validation
+│   │   └── execute/        # Full query execution with optional LIMIT
 │   └── segments/           # CRUD operations for segments
 ├── generate/               # Generate new segment page
 ├── library/                # Browse all segments page
@@ -89,6 +102,7 @@ lib/
 ├── db.ts                   # Prisma client singleton
 ├── prompts.ts              # Prompt building functions
 ├── schema-context.ts       # Schema formatting utilities
+├── snowflake.ts            # Snowflake SDK connection class
 ├── sql-validator.ts        # SQL validation logic
 └── utils.ts                # Utility functions (formatNumber, formatDate, cn)
 
@@ -105,8 +119,19 @@ prisma/
 ## Environment Setup
 
 Required environment variables in `.env.local`:
+
+**Anthropic API:**
 - `ANTHROPIC_API_KEY` - Anthropic API key for Claude access
 - `ANTHROPIC_MODEL` - Model to use (default: `claude-sonnet-4-5-20250929`)
+
+**Snowflake Connection:**
+- `SNOWFLAKE_ACCOUNT` - Snowflake account identifier
+- `SNOWFLAKE_USERNAME` - Service account username
+- `SNOWFLAKE_DATABASE` - Target database name
+- `SNOWFLAKE_WAREHOUSE` - Warehouse to use for queries
+- `SNOWFLAKE_SCHEMA` - Default schema
+- `SNOWFLAKE_PRIVATE_KEY` - Private key for JWT authentication (PEM format, can have escaped `\n`)
+- `SNOWFLAKE_TIMEOUT` - Optional query timeout in ms (default: 30000)
 
 ## Important Implementation Notes
 
@@ -114,7 +139,17 @@ Required environment variables in `.env.local`:
 - Model responses must be parsed to extract JSON from text content
 - Use regex `\{[\s\S]*\}` to extract JSON from Claude responses
 - Always include schema context in prompts to ensure valid SQL generation
-- Validation runs client-side AND server-side (in API route)
+- Discovery endpoint (`/api/discover-audiences`) returns audience concepts with `targetingCriteria.naturalLanguageInput` for subsequent SQL generation
+
+### When Working with Snowflake Integration
+- `lib/snowflake.ts` provides `SnowflakeConnection` class with JWT private key auth
+- Use `createSnowflakeConnection()` factory function which reads from env vars
+- Always call `disconnect()` in finally blocks to clean up connections
+- The `/api/snowflake/count` endpoint wraps queries in CTE for efficient counting:
+  ```sql
+  WITH segment_base AS (user_query) SELECT COUNT(*) FROM segment_base
+  ```
+- Sample data queries append `LIMIT 10` to user's query
 
 ### When Working with Segments
 - Segment lifecycle: draft → approved → active

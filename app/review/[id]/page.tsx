@@ -27,7 +27,7 @@ interface Segment {
   updatedAt: Date | string;
 }
 
-const useCases = ['Marketing', 'Sales', 'Analytics', 'Customer Acquisition', 'Retention'];
+const useCases = ['Marketing', 'Sales', 'Analytics', 'Customer Acquisition', 'Retention', 'Lookalike Audience'];
 
 export default function ReviewPage() {
   const router = useRouter();

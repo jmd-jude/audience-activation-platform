@@ -95,7 +95,7 @@ export function GenerateForm({ onGenerate, initialValues }: GenerateFormProps) {
               onChange={(e) => setNaturalLanguageInput(e.target.value)}
               required
               rows={4}
-              className="resize-none"
+              className="resize-y"
             />
             <p className="text-sm text-muted-foreground">
               {useCase === 'Lookalike Audience'
@@ -131,7 +131,7 @@ export function GenerateForm({ onGenerate, initialValues }: GenerateFormProps) {
               value={additionalContext}
               onChange={(e) => setAdditionalContext(e.target.value)}
               rows={2}
-              className="resize-none"
+              className="resize-y"
             />
           </div>
 
