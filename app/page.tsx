@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SegmentCard } from '@/components/SegmentCard';
 import { formatNumber, formatDate, formatCurrency, formatDecimal } from '@/lib/utils';
-import { Library, TrendingUp, Clock, Loader2, Lightbulb, Rocket, DollarSign } from 'lucide-react';
+import { Library, TrendingUp, Clock, Loader2, Lightbulb, Rocket, DollarSign, Sparkles } from 'lucide-react';
 
 interface Segment {
   id: string;
