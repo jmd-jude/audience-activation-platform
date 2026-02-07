@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SegmentCard } from '@/components/SegmentCard';
-import { formatNumber, formatDate } from '@/lib/utils';
-import { Sparkles, Library, TrendingUp, CheckCircle2, Clock, Loader2, Lightbulb } from 'lucide-react';
+import { formatNumber, formatDate, formatCurrency, formatDecimal } from '@/lib/utils';
+import { Library, TrendingUp, Clock, Loader2, Lightbulb, Rocket, DollarSign } from 'lucide-react';
 
 interface Segment {
   id: string;
@@ -31,6 +31,16 @@ interface Stats {
   mostPopularUseCase: string;
 }
 
+interface PerformanceStats {
+  totalActivations: number;
+  activeActivations: number;
+  totalSpend: number;
+  totalRevenue: number;
+  totalImpressions: number;
+  totalConversions: number;
+  avgROAS: number;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [segments, setSegments] = useState<Segment[]>([]);
@@ -42,9 +52,19 @@ export default function DashboardPage() {
     totalAudienceSize: 0,
     mostPopularUseCase: 'N/A',
   });
+  const [performanceStats, setPerformanceStats] = useState<PerformanceStats>({
+    totalActivations: 0,
+    activeActivations: 0,
+    totalSpend: 0,
+    totalRevenue: 0,
+    totalImpressions: 0,
+    totalConversions: 0,
+    avgROAS: 0,
+  });
 
   useEffect(() => {
     fetchSegments();
+    fetchPerformanceOverview();
   }, []);
 
   const fetchSegments = async () => {
@@ -84,6 +104,17 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchPerformanceOverview = async () => {
+    try {
+      const response = await fetch('/api/performance/overview');
+      if (!response.ok) throw new Error('Failed to fetch performance overview');
+      const data = await response.json();
+      setPerformanceStats(data);
+    } catch (err) {
+      console.error('Error fetching performance overview:', err);
+    }
+  };
+
   const recentSegments = segments
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 9);
@@ -104,7 +135,7 @@ export default function DashboardPage() {
       ) : (
         <>
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Segments</CardTitle>
@@ -114,19 +145,6 @@ export default function DashboardPage() {
                 <div className="text-2xl font-bold">{stats.total}</div>
                 <p className="text-xs text-muted-foreground">
                   {stats.approved} approved, {stats.draft} draft
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Approved Segments</CardTitle>
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.approved}</div>
-                <p className="text-xs text-muted-foreground">
-                  Ready for activation
                 </p>
               </CardContent>
             </Card>
@@ -147,7 +165,7 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Most Popular Use Case</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <Lightbulb className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.mostPopularUseCase}</div>
@@ -158,29 +176,49 @@ export default function DashboardPage() {
             </Card>
           </div>
 
-          {/* Quick Actions */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Get started with common tasks</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-4">
-                <Button onClick={() => router.push('/discover')}>
-                  <Lightbulb className="h-4 w-4 mr-2" />
-                  Discover Audiences
-                </Button>
-                <Button onClick={() => router.push('/generate')} variant="outline">
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Generate New Segment
-                </Button>
-                <Button variant="outline" onClick={() => router.push('/library')}>
-                  <Library className="h-4 w-4 mr-2" />
-                  Browse Library
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Performance Stats */}
+          {performanceStats.totalActivations > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Campaigns</CardTitle>
+                  <Rocket className="h-4 w-4 text-purple-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{performanceStats.activeActivations}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {performanceStats.totalActivations} total activations
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Campaign Spend</CardTitle>
+                  <DollarSign className="h-4 w-4 text-orange-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{formatCurrency(performanceStats.totalSpend)}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {formatNumber(performanceStats.totalImpressions)} impressions
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Avg ROAS</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-green-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{formatDecimal(performanceStats.avgROAS)}x</div>
+                  <p className="text-xs text-muted-foreground">
+                    {formatNumber(performanceStats.totalConversions)} conversions
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {/* Recent Segments */}
           <div className="mb-8">

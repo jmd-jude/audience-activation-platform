@@ -13,7 +13,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Save, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Loader2, Save, CheckCircle2, AlertCircle, ArrowLeft, Rocket } from 'lucide-react';
+import { ActivateSegmentDialog } from '@/components/ActivateSegmentDialog';
+import { ActivationCard } from '@/components/ActivationCard';
+import { PerformanceEntryForm } from '@/components/PerformanceEntryForm';
 
 interface Segment {
   id: string;
@@ -45,9 +48,13 @@ export default function ReviewPage() {
   const [sqlQuery, setSqlQuery] = useState('');
   const [estimatedSize, setEstimatedSize] = useState('');
   const [status, setStatus] = useState('draft');
+  const [isActivateDialogOpen, setIsActivateDialogOpen] = useState(false);
+  const [activations, setActivations] = useState<any[]>([]);
+  const [selectedActivationForMetrics, setSelectedActivationForMetrics] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSegment();
+    fetchActivations();
   }, [segmentId]);
 
   const fetchSegment = async () => {
@@ -68,6 +75,17 @@ export default function ReviewPage() {
       setError(err.message);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchActivations = async () => {
+    try {
+      const response = await fetch(`/api/segments/${segmentId}/activations`);
+      if (!response.ok) throw new Error('Failed to fetch activations');
+      const data = await response.json();
+      setActivations(data);
+    } catch (err: any) {
+      console.error('Error fetching activations:', err);
     }
   };
 
@@ -262,6 +280,55 @@ export default function ReviewPage() {
           </CardContent>
         </Card>
 
+        {/* Activations Section */}
+        {(status === 'approved' || status === 'active') && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Activations & Performance</CardTitle>
+                  <CardDescription>
+                    Platform activations and their performance metrics
+                  </CardDescription>
+                </div>
+                <Button onClick={() => setIsActivateDialogOpen(true)}>
+                  <Rocket className="h-4 w-4 mr-2" />
+                  Activate on Platform
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {activations.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No activations yet. Activate this segment on an advertising platform to start tracking performance.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {activations.map((activation) => (
+                    <ActivationCard
+                      key={activation.id}
+                      activation={activation}
+                      onAddMetrics={(id) => setSelectedActivationForMetrics(id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Performance Entry Form (conditionally shown) */}
+        {selectedActivationForMetrics && (
+          <PerformanceEntryForm
+            activationId={selectedActivationForMetrics}
+            onSuccess={() => {
+              setSelectedActivationForMetrics(null);
+              fetchActivations();
+            }}
+            onCancel={() => setSelectedActivationForMetrics(null)}
+          />
+        )}
+
         {/* Actions */}
         <div className="flex gap-2 justify-end">
           <Button
@@ -290,6 +357,18 @@ export default function ReviewPage() {
           </Button>
         </div>
       </div>
+
+      {/* Activate Dialog */}
+      <ActivateSegmentDialog
+        segmentId={segmentId}
+        segmentName={segmentName}
+        isOpen={isActivateDialogOpen}
+        onClose={() => setIsActivateDialogOpen(false)}
+        onSuccess={() => {
+          setIsActivateDialogOpen(false);
+          fetchActivations();
+        }}
+      />
     </div>
   );
 }

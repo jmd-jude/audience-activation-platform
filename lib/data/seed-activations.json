@@ -1,0 +1,205 @@
+[
+  {
+    "segmentName": "High-Value Tech Enthusiasts",
+    "activations": [
+      {
+        "platform": "meta",
+        "platformName": "Meta Ads Manager",
+        "externalAudienceId": "23856772345678123",
+        "audienceSize": 2450000,
+        "status": "active",
+        "activatedAt": "2025-11-05T14:30:00.000Z",
+        "metrics": [
+          {
+            "periodStart": "2025-11-05",
+            "periodEnd": "2025-11-11",
+            "periodType": "weekly",
+            "impressions": 3500000,
+            "clicks": 87500,
+            "conversions": 1750,
+            "spend": 18500,
+            "revenue": 87500,
+            "matchRate": 98.4
+          },
+          {
+            "periodStart": "2025-11-12",
+            "periodEnd": "2025-11-18",
+            "periodType": "weekly",
+            "impressions": 4200000,
+            "clicks": 105000,
+            "conversions": 2100,
+            "spend": 22000,
+            "revenue": 105000,
+            "matchRate": 98.1
+          },
+          {
+            "periodStart": "2025-11-19",
+            "periodEnd": "2025-11-25",
+            "periodType": "weekly",
+            "impressions": 3900000,
+            "clicks": 97500,
+            "conversions": 1950,
+            "spend": 20500,
+            "revenue": 97500,
+            "matchRate": 98.2
+          }
+        ]
+      },
+      {
+        "platform": "google",
+        "platformName": "Google Ads",
+        "externalAudienceId": "aud-8475839202947",
+        "audienceSize": 2380000,
+        "status": "active",
+        "activatedAt": "2025-11-08T09:15:00.000Z",
+        "metrics": [
+          {
+            "periodStart": "2025-11-08",
+            "periodEnd": "2025-11-14",
+            "periodType": "weekly",
+            "impressions": 2800000,
+            "clicks": 56000,
+            "conversions": 1120,
+            "spend": 15600,
+            "revenue": 67200,
+            "matchRate": 95.2
+          },
+          {
+            "periodStart": "2025-11-15",
+            "periodEnd": "2025-11-21",
+            "periodType": "weekly",
+            "impressions": 3100000,
+            "clicks": 62000,
+            "conversions": 1240,
+            "spend": 17200,
+            "revenue": 74400,
+            "matchRate": 95.8
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "segmentName": "Mobile-First Millennials",
+    "activations": [
+      {
+        "platform": "tiktok",
+        "platformName": "TikTok Ads",
+        "externalAudienceId": "aud_tiktok_12847563",
+        "audienceSize": 3150000,
+        "status": "active",
+        "activatedAt": "2025-11-10T11:00:00.000Z",
+        "metrics": [
+          {
+            "periodStart": "2025-11-10",
+            "periodEnd": "2025-11-16",
+            "periodType": "weekly",
+            "impressions": 8500000,
+            "clicks": 340000,
+            "conversions": 6800,
+            "spend": 28000,
+            "revenue": 136000,
+            "matchRate": 97.8
+          },
+          {
+            "periodStart": "2025-11-17",
+            "periodEnd": "2025-11-23",
+            "periodType": "weekly",
+            "impressions": 9200000,
+            "clicks": 368000,
+            "conversions": 7360,
+            "spend": 30400,
+            "revenue": 147200,
+            "matchRate": 97.5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "segmentName": "Business Decision Makers",
+    "activations": [
+      {
+        "platform": "linkedin",
+        "platformName": "LinkedIn Campaign Manager",
+        "externalAudienceId": "urn:li:sponsoredCampaignGroup:847563920",
+        "audienceSize": 925000,
+        "status": "active",
+        "activatedAt": "2025-11-12T08:30:00.000Z",
+        "metrics": [
+          {
+            "periodStart": "2025-11-12",
+            "periodEnd": "2025-11-18",
+            "periodType": "weekly",
+            "impressions": 450000,
+            "clicks": 13500,
+            "conversions": 540,
+            "spend": 12600,
+            "revenue": 81000,
+            "matchRate": 92.5,
+            "notes": "High engagement from C-suite decision makers"
+          },
+          {
+            "periodStart": "2025-11-19",
+            "periodEnd": "2025-11-25",
+            "periodType": "weekly",
+            "impressions": 480000,
+            "clicks": 14400,
+            "conversions": 576,
+            "spend": 13440,
+            "revenue": 86400,
+            "matchRate": 93.1,
+            "notes": "Continued strong performance with enterprise accounts"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "segmentName": "Travel Intent Shoppers",
+    "activations": [
+      {
+        "platform": "meta",
+        "platformName": "Meta Ads Manager",
+        "externalAudienceId": "23847593847593001",
+        "audienceSize": 1850000,
+        "status": "active",
+        "activatedAt": "2025-11-15T16:20:00.000Z",
+        "metrics": [
+          {
+            "periodStart": "2025-11-15",
+            "periodEnd": "2025-11-21",
+            "periodType": "weekly",
+            "impressions": 2100000,
+            "clicks": 63000,
+            "conversions": 1890,
+            "spend": 16800,
+            "revenue": 94500,
+            "matchRate": 96.7
+          }
+        ]
+      },
+      {
+        "platform": "pinterest",
+        "platformName": "Pinterest Ads",
+        "externalAudienceId": "pinterest-aud-938475920",
+        "audienceSize": 1720000,
+        "status": "active",
+        "activatedAt": "2025-11-18T10:45:00.000Z",
+        "metrics": [
+          {
+            "periodStart": "2025-11-18",
+            "periodEnd": "2025-11-24",
+            "periodType": "weekly",
+            "impressions": 1800000,
+            "clicks": 72000,
+            "conversions": 2160,
+            "spend": 14400,
+            "revenue": 86400,
+            "matchRate": 94.2
+          }
+        ]
+      }
+    ]
+  }
+]

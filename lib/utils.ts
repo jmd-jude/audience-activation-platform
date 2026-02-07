@@ -122,3 +122,78 @@ export function safeJsonParse<T>(json: string, fallback: T): T {
     return fallback;
   }
 }
+
+/**
+ * Formats currency values
+ */
+export function formatCurrency(amount: number | null | undefined): string {
+  if (amount === null || amount === undefined) return 'N/A';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
+/**
+ * Formats percentage values
+ */
+export function formatPercent(value: number | null | undefined, decimals: number = 2): string {
+  if (value === null || value === undefined) return 'N/A';
+  return `${value.toFixed(decimals)}%`;
+}
+
+/**
+ * Formats decimal values (for ROAS)
+ */
+export function formatDecimal(value: number | null | undefined, decimals: number = 2): string {
+  if (value === null || value === undefined) return 'N/A';
+  return value.toFixed(decimals);
+}
+
+/**
+ * Calculates derived metrics
+ */
+export function calculateMetrics(data: {
+  impressions?: number | null;
+  clicks?: number | null;
+  conversions?: number | null;
+  spend?: number | null;
+  revenue?: number | null;
+}) {
+  return {
+    ctr: data.clicks && data.impressions ? (data.clicks / data.impressions) * 100 : null,
+    cpa: data.spend && data.conversions ? data.spend / data.conversions : null,
+    roas: data.revenue && data.spend ? data.revenue / data.spend : null,
+    conversionRate: data.conversions && data.clicks ? (data.conversions / data.clicks) * 100 : null,
+  };
+}
+
+/**
+ * Gets platform badge color
+ */
+export function getPlatformColor(platform: string): string {
+  const colors: Record<string, string> = {
+    meta: 'bg-blue-100 text-blue-800',
+    google: 'bg-red-100 text-red-800',
+    tiktok: 'bg-pink-100 text-pink-800',
+    linkedin: 'bg-cyan-100 text-cyan-800',
+    mntn: 'bg-purple-100 text-purple-800',
+    pinterest: 'bg-rose-100 text-rose-800',
+  };
+  return colors[platform.toLowerCase()] || 'bg-gray-100 text-gray-800';
+}
+
+/**
+ * Gets activation status color
+ */
+export function getActivationStatusColor(status: string): string {
+  const colors: Record<string, string> = {
+    active: 'bg-green-100 text-green-800',
+    paused: 'bg-yellow-100 text-yellow-800',
+    completed: 'bg-blue-100 text-blue-800',
+    failed: 'bg-red-100 text-red-800',
+  };
+  return colors[status] || 'bg-gray-100 text-gray-800';
+}

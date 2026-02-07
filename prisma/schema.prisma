@@ -8,18 +8,72 @@ datasource db {
 }
 
 model Segment {
-  id            String   @id @default(cuid())
+  id            String       @id @default(cuid())
   segmentName   String
   description   String
   targetUseCase String
   sqlQuery      String
-  status        String   @default("draft") // "draft", "approved", "active"
-  createdBy     String   @default("demo-user")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  usageCount    Int      @default(0)
+  status        String       @default("draft") // "draft", "approved", "active"
+  createdBy     String       @default("demo-user")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  usageCount    Int          @default(0)
   lastUsed      DateTime?
   estimatedSize Int?
   approvedBy    String?
   approvedAt    DateTime?
+  activations   Activation[]
+}
+
+model Activation {
+  id                  String              @id @default(cuid())
+  segmentId           String
+  segment             Segment             @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  platform            String              // "meta", "google", "tiktok", "linkedin", "twitter", "pinterest"
+  platformName        String              // "Meta Ads Manager", "Google Ads", etc.
+  externalAudienceId  String              // Platform's audience/campaign ID
+  audienceSize        Int?
+  status              String              @default("active") // "active", "paused", "completed", "failed"
+  activatedAt         DateTime            @default(now())
+  activatedBy         String              @default("demo-user")
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  metrics             PerformanceMetric[]
+
+  @@index([segmentId])
+  @@index([status])
+}
+
+model PerformanceMetric {
+  id              String     @id @default(cuid())
+  activationId    String
+  activation      Activation @relation(fields: [activationId], references: [id], onDelete: Cascade)
+
+  periodStart     DateTime
+  periodEnd       DateTime
+  periodType      String     @default("custom") // "daily", "weekly", "monthly", "custom"
+
+  // Core metrics (all optional)
+  impressions     Int?
+  clicks          Int?
+  conversions     Int?
+  spend           Float?
+  revenue         Float?
+
+  // Computed metrics (calculated and stored)
+  ctr             Float?     // clicks / impressions * 100
+  cpa             Float?     // spend / conversions
+  roas            Float?     // revenue / spend
+  conversionRate  Float?     // conversions / clicks * 100
+
+  matchRate       Float?     // % matched on platform
+  source          String     @default("manual")
+  notes           String?
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  createdBy       String     @default("demo-user")
+
+  @@index([activationId])
+  @@index([periodStart, periodEnd])
 }

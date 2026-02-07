@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDate, formatNumber, getStatusColor, getUseCaseColor, truncate } from '@/lib/utils';
-import { Eye, Copy, Pencil, Trash2 } from 'lucide-react';
+import { Eye, Copy, Pencil, Trash2, Rocket } from 'lucide-react';
 
 interface Segment {
   id: string;
@@ -24,9 +24,10 @@ interface SegmentCardProps {
   onEdit?: (id: string) => void;
   onClone?: (id: string) => void;
   onDelete?: (id: string) => void;
+  onActivate?: (id: string) => void;
 }
 
-export function SegmentCard({ segment, onView, onEdit, onClone, onDelete }: SegmentCardProps) {
+export function SegmentCard({ segment, onView, onEdit, onClone, onDelete, onActivate }: SegmentCardProps) {
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader>
@@ -68,6 +69,12 @@ export function SegmentCard({ segment, onView, onEdit, onClone, onDelete }: Segm
           <Button variant="default" size="sm" onClick={() => onView(segment.id)}>
             <Eye className="h-4 w-4 mr-1" />
             View
+          </Button>
+        )}
+        {onActivate && (segment.status === 'approved' || segment.status === 'active') && (
+          <Button variant="default" size="sm" onClick={() => onActivate(segment.id)}>
+            <Rocket className="h-4 w-4 mr-1" />
+            Activate
           </Button>
         )}
         {onEdit && (
