@@ -108,7 +108,8 @@ TECHNICAL REQUIREMENTS:
 export function buildPromptWithContext(
   userInput: string,
   useCase: string,
-  additionalContext?: string
+  additionalContext?: string,
+  clarificationQA?: Array<{ question: string; answer: string }>
 ): string {
   const schemaContext = buildCompactSchemaContext();
   const semanticContext = buildSemanticContext();
@@ -146,6 +147,10 @@ USER REQUEST:
 ${isLookalike ? 'Customer Profile' : 'Target Description'}: ${userInput}
 Use Case: ${useCase}
 ${additionalContext ? `Additional Context: ${additionalContext}` : ''}
+${clarificationQA && clarificationQA.length > 0 ? `
+CLARIFICATIONS PROVIDED:
+${clarificationQA.map(qa => `Q: ${qa.question}\nA: ${qa.answer}`).join('\n\n')}
+` : ''}
 
 Generate a complete audience segment with metadata. Return ONLY valid JSON in this exact format:
 

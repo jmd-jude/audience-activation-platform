@@ -12,7 +12,7 @@ const anthropic = new Anthropic({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { naturalLanguageInput, useCase, additionalContext, executeQuery = false } = body;
+    const { naturalLanguageInput, useCase, additionalContext, executeQuery = false, clarificationQA } = body;
 
     // Validation
     if (!naturalLanguageInput || !useCase) {
@@ -35,7 +35,8 @@ export async function POST(request: NextRequest) {
     const prompt = buildPromptWithContext(
       naturalLanguageInput,
       useCase,
-      additionalContext
+      additionalContext,
+      clarificationQA
     );
 
     // Call Claude API

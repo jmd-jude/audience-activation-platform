@@ -22,6 +22,24 @@ interface GeneratedSegment {
   useCase?: string;
 }
 
+interface ClarificationQuestion {
+  id: string;
+  question: string;
+  options?: string[];
+  rationale?: string;
+}
+
+interface ClarificationState {
+  questions: ClarificationQuestion[];
+  answers: Record<string, string>;
+  additionalContext?: string;
+  originalInput: {
+    naturalLanguageInput: string;
+    useCase: string;
+    additionalContext?: string;
+  };
+}
+
 function GeneratePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -34,6 +52,10 @@ function GeneratePageContent() {
     useCase: string;
     additionalContext: string;
   } | null>(null);
+
+  // Clarification state
+  const [clarificationState, setClarificationState] = useState<ClarificationState | null>(null);
+  const [isCheckingClarification, setIsCheckingClarification] = useState(false);
 
   // Validation state
   const [isValidating, setIsValidating] = useState(false);
@@ -70,11 +92,57 @@ function GeneratePageContent() {
     setError(null);
     setValidationResults(null); // Clear previous validation results when regenerating
     setValidationError(null);
+    setClarificationState(null); // Clear any previous clarification state
+
+    // Step 1: Check if clarification is needed
+    setIsCheckingClarification(true);
+    try {
+      const clarifyResponse = await fetch('/api/clarify-segment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (clarifyResponse.ok) {
+        const clarifyResult = await clarifyResponse.json();
+
+        if (clarifyResult.needsClarification && clarifyResult.questions?.length > 0) {
+          // Show clarification questions
+          setClarificationState({
+            questions: clarifyResult.questions,
+            answers: {},
+            originalInput: data,
+          });
+          setIsCheckingClarification(false);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('Clarification check failed, proceeding with generation:', err);
+      // Continue to generation even if clarification check fails
+    }
+    setIsCheckingClarification(false);
+
+    // Step 2: Generate segment (either directly or if clarification was skipped)
+    await generateSegment(data);
+  };
+
+  const generateSegment = async (
+    data: {
+      naturalLanguageInput: string;
+      useCase: string;
+      additionalContext?: string;
+    },
+    clarificationQA?: Array<{ question: string; answer: string }>
+  ) => {
     try {
       const response = await fetch('/api/generate-segment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          clarificationQA,
+        }),
       });
 
       if (!response.ok) {
@@ -87,6 +155,37 @@ function GeneratePageContent() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     }
+  };
+
+  const handleClarificationSubmit = async () => {
+    if (!clarificationState) return;
+
+    // Build clarification Q&A array
+    const clarificationQA = clarificationState.questions.map(q => ({
+      question: q.question,
+      answer: clarificationState.answers[q.id] || 'No specific preference',
+    }));
+
+    // Add additional context as a clarification if provided
+    if (clarificationState.additionalContext?.trim()) {
+      clarificationQA.push({
+        question: 'Additional context provided',
+        answer: clarificationState.additionalContext.trim(),
+      });
+    }
+
+    // Clear clarification state and generate
+    setClarificationState(null);
+    await generateSegment(clarificationState.originalInput, clarificationQA);
+  };
+
+  const handleSkipClarification = async () => {
+    if (!clarificationState) return;
+
+    // Clear clarification state and generate without answers
+    const originalInput = clarificationState.originalInput;
+    setClarificationState(null);
+    await generateSegment(originalInput);
   };
 
   const handleValidate = async () => {
@@ -195,6 +294,105 @@ function GeneratePageContent() {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
+          )}
+
+          {/* Clarification Questions */}
+          {clarificationState && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Quick Clarification
+                </CardTitle>
+                <CardDescription>
+                  Help us refine your audience by answering these questions
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {clarificationState.questions.map((q) => (
+                  <div key={q.id} className="space-y-2">
+                    <label className="text-sm font-medium">
+                      {q.question}
+                    </label>
+                    {q.rationale && (
+                      <p className="text-xs text-muted-foreground">{q.rationale}</p>
+                    )}
+                    {q.options && q.options.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        {q.options.map((option) => (
+                          <Button
+                            key={option}
+                            variant={
+                              clarificationState.answers[q.id] === option
+                                ? 'default'
+                                : 'outline'
+                            }
+                            onClick={() => {
+                              setClarificationState({
+                                ...clarificationState,
+                                answers: {
+                                  ...clarificationState.answers,
+                                  [q.id]: option,
+                                },
+                              });
+                            }}
+                            className="justify-start"
+                          >
+                            {option}
+                          </Button>
+                        ))}
+                      </div>
+                    ) : (
+                      <textarea
+                        className="w-full min-h-[80px] px-3 py-2 text-sm border rounded-md"
+                        placeholder="Your answer..."
+                        value={clarificationState.answers[q.id] || ''}
+                        onChange={(e) => {
+                          setClarificationState({
+                            ...clarificationState,
+                            answers: {
+                              ...clarificationState.answers,
+                              [q.id]: e.target.value,
+                            },
+                          });
+                        }}
+                      />
+                    )}
+                  </div>
+                ))}
+
+                {/* Optional additional context */}
+                <div className="space-y-2 pt-2 border-t">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Additional context (optional)
+                  </label>
+                  <textarea
+                    className="w-full min-h-[60px] px-3 py-2 text-sm border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Any other details that might help refine the audience..."
+                    value={clarificationState.additionalContext || ''}
+                    onChange={(e) => {
+                      setClarificationState({
+                        ...clarificationState,
+                        additionalContext: e.target.value,
+                      });
+                    }}
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button onClick={handleClarificationSubmit} className="flex-1">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generate with Clarifications
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleSkipClarification}
+                  >
+                    Skip
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {generatedSegment && (
@@ -354,11 +552,18 @@ function GeneratePageContent() {
             </>
           )}
 
-          {!generatedSegment && !error && (
+          {!generatedSegment && !error && !clarificationState && (
             <Card className="border-dashed">
               <CardContent className="flex items-center justify-center h-96">
                 <div className="text-center text-muted-foreground">
-                  <p>Generated segment will appear here</p>
+                  {isCheckingClarification ? (
+                    <>
+                      <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                      <p>Analyzing your request...</p>
+                    </>
+                  ) : (
+                    <p>Generated segment will appear here</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
