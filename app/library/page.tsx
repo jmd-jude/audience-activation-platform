@@ -12,6 +12,18 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Search, AlertCircle } from 'lucide-react';
 
+interface SegmentMetrics {
+  impressions: number;
+  clicks: number;
+  conversions: number;
+  spend: number;
+  revenue: number;
+  roas: number | null;
+  ctr: number | null;
+  activeActivations: number;
+  totalActivations: number;
+}
+
 interface Segment {
   id: string;
   segmentName: string;
@@ -26,6 +38,7 @@ interface Segment {
   updatedAt: Date | string;
   approvedBy?: string | null;
   approvedAt?: Date | string | null;
+  metrics?: SegmentMetrics | null;
 }
 
 export default function LibraryPage() {

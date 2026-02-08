@@ -33,13 +33,71 @@ export async function GET(request: NextRequest) {
     const orderBy: any = {};
     orderBy[sortBy] = sortOrder;
 
-    // Query database
+    // Query database with activations and their latest metrics
     const segments = await prisma.segment.findMany({
       where,
       orderBy,
+      include: {
+        activations: {
+          include: {
+            metrics: {
+              orderBy: { periodEnd: 'desc' },
+              take: 1, // Get only the latest metric for each activation
+            },
+          },
+        },
+      },
     });
 
-    return NextResponse.json(segments);
+    // Aggregate metrics across all activations for each segment
+    const segmentsWithMetrics = segments.map((segment) => {
+      const latestMetrics = segment.activations
+        .map((activation) => activation.metrics[0])
+        .filter((metric) => metric !== undefined);
+
+      // Aggregate the metrics
+      const aggregatedMetrics = latestMetrics.reduce(
+        (acc, metric) => ({
+          impressions: acc.impressions + (metric.impressions || 0),
+          clicks: acc.clicks + (metric.clicks || 0),
+          conversions: acc.conversions + (metric.conversions || 0),
+          spend: acc.spend + (metric.spend || 0),
+          revenue: acc.revenue + (metric.revenue || 0),
+        }),
+        { impressions: 0, clicks: 0, conversions: 0, spend: 0, revenue: 0 }
+      );
+
+      // Calculate derived metrics
+      const hasMetrics = latestMetrics.length > 0;
+      const roas = aggregatedMetrics.spend > 0
+        ? aggregatedMetrics.revenue / aggregatedMetrics.spend
+        : null;
+      const ctr = aggregatedMetrics.impressions > 0
+        ? (aggregatedMetrics.clicks / aggregatedMetrics.impressions) * 100
+        : null;
+
+      // Remove activations from response, just include aggregated metrics
+      const { activations: _activations, ...segmentData } = segment;
+
+      return {
+        ...segmentData,
+        metrics: hasMetrics
+          ? {
+              impressions: aggregatedMetrics.impressions,
+              clicks: aggregatedMetrics.clicks,
+              conversions: aggregatedMetrics.conversions,
+              spend: aggregatedMetrics.spend,
+              revenue: aggregatedMetrics.revenue,
+              roas,
+              ctr,
+              activeActivations: segment.activations.filter(a => a.status === 'active').length,
+              totalActivations: segment.activations.length,
+            }
+          : null,
+      };
+    });
+
+    return NextResponse.json(segmentsWithMetrics);
   } catch (error: any) {
     console.error('Error fetching segments:', error);
     return NextResponse.json(

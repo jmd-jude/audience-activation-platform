@@ -9,6 +9,18 @@ import { SegmentCard } from '@/components/SegmentCard';
 import { formatNumber, formatDate, formatCurrency, formatDecimal } from '@/lib/utils';
 import { Library, TrendingUp, Clock, Loader2, Lightbulb, Rocket, DollarSign, Sparkles } from 'lucide-react';
 
+interface SegmentMetrics {
+  impressions: number;
+  clicks: number;
+  conversions: number;
+  spend: number;
+  revenue: number;
+  roas: number | null;
+  ctr: number | null;
+  activeActivations: number;
+  totalActivations: number;
+}
+
 interface Segment {
   id: string;
   segmentName: string;
@@ -21,6 +33,7 @@ interface Segment {
   lastUsed?: Date | string | null;
   createdAt: Date | string;
   updatedAt: Date | string;
+  metrics?: SegmentMetrics | null;
 }
 
 interface Stats {

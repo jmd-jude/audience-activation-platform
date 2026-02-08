@@ -1,10 +1,23 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { formatDate, formatNumber, getStatusColor, getUseCaseColor, truncate } from '@/lib/utils';
-import { Eye, Copy, Pencil, Trash2, Rocket } from 'lucide-react';
+import { formatDate, formatNumber, formatCurrency, formatDecimal, formatPercent, getStatusColor, getUseCaseColor, truncate } from '@/lib/utils';
+import { Eye, Copy, Pencil, Trash2, Rocket, ChevronDown, ChevronUp } from 'lucide-react';
+
+interface SegmentMetrics {
+  impressions: number;
+  clicks: number;
+  conversions: number;
+  spend: number;
+  revenue: number;
+  roas: number | null;
+  ctr: number | null;
+  activeActivations: number;
+  totalActivations: number;
+}
 
 interface Segment {
   id: string;
@@ -16,6 +29,7 @@ interface Segment {
   usageCount: number;
   lastUsed?: Date | string | null;
   createdAt: Date | string;
+  metrics?: SegmentMetrics | null;
 }
 
 interface SegmentCardProps {
@@ -28,6 +42,9 @@ interface SegmentCardProps {
 }
 
 export function SegmentCard({ segment, onView, onEdit, onClone, onDelete, onActivate }: SegmentCardProps) {
+  const [isMetricsExpanded, setIsMetricsExpanded] = useState(false);
+  const hasMetrics = segment.metrics !== null && segment.metrics !== undefined;
+
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader>
@@ -52,15 +69,65 @@ export function SegmentCard({ segment, onView, onEdit, onClone, onDelete, onActi
               {segment.estimatedSize ? formatNumber(segment.estimatedSize) : 'N/A'}
             </div>
             <div>
-              <span className="font-medium">Usage Count:</span> {segment.usageCount}
-            </div>
-            <div>
               <span className="font-medium">Created:</span> {formatDate(segment.createdAt)}
             </div>
-            <div>
-              <span className="font-medium">Last Used:</span> {formatDate(segment.lastUsed)}
-            </div>
           </div>
+
+          {/* Collapsible Performance Metrics */}
+          {hasMetrics && (
+            <div className="mt-3 pt-3 border-t">
+              <button
+                onClick={() => setIsMetricsExpanded(!isMetricsExpanded)}
+                className="flex items-center justify-between w-full text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <span>Performance Metrics</span>
+                {isMetricsExpanded ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </button>
+
+              {isMetricsExpanded && segment.metrics && (
+                <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                  <div className="text-muted-foreground">
+                    <span className="font-medium">Impressions:</span>{' '}
+                    <span className="text-foreground">{formatNumber(segment.metrics.impressions)}</span>
+                  </div>
+                  <div className="text-muted-foreground">
+                    <span className="font-medium">Clicks:</span>{' '}
+                    <span className="text-foreground">{formatNumber(segment.metrics.clicks)}</span>
+                  </div>
+                  <div className="text-muted-foreground">
+                    <span className="font-medium">Conversions:</span>{' '}
+                    <span className="text-foreground">{formatNumber(segment.metrics.conversions)}</span>
+                  </div>
+                  <div className="text-muted-foreground">
+                    <span className="font-medium">Spend:</span>{' '}
+                    <span className="text-foreground">{formatCurrency(segment.metrics.spend)}</span>
+                  </div>
+                  <div className="text-muted-foreground">
+                    <span className="font-medium">ROAS:</span>{' '}
+                    <span className="text-foreground font-semibold">
+                      {segment.metrics.roas !== null ? `${formatDecimal(segment.metrics.roas)}x` : 'N/A'}
+                    </span>
+                  </div>
+                  <div className="text-muted-foreground">
+                    <span className="font-medium">CTR:</span>{' '}
+                    <span className="text-foreground">
+                      {segment.metrics.ctr !== null ? formatPercent(segment.metrics.ctr) : 'N/A'}
+                    </span>
+                  </div>
+                  <div className="text-muted-foreground col-span-2">
+                    <span className="font-medium">Activations:</span>{' '}
+                    <span className="text-foreground">
+                      {segment.metrics.activeActivations} active / {segment.metrics.totalActivations} total
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </CardContent>
 
