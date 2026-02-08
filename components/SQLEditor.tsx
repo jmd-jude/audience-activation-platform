@@ -10,7 +10,7 @@ interface SQLEditorProps {
   height?: string;
 }
 
-export function SQLEditor({ value, onChange, readOnly = false, height = '400px' }: SQLEditorProps) {
+export function SQLEditor({ value, onChange, readOnly = false, height = '200px' }: SQLEditorProps) {
   return (
     <Card className="overflow-hidden">
       <Editor

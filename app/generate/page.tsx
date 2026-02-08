@@ -20,11 +20,6 @@ interface GeneratedSegment {
   reasoning?: string;
   confidence?: number;
   useCase?: string;
-  validation?: {
-    isValid: boolean;
-    errors: string[];
-    warnings: string[];
-  };
 }
 
 function GeneratePageContent() {
@@ -73,6 +68,8 @@ function GeneratePageContent() {
     additionalContext?: string;
   }) => {
     setError(null);
+    setValidationResults(null); // Clear previous validation results when regenerating
+    setValidationError(null);
     try {
       const response = await fetch('/api/generate-segment', {
         method: 'POST',
@@ -187,6 +184,7 @@ function GeneratePageContent() {
               useCase: discoveryData.useCase,
               additionalContext: discoveryData.additionalContext,
             } : undefined}
+            isRegenerating={!!generatedSegment}
           />
         </div>
 
@@ -241,74 +239,25 @@ function GeneratePageContent() {
                 />
               </div>
 
-              {/* Validation Results */}
-              {generatedSegment.validation && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      {generatedSegment.validation.isValid ? (
-                        <>
-                          <CheckCircle2 className="h-5 w-5 text-green-600" />
-                          Validation Passed
-                        </>
-                      ) : (
-                        <>
-                          <AlertCircle className="h-5 w-5 text-destructive" />
-                          Validation Issues
-                        </>
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    {generatedSegment.validation.errors.length > 0 && (
-                      <div>
-                        <p className="font-medium text-destructive mb-1">Errors:</p>
-                        <ul className="list-disc list-inside text-sm space-y-1">
-                          {generatedSegment.validation.errors.map((error, idx) => (
-                            <li key={idx} className="text-destructive">
-                              {error}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {generatedSegment.validation.warnings.length > 0 && (
-                      <div>
-                        <p className="font-medium text-yellow-600 mb-1">Warnings:</p>
-                        <ul className="list-disc list-inside text-sm space-y-1">
-                          {generatedSegment.validation.warnings.map((warning, idx) => (
-                            <li key={idx} className="text-yellow-600">
-                              {warning}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-
               {/* Actions */}
               <div className="flex flex-wrap gap-2">
-                {generatedSegment.validation?.isValid && (
-                  <Button
-                    onClick={handleValidate}
-                    disabled={isValidating}
-                    variant="secondary"
-                  >
-                    {isValidating ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Validating...
-                      </>
-                    ) : (
-                      <>
-                        <Database className="h-4 w-4 mr-2" />
-                        Validate Audience
-                      </>
-                    )}
-                  </Button>
-                )}
+                <Button
+                  onClick={handleValidate}
+                  disabled={isValidating}
+                  variant="secondary"
+                >
+                  {isValidating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Validating...
+                    </>
+                  ) : (
+                    <>
+                      <Database className="h-4 w-4 mr-2" />
+                      Generate Counts
+                    </>
+                  )}
+                </Button>
                 <Button
                   onClick={() => handleSave('draft')}
                   disabled={isSaving}
@@ -323,7 +272,7 @@ function GeneratePageContent() {
                 </Button>
                 <Button
                   onClick={() => handleSave('approved')}
-                  disabled={isSaving || !generatedSegment.validation?.isValid}
+                  disabled={isSaving}
                 >
                   {isSaving ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

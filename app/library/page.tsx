@@ -236,7 +236,7 @@ export default function LibraryPage() {
             onClick={() => router.push('/generate')}
             className="mt-4"
           >
-            Generate New Segment
+            Build New Segment
           </Button>
         </div>
       ) : (

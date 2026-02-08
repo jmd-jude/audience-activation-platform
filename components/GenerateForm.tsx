@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, RefreshCw } from 'lucide-react';
 
 interface GenerateFormProps {
   onGenerate: (data: {
@@ -19,6 +19,7 @@ interface GenerateFormProps {
     useCase?: string;
     additionalContext?: string;
   };
+  isRegenerating?: boolean;
 }
 
 const useCases = [
@@ -30,7 +31,7 @@ const useCases = [
   'Lookalike Audience',
 ];
 
-export function GenerateForm({ onGenerate, initialValues }: GenerateFormProps) {
+export function GenerateForm({ onGenerate, initialValues, isRegenerating = false }: GenerateFormProps) {
   const [naturalLanguageInput, setNaturalLanguageInput] = useState(initialValues?.naturalLanguageInput || '');
   const [useCase, setUseCase] = useState(initialValues?.useCase || '');
   const [additionalContext, setAdditionalContext] = useState(initialValues?.additionalContext || '');
@@ -77,7 +78,15 @@ export function GenerateForm({ onGenerate, initialValues }: GenerateFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Describe Your Target Audience in Natural Language</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          {isRegenerating && <RefreshCw className="h-5 w-5 text-primary" />}
+          Describe Your Target Audience in Natural Language
+        </CardTitle>
+        {isRegenerating && (
+          <CardDescription>
+            Edit your description below and regenerate to refine the SQL query
+          </CardDescription>
+        )}
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -143,12 +152,12 @@ export function GenerateForm({ onGenerate, initialValues }: GenerateFormProps) {
             {isGenerating ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Generating Segment...
+                {isRegenerating ? 'Regenerating SQL...' : 'Generating Segment...'}
               </>
             ) : (
               <>
                 <Sparkles className="h-4 w-4 mr-2" />
-                Generate Segment
+                {isRegenerating ? 'Regenerate SQL' : 'Generate Segment'}
               </>
             )}
           </Button>

@@ -274,7 +274,7 @@ export default function ReviewPage() {
             />
             <div className="mt-4">
               <Button variant="outline" onClick={handleValidate}>
-                Validate SQL
+                Validate
               </Button>
             </div>
           </CardContent>
