@@ -283,15 +283,27 @@
   }
 
   .arch-box {
-    background: var(--navy);
-    color: white;
-    padding: 2rem 2.5rem;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 1.05rem;
-    font-weight: 600;
-    min-width: 180px;
-    position: relative;
+  background: var(--navy);
+  color: white;
+  padding: 2rem 2.5rem;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 600;
+  width: 220px;  /* Add this */
+  min-width: 220px;  /* Or change this from 180px */
+  position: relative;
+}
+
+  .arch-link {
+  text-decoration: none;
+  cursor: pointer;
+  }
+
+  .arch-link:hover .arch-box {
+    background-color: #234e6e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
   }
 
   .arch-box.hexagon {
@@ -878,13 +890,15 @@
 
     <div class="arch-flow stagger">
       <div class="arch-box" style="border-radius:6px;">
-        Data Partner<small>(Snowflake)</small>
+        Data Partner
       </div>
       <div class="arch-lock" title="Secure Share — Read Only">🔒</div>
       <div class="arch-arrow">→</div>
-      <div class="arch-box" style="border-radius:6px;">
-        Our AI Platform
-      </div>
+      <a href="https://audience-builder-vert.vercel.app/" class="arch-link">
+        <div class="arch-box" style="border-radius:6px;">
+          Our AI Platform
+        </div>
+      </a>
       <div style="display:flex; flex-direction:column; align-items:center; gap:0.3rem; flex-shrink:0;">
         <span style="font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.05em; color:var(--gray-600);">Audiences</span>
         <span class="arch-arrow" style="margin:0;">→</span>
