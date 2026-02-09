@@ -73,7 +73,7 @@ export default function LandingPage() {
               How it works
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              The platform handles discovery, translation, validation, and delivery. Your team focuses on client relationships.
+              The platform handles discovery, translation, validation, and delivery. Our team focuses on client relationships.
             </p>
           </div>
 
