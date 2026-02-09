@@ -118,6 +118,7 @@ export async function POST(request: NextRequest) {
       sqlQuery,
       status = 'draft',
       estimatedSize,
+      reasoning,
       approvedBy,
       approvedAt,
     } = body;
@@ -142,6 +143,7 @@ export async function POST(request: NextRequest) {
         sqlQuery,
         status,
         estimatedSize: estimatedSize || null,
+        reasoning: reasoning || null,
         approvedBy: approvedBy || null,
         approvedAt: approvedAt ? new Date(approvedAt) : null,
       },

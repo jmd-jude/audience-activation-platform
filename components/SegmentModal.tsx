@@ -15,6 +15,7 @@ interface Segment {
   sqlQuery: string;
   status: string;
   estimatedSize?: number | null;
+  reasoning?: string | null;
   usageCount: number;
   lastUsed?: Date | string | null;
   createdAt: Date | string;
@@ -53,6 +54,14 @@ export function SegmentModal({ segment, isOpen, onClose, onEdit, onClone }: Segm
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
+          {/* Reasoning / Marketing Copy */}
+          {segment.reasoning && (
+            <div className="space-y-2 p-4 bg-muted/50 rounded-lg border">
+              <h3 className="text-sm font-semibold text-muted-foreground">Segment Reasoning</h3>
+              <p className="text-sm leading-relaxed">{segment.reasoning}</p>
+            </div>
+          )}
+
           {/* SQL Query */}
           <div className="space-y-2">
             <h3 className="text-lg font-semibold">SQL Query</h3>

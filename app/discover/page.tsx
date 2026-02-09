@@ -27,8 +27,6 @@ interface DiscoveredAudience {
 
 const useCases = [
   'Marketing',
-  'Sales',
-  'Analytics',
   'Customer Acquisition',
   'Retention',
   'Lookalike Audience',
@@ -267,7 +265,7 @@ export default function DiscoverPage() {
           <CardContent className="flex flex-col items-center justify-center h-64">
             <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground text-center">
-              Discovered audiences will appear here
+              Audience recommendations will appear here
             </p>
           </CardContent>
         </Card>

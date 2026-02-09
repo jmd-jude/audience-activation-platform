@@ -20,6 +20,7 @@ model Segment {
   usageCount    Int          @default(0)
   lastUsed      DateTime?
   estimatedSize Int?
+  reasoning     String?      // AI-generated reasoning/marketing copy from segment generation
   approvedBy    String?
   approvedAt    DateTime?
   activations   Activation[]

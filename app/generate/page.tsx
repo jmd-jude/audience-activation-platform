@@ -233,6 +233,7 @@ function GeneratePageContent() {
           sqlQuery: generatedSegment.sqlQuery,
           status,
           estimatedSize: validationResults?.audienceSize || null,
+          reasoning: generatedSegment.reasoning || null,
         }),
       });
 
@@ -258,9 +259,6 @@ function GeneratePageContent() {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Generate Audience Segment</h1>
-        <p className="text-muted-foreground">
-          Describe your target audience
-        </p>
       </div>
 
       {/* Discovery Banner */}
@@ -302,10 +300,10 @@ function GeneratePageContent() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary" />
-                  Quick Clarification
+                  Quick Questions
                 </CardTitle>
                 <CardDescription>
-                  Help us refine your audience by answering these questions
+                  Help us refine your audience by answering a few additional questions
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -336,7 +334,7 @@ function GeneratePageContent() {
                                 },
                               });
                             }}
-                            className="justify-start"
+                            className="justify-start text-left h-auto whitespace-normal py-3"
                           >
                             {option}
                           </Button>
