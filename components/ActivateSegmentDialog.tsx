@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Rocket, AlertCircle } from 'lucide-react';
+import { PLATFORMS } from '@/lib/constants';
 
 interface ActivateSegmentDialogProps {
   segmentId: string;
@@ -16,15 +17,6 @@ interface ActivateSegmentDialogProps {
   onClose: () => void;
   onSuccess: () => void;
 }
-
-const PLATFORMS = [
-  { value: 'meta', label: 'Meta Ads Manager' },
-  { value: 'google', label: 'Google Ads' },
-  { value: 'tiktok', label: 'TikTok Ads' },
-  { value: 'linkedin', label: 'LinkedIn Campaign Manager' },
-  { value: 'mntn', label: 'MNTN - CTV' },
-  { value: 'pinterest', label: 'Pinterest Ads' },
-];
 
 export function ActivateSegmentDialog({
   segmentId,

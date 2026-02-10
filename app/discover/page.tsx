@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Sparkles, ArrowRight, Target, Users, Lightbulb } from 'lucide-react';
+import { USE_CASES } from '@/lib/constants';
 
 interface DiscoveredAudience {
   id: string;
@@ -24,13 +25,6 @@ interface DiscoveredAudience {
     additionalContext: string;
   };
 }
-
-const useCases = [
-  'Marketing',
-  'Customer Acquisition',
-  'Retention',
-  'Lookalike Audience',
-];
 
 export default function DiscoverPage() {
   const router = useRouter();
@@ -144,7 +138,7 @@ export default function DiscoverPage() {
                   <SelectValue placeholder="Select a use case" />
                 </SelectTrigger>
                 <SelectContent>
-                  {useCases.map((uc) => (
+                  {USE_CASES.map((uc) => (
                     <SelectItem key={uc} value={uc}>
                       {uc}
                     </SelectItem>

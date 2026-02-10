@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Search, AlertCircle } from 'lucide-react';
+import { SEGMENT_STATUSES } from '@/lib/constants';
 
 interface SegmentMetrics {
   impressions: number;
@@ -55,6 +56,26 @@ export default function LibraryPage() {
 
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Dynamic use cases from API
+  const [useCases, setUseCases] = useState<string[]>(['all']);
+
+  // Fetch use cases from API
+  useEffect(() => {
+    const fetchUseCases = async () => {
+      try {
+        const response = await fetch('/api/enums/use-cases');
+        if (response.ok) {
+          const data = await response.json();
+          setUseCases(['all', ...data]);
+        }
+      } catch (error) {
+        console.error('Error fetching use cases:', error);
+      }
+    };
+
+    fetchUseCases();
+  }, []);
 
   // Fetch segments
   useEffect(() => {
@@ -155,8 +176,7 @@ export default function LibraryPage() {
     }
   };
 
-  const useCases = ['all', 'Marketing', 'Sales', 'Analytics', 'Customer Acquisition', 'Retention'];
-  const statuses = ['all', 'draft', 'approved', 'active'];
+  const statuses = ['all', ...SEGMENT_STATUSES];
   const sortOptions = [
     { value: 'createdAt', label: 'Newest' },
     { value: 'updatedAt', label: 'Recently Updated' },

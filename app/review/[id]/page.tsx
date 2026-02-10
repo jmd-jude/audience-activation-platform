@@ -13,10 +13,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Save, CheckCircle2, AlertCircle, ArrowLeft, Rocket } from 'lucide-react';
+import { Loader2, Save, AlertCircle, ArrowLeft, Rocket } from 'lucide-react';
 import { ActivateSegmentDialog } from '@/components/ActivateSegmentDialog';
 import { ActivationCard } from '@/components/ActivationCard';
 import { PerformanceEntryForm } from '@/components/PerformanceEntryForm';
+import { USE_CASES, SEGMENT_STATUSES } from '@/lib/constants';
 
 interface Segment {
   id: string;
@@ -29,8 +30,6 @@ interface Segment {
   createdAt: Date | string;
   updatedAt: Date | string;
 }
-
-const useCases = ['Marketing', 'Sales', 'Analytics', 'Customer Acquisition', 'Retention', 'Lookalike Audience'];
 
 export default function ReviewPage() {
   const router = useRouter();
@@ -47,7 +46,7 @@ export default function ReviewPage() {
   const [targetUseCase, setTargetUseCase] = useState('');
   const [sqlQuery, setSqlQuery] = useState('');
   const [estimatedSize, setEstimatedSize] = useState('');
-  const [status, setStatus] = useState('draft');
+  const [selectedStatus, setSelectedStatus] = useState<'draft' | 'approved' | 'published'>('draft');
   const [isActivateDialogOpen, setIsActivateDialogOpen] = useState(false);
   const [activations, setActivations] = useState<any[]>([]);
   const [selectedActivationForMetrics, setSelectedActivationForMetrics] = useState<string | null>(null);
@@ -70,7 +69,7 @@ export default function ReviewPage() {
       setTargetUseCase(segment.targetUseCase);
       setSqlQuery(segment.sqlQuery);
       setEstimatedSize(segment.estimatedSize?.toString() || '');
-      setStatus(segment.status);
+      setSelectedStatus(segment.status as 'draft' | 'approved' | 'published');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -112,13 +111,13 @@ export default function ReviewPage() {
     }
   };
 
-  const handleSave = async (newStatus?: string) => {
+  const handleSave = async () => {
     setIsSaving(true);
     setError(null);
 
     try {
-      // Validate SQL if approving
-      if (newStatus === 'approved') {
+      // Validate SQL if approving or publishing
+      if (selectedStatus === 'approved' || selectedStatus === 'published') {
         const isValid = await handleValidate();
         if (!isValid) {
           setIsSaving(false);
@@ -135,7 +134,7 @@ export default function ReviewPage() {
           targetUseCase,
           sqlQuery,
           estimatedSize: estimatedSize ? parseInt(estimatedSize) : null,
-          status: newStatus || status,
+          status: selectedStatus,
         }),
       });
 
@@ -172,8 +171,8 @@ export default function ReviewPage() {
               Review and modify the segment details before approval
             </p>
           </div>
-          <Badge className={status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
-            {status}
+          <Badge className={selectedStatus === 'approved' || selectedStatus === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+            {selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1)}
           </Badge>
         </div>
       </div>
@@ -235,7 +234,7 @@ export default function ReviewPage() {
                     <SelectValue placeholder="Select use case" />
                   </SelectTrigger>
                   <SelectContent>
-                    {useCases.map((uc) => (
+                    {USE_CASES.map((uc) => (
                       <SelectItem key={uc} value={uc}>
                         {uc}
                       </SelectItem>
@@ -281,7 +280,7 @@ export default function ReviewPage() {
         </Card>
 
         {/* Activations Section */}
-        {(status === 'approved' || status === 'active') && (
+        {(selectedStatus === 'approved' || selectedStatus === 'published') && (
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -330,32 +329,42 @@ export default function ReviewPage() {
         )}
 
         {/* Actions */}
-        <div className="flex gap-2 justify-end">
-          <Button
-            variant="outline"
-            onClick={() => handleSave()}
-            disabled={isSaving || !segmentName || !description || !targetUseCase || !sqlQuery}
-          >
-            {isSaving ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
-            )}
-            Save as Draft
-          </Button>
+        <Card>
+          <CardHeader>
+            <CardTitle>Save Segment</CardTitle>
+            <CardDescription>Choose a status and save your changes</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="segmentStatus">Status</Label>
+              <Select value={selectedStatus} onValueChange={(value: any) => setSelectedStatus(value)}>
+                <SelectTrigger id="segmentStatus">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {SEGMENT_STATUSES.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <Button
-            onClick={() => handleSave('approved')}
-            disabled={isSaving || !segmentName || !description || !targetUseCase || !sqlQuery}
-          >
-            {isSaving ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <CheckCircle2 className="h-4 w-4 mr-2" />
-            )}
-            Approve & Save
-          </Button>
-        </div>
+            <Button
+              onClick={handleSave}
+              disabled={isSaving || !segmentName || !description || !targetUseCase || !sqlQuery}
+              className="w-full"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Save Segment
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Activate Dialog */}

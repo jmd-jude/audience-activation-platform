@@ -10,8 +10,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CheckCircle2, AlertCircle, Save, Eye, Sparkles, Database } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertCircle, Save, Sparkles, Database } from 'lucide-react';
 import { formatNumber } from '@/lib/utils';
+import { SEGMENT_STATUSES } from '@/lib/constants';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 interface GeneratedSegment {
   segmentName: string;
@@ -56,6 +59,9 @@ function GeneratePageContent() {
   // Clarification state
   const [clarificationState, setClarificationState] = useState<ClarificationState | null>(null);
   const [isCheckingClarification, setIsCheckingClarification] = useState(false);
+
+  // Status selection
+  const [selectedStatus, setSelectedStatus] = useState<'draft' | 'approved' | 'published'>('draft');
 
   // Validation state
   const [isValidating, setIsValidating] = useState(false);
@@ -218,7 +224,7 @@ function GeneratePageContent() {
     }
   };
 
-  const handleSave = async (status: 'draft' | 'approved') => {
+  const handleSave = async (status: 'draft' | 'approved' | 'published') => {
     if (!generatedSegment) return;
 
     setIsSaving(true);
@@ -243,6 +249,7 @@ function GeneratePageContent() {
 
       const savedSegment = await response.json();
 
+      // Always go to review page for drafts, library for approved/published
       if (status === 'draft') {
         router.push(`/review/${savedSegment.id}`);
       } else {
@@ -436,11 +443,12 @@ function GeneratePageContent() {
               </div>
 
               {/* Actions */}
-              <div className="flex flex-wrap gap-2">
+              <div className="space-y-4">
                 <Button
                   onClick={handleValidate}
                   disabled={isValidating}
                   variant="secondary"
+                  className="w-full"
                 >
                   {isValidating ? (
                     <>
@@ -454,28 +462,34 @@ function GeneratePageContent() {
                     </>
                   )}
                 </Button>
+
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={selectedStatus} onValueChange={(value: any) => setSelectedStatus(value)}>
+                    <SelectTrigger id="status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SEGMENT_STATUSES.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status.charAt(0).toUpperCase() + status.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <Button
-                  onClick={() => handleSave('draft')}
+                  onClick={() => handleSave(selectedStatus)}
                   disabled={isSaving}
-                  variant="outline"
+                  className="w-full"
                 >
                   {isSaving ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
                     <Save className="h-4 w-4 mr-2" />
                   )}
-                  Save as Draft
-                </Button>
-                <Button
-                  onClick={() => handleSave('approved')}
-                  disabled={isSaving}
-                >
-                  {isSaving ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Eye className="h-4 w-4 mr-2" />
-                  )}
-                  Approve & Save
+                  Save Segment
                 </Button>
               </div>
 

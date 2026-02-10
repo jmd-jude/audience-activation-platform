@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || '';
     const useCase = searchParams.get('useCase') || '';
     const status = searchParams.get('status') || '';
+    const platform = searchParams.get('platform') || '';
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
@@ -33,12 +34,19 @@ export async function GET(request: NextRequest) {
     const orderBy: any = {};
     orderBy[sortBy] = sortOrder;
 
+    // Build activations filter (for platform filtering)
+    const activationsWhere: any = {};
+    if (platform) {
+      activationsWhere.platform = platform;
+    }
+
     // Query database with activations and their latest metrics
     const segments = await prisma.segment.findMany({
       where,
       orderBy,
       include: {
         activations: {
+          where: activationsWhere,
           include: {
             metrics: {
               orderBy: { periodEnd: 'desc' },
@@ -49,8 +57,13 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // Filter out segments with no activations if platform filter is applied
+    const filteredSegments = platform
+      ? segments.filter((segment) => segment.activations.length > 0)
+      : segments;
+
     // Aggregate metrics across all activations for each segment
-    const segmentsWithMetrics = segments.map((segment) => {
+    const segmentsWithMetrics = filteredSegments.map((segment) => {
       const latestMetrics = segment.activations
         .map((activation) => activation.metrics[0])
         .filter((metric) => metric !== undefined);

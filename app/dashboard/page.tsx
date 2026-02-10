@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SegmentPerformanceTable } from '@/components/SegmentPerformanceTable';
 import { CompactStats } from '@/components/CompactStats';
+import { DashboardFilters } from '@/components/DashboardFilters';
 import { Loader2, Library, Sparkles } from 'lucide-react';
 
 interface SegmentMetrics {
@@ -64,6 +65,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const [segments, setSegments] = useState<Segment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedUseCase, setSelectedUseCase] = useState<string>('All');
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
   const [stats, setStats] = useState<Stats>({
     total: 0,
     approved: 0,
@@ -84,12 +87,22 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchSegments();
     fetchPerformanceOverview();
-  }, []);
+  }, [selectedUseCase, selectedPlatform]);
 
   const fetchSegments = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/segments');
+      // Build query params
+      const params = new URLSearchParams();
+      if (selectedUseCase !== 'All') {
+        params.append('useCase', selectedUseCase);
+      }
+      if (selectedPlatform !== 'all') {
+        params.append('platform', selectedPlatform);
+      }
+
+      const url = `/api/segments${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch segments');
 
       const data: Segment[] = await response.json();
@@ -116,6 +129,33 @@ export default function DashboardPage() {
         totalAudienceSize,
         mostPopularUseCase,
       });
+
+      // Calculate performance stats from filtered segments
+      let activeActivations = 0;
+      let totalSpend = 0;
+      let totalRevenue = 0;
+      let segmentsWithMetrics = 0;
+
+      data.forEach((segment) => {
+        if (segment.metrics) {
+          activeActivations += segment.metrics.activeActivations || 0;
+          totalSpend += segment.metrics.spend || 0;
+          totalRevenue += segment.metrics.revenue || 0;
+          segmentsWithMetrics++;
+        }
+      });
+
+      const avgROAS = totalSpend > 0 ? totalRevenue / totalSpend : 0;
+
+      setPerformanceStats({
+        totalActivations: segmentsWithMetrics,
+        activeActivations,
+        totalSpend,
+        totalRevenue,
+        totalImpressions: 0,
+        totalConversions: 0,
+        avgROAS,
+      });
     } catch (err) {
       console.error('Error fetching segments:', err);
     } finally {
@@ -124,14 +164,7 @@ export default function DashboardPage() {
   };
 
   const fetchPerformanceOverview = async () => {
-    try {
-      const response = await fetch('/api/performance/overview');
-      if (!response.ok) throw new Error('Failed to fetch performance overview');
-      const data = await response.json();
-      setPerformanceStats(data);
-    } catch (err) {
-      console.error('Error fetching performance overview:', err);
-    }
+    // Performance stats are now calculated from filtered segments in fetchSegments
   };
 
   return (
@@ -174,6 +207,14 @@ export default function DashboardPage() {
                 View All Segments
               </Button>
             </div>
+
+            {/* Filter Controls */}
+            <DashboardFilters
+              selectedUseCase={selectedUseCase}
+              selectedPlatform={selectedPlatform}
+              onUseCaseChange={setSelectedUseCase}
+              onPlatformChange={setSelectedPlatform}
+            />
 
             {segments.length === 0 ? (
               <Card className="border-dashed">

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Sparkles, RefreshCw } from 'lucide-react';
+import { USE_CASES } from '@/lib/constants';
 
 interface GenerateFormProps {
   onGenerate: (data: {
@@ -21,15 +22,6 @@ interface GenerateFormProps {
   };
   isRegenerating?: boolean;
 }
-
-const useCases = [
-  'Marketing',
-  'Sales',
-  'Analytics',
-  'Customer Acquisition',
-  'Retention',
-  'Lookalike Audience',
-];
 
 export function GenerateForm({ onGenerate, initialValues, isRegenerating = false }: GenerateFormProps) {
   const [naturalLanguageInput, setNaturalLanguageInput] = useState(initialValues?.naturalLanguageInput || '');
@@ -123,7 +115,7 @@ export function GenerateForm({ onGenerate, initialValues, isRegenerating = false
                 <SelectValue placeholder="Select a use case" />
               </SelectTrigger>
               <SelectContent>
-                {useCases.map((uc) => (
+                {USE_CASES.map((uc) => (
                   <SelectItem key={uc} value={uc}>
                     {uc}
                   </SelectItem>
