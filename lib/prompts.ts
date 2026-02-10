@@ -170,6 +170,88 @@ The estimatedComplexity should be "low", "medium", or "high".`;
 }
 
 /**
+ * Builds the discovery-focused prompt for Claude
+ * Used to generate 3-6 audience suggestions from a business goal
+ */
+export function buildDiscoveryPrompt(
+  businessGoal: string,
+  useCase: string,
+  additionalContext?: string
+): string {
+  const schemaContext = buildCompactSchemaContext();
+
+  const isLookalike = useCase === 'Lookalike Audience';
+
+  const modeInstructions = isLookalike
+    ? `The user has described their IDEAL CUSTOMER PROFILE (their best existing customers). Your task is to generate 3-6 LOOKALIKE AUDIENCES that would be statistically similar to this profile.
+
+LOOKALIKE OBJECTIVES:
+- Find broader populations with similar demographic and behavioral patterns
+- Expand beyond exact matches to discover net-new prospects who share core characteristics
+- Use multiple signal combinations to replicate the profile's defining attributes
+- Focus on audiences who HAVEN'T yet engaged with the user's brand
+
+CRITICAL: Honor explicit user constraints. If the user specifies geography (states, cities, metros), those are hard constraints - lookalike means finding similar profiles WITHIN those areas, not removing the areas. Expand within stated constraints, not by dropping them.
+
+FRAMING: Frame each audience as "Similar to..." or "Expansion of..." rather than "People who are exactly..."
+Example: "Affluent Travelers - Lookalike Expansion" not just "Affluent Travelers"
+
+For each audience, explain HOW it matches the seed profile's key signals (income, lifestyle, purchase behavior) while representing new prospect territory.`
+    : `Given a business goal, suggest 3-6 creative audience segments that could help achieve it.
+For each audience, provide a compelling marketing narrative and actionable targeting criteria.`;
+
+  return `You are an expert Marketing Strategist with deep consumer intelligence expertise.
+
+${modeInstructions}
+
+${isLookalike ? 'CUSTOMER PROFILE' : 'BUSINESS GOAL'}: ${businessGoal}
+USE CASE: ${useCase}
+${additionalContext ? `ADDITIONAL CONTEXT: ${additionalContext}` : ''}
+
+DATABASE SCHEMA:
+${schemaContext}
+
+For each audience, think creatively about:
+- Who they are (demographics + psychographics)
+- What drives their decisions and behaviors
+- How to reach them effectively through available channels
+- Why they're valuable for achieving this business goal
+- What data signals indicate they're part of this audience
+
+IMPORTANT GUIDELINES:
+1. Think beyond simple demographic cuts - create audiences with compelling stories
+2. Ensure diversity in your suggestions (different strategies, not just variations)
+3. Focus on actionable, measurable criteria from the available data
+4. Consider email quality (EMAILQUALITYLEVEL >= 7), phone quality (PHONEQUALITYLEVEL >= 7)
+5. Think about compliance (EMAILOPTIN, DNC flags)
+6. Each audience should be meaningfully different from the others
+
+Return ONLY valid JSON in this exact format (no markdown, no explanations):
+{
+  "audiences": [
+    {
+      "audienceName": "Creative, memorable name under 60 characters",
+      "description": "Rich 2-3 sentence description painting a vivid picture of who they are and what makes them unique",
+      "keyCharacteristics": [
+        "Specific demographic or behavioral characteristic 1",
+        "Specific demographic or behavioral characteristic 2",
+        "Specific demographic or behavioral characteristic 3",
+        "Specific demographic or behavioral characteristic 4"
+      ],
+      "marketingOpportunity": "Clear explanation of why this audience matters for the business goal and how to engage them effectively",
+      "targetingCriteria": {
+        "naturalLanguageInput": "A clear, natural language description of this audience written from a marketing perspective. Describe WHO they are as people using everyday language (e.g., 'affluent professionals aged 40-60 who enjoy luxury travel') rather than database fields (e.g., 'AGE >= 40, INCOME >= 150000'). Focus on their demographics, lifestyle, interests, and behaviors in human terms.",
+        "useCase": "${useCase}",
+        "additionalContext": "Strategic insights about this audience's behaviors, preferences, and value (e.g., 'prefer email communication', 'responsive to premium brand messaging', 'high lifetime value potential')"
+      }
+    }
+  ]
+}
+
+Generate 3-6 diverse audience ideas. Be creative and strategic.`;
+}
+
+/**
  * Prompt for SQL validation and improvement suggestions
  */
 export function buildValidationPrompt(sql: string): string {
