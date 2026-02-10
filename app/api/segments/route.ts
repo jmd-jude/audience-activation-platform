@@ -76,11 +76,16 @@ export async function GET(request: NextRequest) {
         ? (aggregatedMetrics.clicks / aggregatedMetrics.impressions) * 100
         : null;
 
-      // Remove activations from response, just include aggregated metrics
-      const { activations: _activations, ...segmentData } = segment;
+      // Include basic activation info (for platform badges on dashboard)
+      const activations = segment.activations.map((activation) => ({
+        platform: activation.platform,
+        platformName: activation.platformName,
+        status: activation.status,
+      }));
 
       return {
-        ...segmentData,
+        ...segment,
+        activations,
         metrics: hasMetrics
           ? {
               impressions: aggregatedMetrics.impressions,

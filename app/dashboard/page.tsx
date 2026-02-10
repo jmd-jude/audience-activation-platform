@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { SegmentCard } from '@/components/SegmentCard';
-import { formatNumber, formatDate, formatCurrency, formatDecimal } from '@/lib/utils';
-import { Library, TrendingUp, Clock, Loader2, Lightbulb, Rocket, DollarSign, Sparkles } from 'lucide-react';
+import { SegmentPerformanceTable } from '@/components/SegmentPerformanceTable';
+import { CompactStats } from '@/components/CompactStats';
+import { Loader2, Library, Sparkles } from 'lucide-react';
 
 interface SegmentMetrics {
   impressions: number;
@@ -19,6 +18,12 @@ interface SegmentMetrics {
   ctr: number | null;
   activeActivations: number;
   totalActivations: number;
+}
+
+interface Activation {
+  platform: string;
+  platformName: string;
+  status: string;
 }
 
 interface Segment {
@@ -34,6 +39,7 @@ interface Segment {
   createdAt: Date | string;
   updatedAt: Date | string;
   metrics?: SegmentMetrics | null;
+  activations?: Activation[];
 }
 
 interface Stats {
@@ -128,10 +134,6 @@ export default function DashboardPage() {
     }
   };
 
-  const recentSegments = segments
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 9);
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
@@ -147,105 +149,36 @@ export default function DashboardPage() {
         </div>
       ) : (
         <>
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Segments</CardTitle>
-                <Library className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.total}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stats.approved} approved, {stats.draft} draft
-                </p>
-              </CardContent>
-            </Card>
+          {/* Compact Stats */}
+          <CompactStats
+            totalSegments={stats.total}
+            approvedSegments={stats.approved}
+            draftSegments={stats.draft}
+            totalAudienceSize={stats.totalAudienceSize}
+            mostPopularUseCase={stats.mostPopularUseCase}
+            activeActivations={performanceStats.activeActivations}
+            totalSpend={performanceStats.totalSpend}
+            avgROAS={performanceStats.avgROAS}
+          />
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Audience Size</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatNumber(stats.totalAudienceSize)}</div>
-                <p className="text-xs text-muted-foreground">
-                  Across all segments
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Most Popular Use Case</CardTitle>
-                <Lightbulb className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.mostPopularUseCase}</div>
-                <p className="text-xs text-muted-foreground">
-                  Top segment category
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Performance Stats */}
-          {performanceStats.totalActivations > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Campaigns</CardTitle>
-                  <Rocket className="h-4 w-4 text-purple-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{performanceStats.activeActivations}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {performanceStats.totalActivations} total activations
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Campaign Spend</CardTitle>
-                  <DollarSign className="h-4 w-4 text-orange-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{formatCurrency(performanceStats.totalSpend)}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {formatNumber(performanceStats.totalImpressions)} impressions
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Avg ROAS</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{formatDecimal(performanceStats.avgROAS)}x</div>
-                  <p className="text-xs text-muted-foreground">
-                    {formatNumber(performanceStats.totalConversions)} conversions
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Recent Segments */}
+          {/* Segment Performance Table */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold">Recent Segments</h2>
-              <Button variant="ghost" onClick={() => router.push('/library')}>
-                View All
+              <div>
+                <h2 className="text-2xl font-bold">Segment Performance</h2>
+                <p className="text-sm text-muted-foreground">
+                  Top performing segments across all platforms
+                </p>
+              </div>
+              <Button variant="outline" onClick={() => router.push('/library')}>
+                View All Segments
               </Button>
             </div>
 
-            {recentSegments.length === 0 ? (
+            {segments.length === 0 ? (
               <Card className="border-dashed">
                 <CardContent className="flex flex-col items-center justify-center h-48">
-                  <Clock className="h-12 w-12 text-muted-foreground mb-4" />
+                  <Library className="h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-muted-foreground mb-4">No segments yet</p>
                   <Button onClick={() => router.push('/generate')}>
                     <Sparkles className="h-4 w-4 mr-2" />
@@ -254,25 +187,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recentSegments.map((segment) => (
-                  <SegmentCard
-                    key={segment.id}
-                    segment={segment}
-                    onView={(id) => router.push(`/review/${id}`)}
-                    onEdit={(id) => router.push(`/review/${id}`)}
-                    onClone={async (id) => {
-                      const response = await fetch(`/api/segments/${id}/clone`, {
-                        method: 'POST',
-                      });
-                      if (response.ok) {
-                        const cloned = await response.json();
-                        router.push(`/review/${cloned.id}`);
-                      }
-                    }}
-                  />
-                ))}
-              </div>
+              <SegmentPerformanceTable segments={segments} maxRows={15} />
             )}
           </div>
         </>

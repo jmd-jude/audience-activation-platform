@@ -7,9 +7,9 @@ import { Home, Sparkles, Library, BarChart3, Lightbulb } from 'lucide-react';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
+  { name: 'Library', href: '/library', icon: Library },
   { name: 'Discover', href: '/discover', icon: Lightbulb },
   { name: 'Generate', href: '/generate', icon: Sparkles },
-  { name: 'Library', href: '/library', icon: Library },
 ];
 
 export function Navigation() {
