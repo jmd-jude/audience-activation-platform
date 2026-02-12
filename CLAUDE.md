@@ -14,7 +14,7 @@ The platform validates queries in real-time against Snowflake, showing counts an
 ## Development Commands
 
 ### Core Commands
-- `npm run dev` - Start development server (runs on http://localhost:3002)
+- `npm run dev` - Start development server (runs on http://localhost:3005)
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
@@ -51,7 +51,7 @@ The platform validates queries in real-time against Snowflake, showing counts an
 
 4. **Data Layer**:
    - Prisma ORM with SQLite database (`prisma/dev.db`)
-   - Single `Segment` model tracks generated segments with status workflow (draft → approved → active)
+   - Single `Segment` model tracks generated segments with status workflow (draft → approved → published)
    - Segments include metadata: `usageCount`, `estimatedSize`, `approvedBy`, `approvedAt`
 
 ### Key Architectural Patterns
@@ -75,6 +75,12 @@ The platform validates queries in real-time against Snowflake, showing counts an
 - Client components use `'use client'` directive
 - Path alias `@/` resolves to project root
 
+**Constants and Configuration**:
+- `lib/constants.ts` is the single source of truth for platforms and use cases
+- Platforms: Meta, Google, TikTok, LinkedIn, MNTN (CTV), Pinterest
+- Use cases: Awareness, Customer Acquisition, Retention, Lookalike Audience
+- Segment statuses defined as const array: ['draft', 'approved', 'published']
+
 ### Directory Structure
 
 ```
@@ -88,10 +94,12 @@ app/
 │   │   ├── validate/       # EXPLAIN-based query validation
 │   │   └── execute/        # Full query execution with optional LIMIT
 │   └── segments/           # CRUD operations for segments
+├── discover/               # AI-powered audience discovery page
+├── dashboard/              # Dashboard with metrics and performance
 ├── generate/               # Generate new segment page
 ├── library/                # Browse all segments page
 ├── review/[id]/            # Review/edit individual segment
-├── page.tsx                # Dashboard (home page)
+├── page.tsx                # Landing page (marketing homepage)
 ├── layout.tsx              # Root layout with Navigation
 └── globals.css             # Global styles with CSS variables
 
@@ -152,7 +160,7 @@ Required environment variables in `.env.local`:
 - Sample data queries append `LIMIT 10` to user's query
 
 ### When Working with Segments
-- Segment lifecycle: draft → approved → active
+- Segment lifecycle: draft → approved → published
 - SQL queries are read-only SELECT statements only (validation blocks DROP/DELETE/UPDATE)
 - `DISTINCT` is strongly recommended to avoid duplicate records
 - All SQL queries target the identity graph schema, not the Prisma database

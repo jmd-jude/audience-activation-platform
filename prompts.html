@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo Prompts - Audience Activation</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F0EDE6;
+    --cream-dark: #E5E0D6;
+    --black: #1A1A1A;
+    --orange: #D4532A;
+    --orange-light: #E8754F;
+    --orange-glow: rgba(212, 83, 42, 0.12);
+    --gray-600: #555;
+    --gray-400: #999;
+    --gray-300: #BBB;
+    --navy: #1C2333;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--black);
+    -webkit-font-smoothing: antialiased;
+    padding: 3rem 2rem;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.15;
+    font-weight: 400;
+    margin-bottom: 0.8rem;
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange);
+    font-weight: 500;
+  }
+
+  .prompt-card {
+    background: white;
+    border: 1px solid var(--cream-dark);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .prompt-card:hover {
+    border-color: var(--orange);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .prompt-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--orange);
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  .prompt-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+    color: var(--black);
+  }
+
+  .prompt-text {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--gray-600);
+    font-style: italic;
+    padding-left: 1rem;
+    border-left: 3px solid var(--orange-light);
+  }
+
+  .copy-indicator {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .prompt-card:hover .copy-indicator {
+    opacity: 1;
+  }
+
+  .copied {
+    color: var(--orange) !important;
+    opacity: 1 !important;
+  }
+
+  @media (max-width: 600px) {
+    body {
+      padding: 2rem 1rem;
+    }
+    .prompt-card {
+      padding: 1.5rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="subtitle">Sample Use Cases</div>
+    <h1>AI-Enriched Audience Generation</h1>
+  </div>
+
+  <div class="prompt-card" onclick="copyPrompt(this, 1)">
+    <div class="prompt-number">USE CASE 01</div>
+    <div class="prompt-title">The "Empty Nester" Luxury Downsizing Campaign</div>
+    <div class="prompt-text">Identify high-net-worth Baby Boomers who currently live in suburban single-family homes but have children in the 13-18 age bracket likely heading to college, suggesting a readiness to downsize into luxury urban condos.</div>
+    <div class="copy-indicator" id="copy-1">Click to copy</div>
+  </div>
+
+  <div class="prompt-card" onclick="copyPrompt(this, 2)">
+    <div class="prompt-number">USE CASE 02</div>
+    <div class="prompt-title">The "Early-Stage Wealth & Wellness" Recruitment</div>
+    <div class="prompt-text">Target high-earning Millennials in urban centers who are heavy spenders in health and travel categories, but do not yet have recorded investments, to pitch them on their first premium wealth-management platform.</div>
+    <div class="copy-indicator" id="copy-2">Click to copy</div>
+  </div>
+
+  <div class="prompt-card" onclick="copyPrompt(this, 3)">
+    <div class="prompt-number">USE CASE 03</div>
+    <div class="prompt-title">The "New Parent Sustainability" Micro-Target</div>
+    <div class="prompt-text">Find new parents with infants (0-3) who hold graduate or doctoral degrees and earn over $150k, to market a subscription-based line of premium, eco-friendly, and developmentally-focused childcare products.</div>
+    <div class="copy-indicator" id="copy-3">Click to copy</div>
+  </div>
+
+  <div class="prompt-card" onclick="copyPrompt(this, 4)">
+    <div class="prompt-number">USE CASE 04</div>
+    <div class="prompt-title">The "Blue Collar Outdoor" Gear Launch</div>
+    <div class="prompt-text">Identify skilled Blue Collar professionals in rural areas who have been offered high credit limits ($5k+) and show high purchase activity in the outdoors category for a targeted campaign on high-end ATVs or camping trailers.</div>
+    <div class="copy-indicator" id="copy-4">Click to copy</div>
+  </div>
+
+  <div class="prompt-card" onclick="copyPrompt(this, 5)">
+    <div class="prompt-number">USE CASE 05</div>
+    <div class="prompt-title">The "Executive Hobbyist" Collector Search</div>
+    <div class="prompt-text">Find individuals in Upper Management with a net worth exceeding $500k who are active 'experience collectors' (high travel and high collectibles purchase history) for an exclusive fractional-ownership investment opportunity in rare assets.</div>
+    <div class="copy-indicator" id="copy-5">Click to copy</div>
+  </div>
+
+  <div class="prompt-card" onclick="copyPrompt(this, 6)">
+    <div class="prompt-number">USE CASE 06</div>
+    <div class="prompt-title">The "B2B Decision Maker" Personal Persona</div>
+    <div class="prompt-text">Identify professional decision-makers using corporate email domains who are in their peak earning years (26-40) and living in multi-family urban dwellings, to market a high-end B2B productivity suite focused on 'work-from-anywhere' efficiency.</div>
+    <div class="copy-indicator" id="copy-6">Click to copy</div>
+  </div>
+
+  <div class="prompt-card" onclick="copyPrompt(this, 7)">
+    <div class="prompt-number">USE CASE 07</div>
+    <div class="prompt-title">The "High-Touch Multi-Channel" Reactivation</div>
+    <div class="prompt-text">Create a list of married homeowners with premium email quality scores (8-10) and available phone numbers to launch a high-conversion, multi-channel (SMS + Email) campaign for a luxury home-automation and security service.</div>
+    <div class="copy-indicator" id="copy-7">Click to copy</div>
+  </div>
+
+</div>
+
+<script>
+  function copyPrompt(card, num) {
+    const promptText = card.querySelector('.prompt-text').textContent;
+    const indicator = document.getElementById(`copy-${num}`);
+    
+    navigator.clipboard.writeText(promptText).then(() => {
+      indicator.textContent = 'Copied!';
+      indicator.classList.add('copied');
+      
+      setTimeout(() => {
+        indicator.textContent = 'Click to copy';
+        indicator.classList.remove('copied');
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+    });
+  }
+</script>
+
+</body>
+</html>
