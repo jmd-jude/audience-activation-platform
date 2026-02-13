@@ -30,12 +30,6 @@ Use LEFT JOIN for optional tables:
 - LEFT JOIN EMAIL when email communication is mentioned
 - LEFT JOIN PII when geographic targeting (STATE, ZIP, URBANICITY_CODE) is needed
 
-For phone/SMS targeting:
-- Use DATA.HASPHONE = 1 (no PHONE table exists)
-- Example: WHERE d.HASPHONE = 1 AND d.INCOME_HH IN (...)
-- For multi-channel: WHERE d.HASPHONE = 1 AND d.HASEMAIL = 1 (EMAIL table not required if just checking flag)
-- Don't force joins to tables you don't need
-
 CRITICAL ENUMERATED FIELD RULES:
 - ANY field with valid_values in the schema MUST use IN (...) syntax
 - NEVER use >, <, >=, <= on fields with valid_values
@@ -58,33 +52,7 @@ CRITICAL - KEEP QUERIES SIMPLE:
   ✓ USE: INCOME_HH IN (...high values...) AND GENERATION = '1. Millennials...' AND MARITAL_STATUS = 'Married'
   ✗ SKIP: urbanicity, travel purchases, premium card - these are secondary
 
-Build queries that return results:
-- Start with DATA table (has most consumer intelligence)
-- Use HOUSEHOLD_ID for all table joins (HOUSEHOLD_ID links DATA, PII, and EMAIL tables)
-- Always include d.ID, d.HOUSEHOLD_ID, and e.MD5 in SELECT for activation capabilities
-- Always LEFT JOIN EMAIL to get MD5 for digital activation
-- Balance precision (AND conditions) with reach (broader criteria)
-- Typical pattern: 2-4 key filters with DISTINCT on d.ID
-
 EXAMPLE QUERY PATTERNS:
-
-Affluent Families with Purchase Behavior:
-SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5
-FROM DATA d
-LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID
-WHERE d.INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', 'M. $175,000-$199,999')
-  AND d.MARITAL_STATUS = 'Married'
-  AND d.CHILDREN_HH > 0
-  AND d.RECENT_TRAVEL_PURCHASES_TOTAL_COMPANIES >= 1
-
-Email-Addressable Professionals:
-SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5
-FROM DATA d
-LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID
-WHERE d.OCCUPATION_CATEGORY IN ('Professional', 'Upper Management')
-  AND d.AGE BETWEEN 30 AND 55
-  AND e.EMAILQUALITYLEVEL >= 7
-  AND e.EMAILOPTIN = 1
 
 Urban Millennials:
 SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5
@@ -97,6 +65,7 @@ WHERE d.GENERATION = '1. Millennials and Gen Z (1982 and after)'
 
 TECHNICAL REQUIREMENTS:
 - Use DISTINCT to avoid duplicate HOUSEHOLD_IDs
+- Use aliases: d=DATA, e=EMAIL, p=PII
 - Use Snowflake SQL syntax
 - Return only valid JSON (no markdown, no explanations)
 - Verify all field names exist in provided schema`;
@@ -156,7 +125,7 @@ Generate a complete audience segment with metadata. Return ONLY valid JSON in th
 
 {
   "segmentName": "Business-friendly segment name (under 60 chars)",
-  "description": "Clear description of who this targets and why (100-200 chars)",
+  "description": "Clear description of who this targets and why (75-150 chars)",
   "sqlQuery": "SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5 FROM DATA d LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID WHERE...",
   "reasoning": "Brief explanation of your query approach, key filters used, and expected audience size range (e.g., '50K-200K households')",
   "confidence": 0.85,
