@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Sparkles, ArrowRight, Target, Users, Lightbulb } from 'lucide-react';
 import { USE_CASES } from '@/lib/constants';
+import { DemoPromptDropdown } from '@/components/DemoPromptDropdown';
 
 interface DiscoveredAudience {
   id: string;
@@ -106,9 +107,12 @@ export default function DiscoverPage() {
         <CardContent>
           <form onSubmit={handleDiscover} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="businessGoal">
-                Business Goal <span className="text-destructive">*</span>
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="businessGoal">
+                  Business Goal <span className="text-destructive">*</span>
+                </Label>
+                <DemoPromptDropdown onSelect={setBusinessGoal} />
+              </div>
               <Textarea
                 id="businessGoal"
                 placeholder={useCase === 'Lookalike Audience'
