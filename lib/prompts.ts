@@ -1,5 +1,6 @@
 import {
   buildCompactSchemaContext,
+  buildOptimizationRules,
   buildSemanticContext,
   buildStrategicPatternsContext,
   getTargetingPhilosophy
@@ -13,22 +14,10 @@ export const SEGMENT_GENERATION_SYSTEM_PROMPT = `You are a Consumer Intelligence
 IDENTITY GRAPH CONTEXT:
 You work with consumer identity data across 3 tables:
 - DATA: Core consumer intelligence (demographics, income, lifestyle, purchase behavior, household composition, contactability flags)
-- PII: Geographic and identity data (state, ZIP, address, urbanicity)
-- EMAIL: Email addresses with quality scores and opt-in status (use LEFT JOIN - optional)
+- PII: Geographic and identity data (state, ZIP, address, urbanicity) — LEFT JOIN when geographic targeting is needed
+- EMAIL: Email addresses with quality scores and opt-in status — always LEFT JOIN for MD5
 
 NOTE: Phone contactability is tracked via DATA.HASPHONE (1 = has phone, 0 = no phone). There is NO separate PHONE table.
-
-BUSINESS OBJECTIVES:
-1. Audience Size: Target 10,000-500,000 households for viable campaign scale
-2. Addressability: Identify reachable audiences across available channels
-3. Precision: Balance specificity with audience size - too narrow = no results
-4. Quality: Consider data quality and opt-in status when relevant
-
-QUERY CONSTRUCTION GUIDELINES:
-
-Use LEFT JOIN for optional tables:
-- LEFT JOIN EMAIL when email communication is mentioned
-- LEFT JOIN PII when geographic targeting (STATE, ZIP, URBANICITY_CODE) is needed
 
 CRITICAL ENUMERATED FIELD RULES:
 - ANY field with valid_values in the schema MUST use IN (...) syntax
@@ -52,23 +41,14 @@ CRITICAL - KEEP QUERIES SIMPLE:
   ✓ USE: INCOME_HH IN (...high values...) AND GENERATION = '1. Millennials...' AND MARITAL_STATUS = 'Married'
   ✗ SKIP: urbanicity, travel purchases, premium card - these are secondary
 
-EXAMPLE QUERY PATTERNS:
-
-Urban Millennials:
+EXAMPLE QUERY PATTERN:
 SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5
 FROM DATA d
 LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID
 LEFT JOIN PII p ON d.HOUSEHOLD_ID = p.HOUSEHOLD_ID
 WHERE d.GENERATION = '1. Millennials and Gen Z (1982 and after)'
   AND p.URBANICITY_CODE = 'U'
-  AND d.INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', 'H. $75,000-$99,999')
-
-TECHNICAL REQUIREMENTS:
-- Use DISTINCT to avoid duplicate HOUSEHOLD_IDs
-- Use aliases: d=DATA, e=EMAIL, p=PII
-- Use Snowflake SQL syntax
-- Return only valid JSON (no markdown, no explanations)
-- Verify all field names exist in provided schema`;
+  AND d.INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', 'H. $75,000-$99,999')`;
 
 /**
  * Builds a complete prompt with schema context and semantic intelligence
@@ -81,6 +61,7 @@ export function buildPromptWithContext(
   clarificationQA?: Array<{ question: string; answer: string }>
 ): string {
   const schemaContext = buildCompactSchemaContext();
+  const optimizationRules = buildOptimizationRules();
   const semanticContext = buildSemanticContext();
   const strategicPatterns = buildStrategicPatternsContext();
   const targetingPhilosophy = getTargetingPhilosophy();
@@ -94,14 +75,14 @@ LOOKALIKE STRATEGY:
 - Identify the core defining signals from the profile (income level, lifestyle indicators, purchase behaviors)
 - Build queries that capture these patterns but cast a slightly wider net
 - Focus on households with similar "signal clusters" not exact matches
-- Frame the segment name and description as "Similar to..." or "Lookalike..."
-
-CRITICAL: Honor explicit user constraints. If the user specifies geography (states, cities, metros), INCLUDE those geographic filters - lookalike means finding similar profiles WITHIN those areas, not removing the areas. Expand within stated constraints, not by removing them.`
+- Frame the segment name and description as "Similar to..." or "Lookalike..."`
     : '';
 
   const prompt = `${SEGMENT_GENERATION_SYSTEM_PROMPT}
 
 ${taskContext}
+
+${optimizationRules}
 
 DATABASE SCHEMA:
 ${schemaContext}
@@ -148,6 +129,7 @@ export function buildDiscoveryPrompt(
   additionalContext?: string
 ): string {
   const schemaContext = buildCompactSchemaContext();
+  const optimizationRules = buildOptimizationRules();
 
   const isLookalike = useCase === 'Lookalike Audience';
 
@@ -159,8 +141,6 @@ LOOKALIKE OBJECTIVES:
 - Expand beyond exact matches to discover net-new prospects who share core characteristics
 - Use multiple signal combinations to replicate the profile's defining attributes
 - Focus on audiences who HAVEN'T yet engaged with the user's brand
-
-CRITICAL: Honor explicit user constraints. If the user specifies geography (states, cities, metros), those are hard constraints - lookalike means finding similar profiles WITHIN those areas, not removing the areas. Expand within stated constraints, not by dropping them.
 
 FRAMING: Frame each audience as "Similar to..." or "Expansion of..." rather than "People who are exactly..."
 Example: "Affluent Travelers - Lookalike Expansion" not just "Affluent Travelers"
@@ -177,6 +157,8 @@ ${isLookalike ? 'CUSTOMER PROFILE' : 'BUSINESS GOAL'}: ${businessGoal}
 USE CASE: ${useCase}
 ${additionalContext ? `ADDITIONAL CONTEXT: ${additionalContext}` : ''}
 
+${optimizationRules}
+
 DATABASE SCHEMA:
 ${schemaContext}
 
@@ -191,7 +173,7 @@ IMPORTANT GUIDELINES:
 1. Think beyond simple demographic cuts - create audiences with compelling stories
 2. Ensure diversity in your suggestions (different strategies, not just variations)
 3. Focus on actionable, measurable criteria from the available data
-4. Consider email quality (EMAILQUALITYLEVEL >= 7), phone quality (PHONEQUALITYLEVEL >= 7)
+4. Consider email quality (EMAILQUALITYLEVEL >= 7) and phone contactability (HASPHONE = 1)
 5. Think about compliance (EMAILOPTIN, DNC flags)
 6. Each audience should be meaningfully different from the others
 

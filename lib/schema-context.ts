@@ -165,6 +165,25 @@ export function buildStrategicPatternsContext(): string {
 }
 
 /**
+ * Builds universal optimization rules from schema
+ * These apply to all query generation regardless of use case
+ */
+export function buildOptimizationRules(): string {
+  const rules = schema.query_guidelines?.optimization_rules || [];
+
+  if (rules.length === 0) {
+    return '';
+  }
+
+  let context = 'UNIVERSAL QUERY RULES:\n';
+  rules.forEach((rule, idx) => {
+    context += `${idx + 1}. ${rule}\n`;
+  });
+
+  return context;
+}
+
+/**
  * Gets the targeting philosophy from schema
  */
 export function getTargetingPhilosophy(): string {
