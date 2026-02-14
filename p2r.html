@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audience Activation as a Service</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F0EDE6;
+    --cream-dark: #E5E0D6;
+    --black: #1A1A1A;
+    --orange: #D4532A;
+    --orange-light: #E8754F;
+    --orange-glow: rgba(212, 83, 42, 0.12);
+    --gray-600: #555;
+    --gray-400: #999;
+    --gray-300: #BBB;
+    --navy: #1C2333;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--black);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5vh 7vw;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .slide-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 1.2rem;
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.4rem, 4.5vw, 4.2rem);
+    line-height: 1.1;
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 3.2vw, 3rem);
+    line-height: 1.15;
+    font-weight: 400;
+    margin-bottom: 1.2rem;
+    letter-spacing: -0.01em;
+  }
+
+  p, li {
+    font-size: clamp(0.95rem, 1.2vw, 1.15rem);
+    line-height: 1.65;
+    color: var(--gray-600);
+  }
+
+  .highlight { color: var(--orange); font-weight: 600; }
+  .bold { font-weight: 700; color: var(--black); }
+
+  .accent-bar {
+    width: 48px;
+    height: 3px;
+    background: var(--orange);
+    margin-bottom: 1rem;
+    border-radius: 2px;
+  }
+
+  /* ── Step List ── */
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    margin-top: 2rem;
+    max-width: 620px;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: baseline;
+    gap: 1.2rem;
+  }
+
+  .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--orange);
+    flex-shrink: 0;
+    min-width: 24px;
+  }
+
+  .step-item p {
+    margin: 0;
+  }
+
+  /* ── Option Cards ── */
+  .option-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .option-card {
+    background: white;
+    border: 1px solid var(--cream-dark);
+    border-radius: 6px;
+    padding: 1.8rem;
+    transition: border-color 0.3s;
+  }
+
+  .option-card:hover { border-color: var(--orange); }
+
+  .option-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--orange);
+    line-height: 1;
+    margin-bottom: 0.8rem;
+  }
+
+  .option-card h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.6rem;
+    color: var(--black);
+  }
+
+  .option-card p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  /* ── Iframe ── */
+  .iframe-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    flex: 1;
+    height: 78vh;
+  }
+
+  .iframe-row > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .iframe-wrap {
+    flex: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--cream-dark);
+    background: white;
+  }
+
+  .iframe-wrap iframe {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: none;
+  }
+
+  /* ── Opening slide ── */
+  .opening {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .opening h1 {
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    max-width: 760px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .opening p {
+    font-size: 1.15rem;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* ── Navigation ── */
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    z-index: 100;
+    background: linear-gradient(transparent, rgba(240,237,230,0.95) 30%);
+  }
+
+  .nav-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gray-300);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+
+  .nav-dot.active {
+    background: var(--orange);
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  .nav-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--cream-dark);
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: var(--black);
+    font-size: 1rem;
+  }
+
+  .nav-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .slide-counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--gray-400);
+    min-width: 50px;
+    text-align: center;
+  }
+
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--orange);
+    z-index: 200;
+    transition: width 0.4s ease;
+  }
+
+  /* ── Stagger Animations ── */
+  .slide.active .stagger { animation: fadeUp 0.5s ease forwards; opacity: 0; }
+  .slide.active .stagger:nth-child(1) { animation-delay: 0.1s; }
+  .slide.active .stagger:nth-child(2) { animation-delay: 0.2s; }
+  .slide.active .stagger:nth-child(3) { animation-delay: 0.3s; }
+  .slide.active .stagger:nth-child(4) { animation-delay: 0.4s; }
+  .slide.active .stagger:nth-child(5) { animation-delay: 0.5s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<div class="deck">
+
+  <!-- ══════════ SLIDE 0: Hook ══════════ -->
+  <div class="slide opening active">
+    <span class="slide-label stagger">The Opportunity</span>
+    <h1 class="stagger">Your data should be selling itself.</h1>
+    <p class="stagger">You have 300+ segments backed by verified, first-party transaction data — the best targeting signal in programmatic. The buyers who need it most can't easily activate it without your team walking them through it.<br><br>That's not a data problem.</p>
+  </div>
+
+  <!-- ══════════ SLIDE 1: What We Built ══════════ -->
+  <div class="slide">
+    <span class="slide-label stagger">The Platform</span>
+    <h2 class="stagger">From business goal to live audience.<br>No SQL. No tickets. No waiting.</h2>
+    <p class="stagger" style="max-width: 580px;">We built the activation layer that sits in front of data like yours and makes it self-serve for any programmatic buyer.</p>
+
+    <div class="step-list">
+      <div class="step-item stagger">
+        <span class="step-num">01</span>
+        <p><span class="bold">Natural language in.</span> Buyer types a plain-English goal — not a data request, a business objective. The platform generates 3–6 audience concepts, ranked by strategic fit.</p>
+      </div>
+      <div class="step-item stagger">
+        <span class="step-num">02</span>
+        <p><span class="bold">Validated counts before anything moves.</span> Real-time record counts against the actual data, before a single dollar is committed. No surprises downstream.</p>
+      </div>
+      <div class="step-item stagger">
+        <span class="step-num">03</span>
+        <p><span class="bold">One-click to any platform.</span> Activated directly to The Trade Desk, Meta, Google, CTV — wherever the buyer runs. Automated refresh included.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SLIDE 2: Live Demo ══════════ -->
+  <div class="slide">
+    <span class="slide-label stagger">See It Live</span>
+    <div class="iframe-row stagger">
+      <div>
+        <div class="iframe-wrap">
+          <iframe src="https://audience-builder-vert.vercel.app/" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SLIDE 3: The Conversation ══════════ -->
+  <div class="slide">
+    <span class="slide-label stagger">Next Step</span>
+    <h2 class="stagger">Three ways this could work.</h2>
+
+    <div class="option-grid">
+      <div class="option-card stagger">
+        <div class="option-num">01</div>
+        <h3>Data License</h3>
+        <p>We pay you per activation. Your data becomes self-serve for a new class of programmatic buyers — no ops lift, no hand-holding, no SQL tickets.</p>
+      </div>
+      <div class="option-card stagger">
+        <div class="option-num">02</div>
+        <h3>Revenue Share</h3>
+        <p>We split on outcomes. Aligned incentives — we only make money when your data activates and performs. Zero upfront commitment.</p>
+      </div>
+      <div class="option-card stagger">
+        <div class="option-num">03</div>
+        <h3>Start with a Pilot</h3>
+        <p>Run it through a shared relationship or two. Prove the unit economics before we decide on structure. Low risk, fast signal.</p>
+      </div>
+    </div>
+
+    <p class="stagger" style="margin-top: 2.5rem; font-size: 0.95rem;">No pressure on structure. Worth 30 minutes to find out if there's a fit.</p>
+  </div>
+
+</div>
+
+<!-- ── Nav Bar ── -->
+<nav class="nav-bar">
+  <div style="width: 80px;"></div>
+  <div class="nav-dots" id="navDots"></div>
+  <div class="nav-buttons">
+    <button class="nav-btn" id="prevBtn" aria-label="Previous slide">←</button>
+    <span class="slide-counter" id="counter">1 / 4</span>
+    <button class="nav-btn" id="nextBtn" aria-label="Next slide">→</button>
+  </div>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  const dotsContainer = document.getElementById('navDots');
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+    dot.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(dot);
+  }
+
+  function goTo(n) {
+    if (n < 0 || n >= total) return;
+    slides[current].classList.remove('active');
+    slides[n].querySelectorAll('.stagger').forEach(el => {
+      el.style.animation = 'none';
+      el.offsetHeight;
+      el.style.animation = '';
+    });
+    current = n;
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  function updateUI() {
+    counter.textContent = `${current + 1} / ${total}`;
+    progress.style.width = `${((current + 1) / total) * 100}%`;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+    document.querySelectorAll('.nav-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
+    if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+  document.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(diff) > 60) {
+      diff < 0 ? goTo(current + 1) : goTo(current - 1);
+    }
+  });
+
+  updateUI();
+</script>
+
+</body>
+</html>

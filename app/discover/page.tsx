@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Sparkles, ArrowRight, Target, Users, Lightbulb } from 'lucide-react';
 import { USE_CASES } from '@/lib/constants';
 import { DemoPromptDropdown } from '@/components/DemoPromptDropdown';
+
+interface SemanticSignal {
+  field: string;
+  meaning: string;
+  role: string;
+}
 
 interface DiscoveredAudience {
   id: string;
@@ -25,6 +31,7 @@ interface DiscoveredAudience {
     useCase: string;
     additionalContext: string;
   };
+  semanticSignals?: SemanticSignal[];
 }
 
 export default function DiscoverPage() {
@@ -35,6 +42,29 @@ export default function DiscoverPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [discoveredAudiences, setDiscoveredAudiences] = useState<DiscoveredAudience[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [expandedSignals, setExpandedSignals] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const cached = sessionStorage.getItem('discover-results');
+    if (cached) {
+      const { audiences, businessGoal: goal, useCase: uc } = JSON.parse(cached);
+      setDiscoveredAudiences(audiences);
+      setBusinessGoal(goal);
+      setUseCase(uc);
+    }
+  }, []);
+
+  const toggleSignals = (id: string) => {
+    setExpandedSignals(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
 
   const handleDiscover = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +94,11 @@ export default function DiscoverPage() {
 
       const result = await response.json();
       setDiscoveredAudiences(result.audiences);
+      sessionStorage.setItem('discover-results', JSON.stringify({
+        audiences: result.audiences,
+        businessGoal,
+        useCase,
+      }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -240,6 +275,76 @@ export default function DiscoverPage() {
                       </p>
                     </div>
                   </div>
+
+                  {/* Semantic Intelligence Reveal */}
+                  {audience.semanticSignals && audience.semanticSignals.length > 0 && (
+                    <div className="mt-4">
+                      <button
+                        type="button"
+                        onClick={() => toggleSignals(audience.id)}
+                        style={{
+                          fontFamily: 'JetBrains Mono, monospace',
+                          fontSize: '0.7rem',
+                          color: expandedSignals.has(audience.id) ? 'var(--orange, #D4532A)' : 'var(--gray-400, #9ca3af)',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.08em',
+                          cursor: 'pointer',
+                          background: 'none',
+                          border: 'none',
+                          padding: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.25rem',
+                          transition: 'color 0.15s',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.color = 'var(--orange, #D4532A)')}
+                        onMouseLeave={e => (e.currentTarget.style.color = expandedSignals.has(audience.id) ? 'var(--orange, #D4532A)' : 'var(--gray-400, #9ca3af)')}
+                      >
+                        Why this audience? {expandedSignals.has(audience.id) ? '▴' : '▾'}
+                      </button>
+
+                      <div
+                        style={{
+                          maxHeight: expandedSignals.has(audience.id) ? '600px' : '0',
+                          overflow: 'hidden',
+                          transition: 'max-height 0.25s ease',
+                        }}
+                      >
+                        <div
+                          style={{
+                            marginTop: '0.5rem',
+                            background: 'var(--cream-dark, #e8e4dc)',
+                            border: '1px solid var(--cream-dark, #e8e4dc)',
+                            borderRadius: '4px',
+                            padding: '1rem',
+                            maxHeight: '360px',
+                            overflowY: 'auto',
+                          }}
+                        >
+                          {audience.semanticSignals.map((signal, idx) => (
+                            <div
+                              key={idx}
+                              style={{
+                                paddingBottom: idx < audience.semanticSignals!.length - 1 ? '0.75rem' : 0,
+                                marginBottom: idx < audience.semanticSignals!.length - 1 ? '0.75rem' : 0,
+                                borderBottom: idx < audience.semanticSignals!.length - 1 ? '1px solid var(--cream-dark, #d1cdc4)' : 'none',
+                              }}
+                            >
+                              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--black, #1C2333)', marginBottom: '0.25rem' }}>
+                                {signal.field}
+                              </div>
+                              <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '0.85rem', color: 'var(--gray-600, #4b5563)', marginBottom: '0.2rem' }}>
+                                {signal.meaning}
+                              </div>
+                              <div style={{ fontFamily: 'DM Sans, sans-serif', fontStyle: 'italic', fontSize: '0.82rem', color: 'var(--orange, #D4532A)' }}>
+                                {signal.role}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Action Button */}
                   <Button

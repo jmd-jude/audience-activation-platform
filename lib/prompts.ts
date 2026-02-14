@@ -130,6 +130,7 @@ export function buildDiscoveryPrompt(
 ): string {
   const schemaContext = buildCompactSchemaContext();
   const optimizationRules = buildOptimizationRules();
+  const semanticContext = buildSemanticContext();
 
   const isLookalike = useCase === 'Lookalike Audience';
 
@@ -161,6 +162,8 @@ ${optimizationRules}
 
 DATABASE SCHEMA:
 ${schemaContext}
+
+${semanticContext}
 
 For each audience, think creatively about:
 - Who they are (demographics + psychographics)
@@ -194,12 +197,21 @@ Return ONLY valid JSON in this exact format (no markdown, no explanations):
         "naturalLanguageInput": "A clear, natural language description of this audience written from a marketing perspective. Describe WHO they are as people using everyday language (e.g., 'affluent professionals aged 40-60 who enjoy luxury travel') rather than database fields (e.g., 'AGE >= 40, INCOME >= 150000'). Focus on their demographics, lifestyle, interests, and behaviors in human terms.",
         "useCase": "${useCase}",
         "additionalContext": "Strategic insights about this audience's behaviors, preferences, and value (e.g., 'prefer email communication', 'responsive to premium brand messaging', 'high lifetime value potential')"
-      }
+      },
+      "semanticSignals": [
+        {
+          "field": "EXACT_FIELD_NAME_FROM_SCHEMA",
+          "meaning": "What this field signals strategically for this audience",
+          "role": "Why this field is key for this specific concept"
+        }
+      ]
     }
   ]
 }
 
-Generate 3-6 diverse audience ideas. Be creative and strategic.`;
+For semanticSignals: List 2-4 schema fields that are most central to this audience concept. Use the exact field name from the schema. For "meaning", draw from the marketing intelligence provided above (not just the field description). For "role", explain why this specific field matters for THIS audience concept specifically — not a generic definition.
+
+Generate 3 diverse audience ideas. Be creative and strategic.`;
 }
 
 /**

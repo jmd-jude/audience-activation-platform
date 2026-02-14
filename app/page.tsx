@@ -53,7 +53,7 @@ export default function LandingPage() {
                 onClick={() => router.push('/dashboard')}
                 className="text-lg px-8 py-6"
               >
-                View Platform
+                See Platform
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
