@@ -131,33 +131,33 @@ export function SegmentCard({ segment, onView, onEdit, onClone, onDelete, onActi
         </div>
       </CardContent>
 
-      <CardFooter className="gap-2">
+      <CardFooter className="grid grid-cols-2 gap-2">
         {onView && (
-          <Button variant="default" size="sm" onClick={() => onView(segment.id)}>
+          <Button variant="outline" size="sm" className="w-full" onClick={() => onView(segment.id)}>
             <Eye className="h-4 w-4 mr-1" />
             View
           </Button>
         )}
         {onActivate && (segment.status === 'approved' || segment.status === 'active') && (
-          <Button variant="default" size="sm" onClick={() => onActivate(segment.id)}>
+          <Button variant="outline" size="sm" className="w-full" onClick={() => onActivate(segment.id)}>
             <Rocket className="h-4 w-4 mr-1" />
             Activate
           </Button>
         )}
         {onEdit && (
-          <Button variant="outline" size="sm" onClick={() => onEdit(segment.id)}>
+          <Button variant="outline" size="sm" className="w-full" onClick={() => onEdit(segment.id)}>
             <Pencil className="h-4 w-4 mr-1" />
             Edit
           </Button>
         )}
         {onClone && (
-          <Button variant="outline" size="sm" onClick={() => onClone(segment.id)}>
+          <Button variant="outline" size="sm" className="w-full" onClick={() => onClone(segment.id)}>
             <Copy className="h-4 w-4 mr-1" />
             Clone
           </Button>
         )}
         {onDelete && (
-          <Button variant="destructive" size="sm" onClick={() => onDelete(segment.id)}>
+          <Button variant="outline" size="sm" className="w-full" onClick={() => onDelete(segment.id)}>
             <Trash2 className="h-4 w-4 mr-1" />
             Delete
           </Button>

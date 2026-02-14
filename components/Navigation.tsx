@@ -55,7 +55,7 @@ export function Navigation() {
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">Demo</span>
+            <span className="text-sm text-muted-foreground">Demo Account</span>
           </div>
         </div>
       </div>

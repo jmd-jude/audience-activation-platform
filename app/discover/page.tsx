@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Sparkles, ArrowRight, Target, Users, Lightbulb } from 'lucide-react';
+import { Loader2, Sparkles, ArrowRight, Target, Users, Lightbulb, X } from 'lucide-react';
 import { USE_CASES } from '@/lib/constants';
 import { DemoPromptDropdown } from '@/components/DemoPromptDropdown';
 
@@ -104,6 +104,13 @@ export default function DiscoverPage() {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleClear = () => {
+    sessionStorage.removeItem('discover-results');
+    setDiscoveredAudiences(null);
+    setBusinessGoal('');
+    setUseCase('');
   };
 
   const handleCreateSegment = (audience: DiscoveredAudience) => {
@@ -230,14 +237,20 @@ export default function DiscoverPage() {
       {/* Results Section */}
       {discoveredAudiences && discoveredAudiences.length > 0 && (
         <div>
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-              <Users className="h-6 w-6" />
-              Discovered Audiences
-            </h2>
-            <p className="text-muted-foreground">
-              {discoveredAudiences.length} strategic audience segments to help achieve your goal
-            </p>
+          <div className="mb-6 flex items-start justify-between">
+            <div>
+              <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
+                <Users className="h-6 w-6" />
+                Discovered Audiences
+              </h2>
+              <p className="text-muted-foreground">
+                {discoveredAudiences.length} strategic audience segments to help achieve your goal
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleClear} className="text-muted-foreground hover:text-foreground">
+              <X className="h-3.5 w-3.5 mr-1" />
+              Clear
+            </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
