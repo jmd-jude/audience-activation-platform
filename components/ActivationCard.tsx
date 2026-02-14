@@ -12,7 +12,7 @@ import {
   getPlatformColor,
   getActivationStatusColor
 } from '@/lib/utils';
-import { TrendingUp, BarChart3 } from 'lucide-react';
+import { TrendingUp, BarChart3, Trash2 } from 'lucide-react';
 
 interface LatestMetric {
   impressions: number | null;
@@ -41,9 +41,10 @@ interface ActivationCardProps {
   };
   onAddMetrics?: (activationId: string) => void;
   onViewMetrics?: (activationId: string) => void;
+  onDelete?: (activationId: string) => void;
 }
 
-export function ActivationCard({ activation, onAddMetrics, onViewMetrics }: ActivationCardProps) {
+export function ActivationCard({ activation, onAddMetrics, onViewMetrics, onDelete }: ActivationCardProps) {
   const { latestMetric } = activation;
 
   return (
@@ -143,6 +144,11 @@ export function ActivationCard({ activation, onAddMetrics, onViewMetrics }: Acti
           <Button variant="outline" size="sm" onClick={() => onViewMetrics(activation.id)}>
             <BarChart3 className="h-4 w-4 mr-1" />
             View History
+          </Button>
+        )}
+        {onDelete && (
+          <Button variant="ghost" size="sm" className="ml-auto text-destructive hover:text-destructive" onClick={() => onDelete(activation.id)}>
+            <Trash2 className="h-4 w-4" />
           </Button>
         )}
       </CardFooter>

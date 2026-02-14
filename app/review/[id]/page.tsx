@@ -88,6 +88,16 @@ export default function ReviewPage() {
     }
   };
 
+  const handleDeleteActivation = async (activationId: string) => {
+    try {
+      const response = await fetch(`/api/activations/${activationId}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete activation');
+      fetchActivations();
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   const handleValidate = async () => {
     setValidationError(null);
     try {
@@ -308,6 +318,7 @@ export default function ReviewPage() {
                       key={activation.id}
                       activation={activation}
                       onAddMetrics={(id) => setSelectedActivationForMetrics(id)}
+                      onDelete={handleDeleteActivation}
                     />
                   ))}
                 </div>

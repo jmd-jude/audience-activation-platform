@@ -11,11 +11,11 @@ export interface Platform {
 }
 
 export const PLATFORMS: Platform[] = [
-  { value: 'meta', label: 'Meta Ads Manager' },
+  { value: 'meta', label: 'Meta Ads' },
   { value: 'google', label: 'Google Ads' },
   { value: 'tiktok', label: 'TikTok Ads' },
-  { value: 'linkedin', label: 'LinkedIn Campaign Manager' },
-  { value: 'mntn', label: 'MNTN - CTV' },
+  { value: 'linkedin', label: 'LinkedIn' },
+  { value: 'mntn', label: 'Mountain CTV' },
   { value: 'pinterest', label: 'Pinterest Ads' },
 ];
 
