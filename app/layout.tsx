@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Data Activation Platform",
+  title: "Graphent",
   description: "Transform natural language into audience segments",
 };
 
