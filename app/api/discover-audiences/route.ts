@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     // Call Claude API
     const message = await anthropic.messages.create({
       model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929',
-      max_tokens: 3000,
+      max_tokens: 8000,
       messages: [
         {
           role: 'user',
@@ -48,10 +48,19 @@ export async function POST(request: NextRequest) {
     const responseText =
       message.content[0].type === 'text' ? message.content[0].text : '';
 
-    // Parse JSON response
+    if (message.stop_reason === 'max_tokens') {
+      console.error('Claude response was truncated (max_tokens reached). Increase max_tokens.');
+      return NextResponse.json(
+        { error: 'AI response was truncated. Please try again.' },
+        { status: 500 }
+      );
+    }
+
+    // Parse JSON response — strip markdown code fences if present
     let discoveryResult;
     try {
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      const stripped = responseText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '');
+      const jsonMatch = stripped.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         discoveryResult = JSON.parse(jsonMatch[0]);
       } else {

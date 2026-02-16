@@ -7,6 +7,7 @@ export const DEMO_PROMPTS = [
   "Find high-value homeowners likely to need HVAC replacement or home improvement financing",
   "Identify affluent frequent travelers for a premium credit card acquisition campaign",
   "Reach households with young children who are likely in-market for life insurance",
+  "Identify skilled Blue Collar professionals in rural areas who have been offered high credit limits ($5k+) and show high purchase activity in the outdoors category for a targeted campaign on high-end ATVs or camping trailers",
 ];
 
 interface DemoPromptDropdownProps {

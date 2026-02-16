@@ -176,7 +176,7 @@ IMPORTANT GUIDELINES:
 1. Think beyond simple demographic cuts - create audiences with compelling stories
 2. Ensure diversity in your suggestions (different strategies, not just variations)
 3. Focus on actionable, measurable criteria from the available data
-4. Consider email quality (EMAILQUALITYLEVEL >= 7) and phone contactability (HASPHONE = 1)
+4. Consider email quality (EMAILQUALITYLEVEL >= 7)
 5. Think about compliance (EMAILOPTIN, DNC flags)
 6. Each audience should be meaningfully different from the others
 
@@ -211,7 +211,7 @@ Return ONLY valid JSON in this exact format (no markdown, no explanations):
 
 For semanticSignals: List 2-4 schema fields that are most central to this audience concept. Use the exact field name from the schema. For "meaning", draw from the marketing intelligence provided above (not just the field description). For "role", explain why this specific field matters for THIS audience concept specifically — not a generic definition.
 
-Generate 6 diverse audience ideas. Be creative and strategic.`;
+Generate 3 diverse audience ideas. Be creative and strategic.`;
 }
 
 /**
