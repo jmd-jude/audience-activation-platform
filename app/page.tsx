@@ -50,7 +50,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
-                onClick={() => router.push('/dashboard')}
+                onClick={() => router.push('/discover')}
                 className="text-lg px-8 py-6"
               >
                 See Platform
@@ -112,7 +112,7 @@ export default function LandingPage() {
             </p>
             <Button
               size="lg"
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/discover')}
               className="text-lg px-8 py-6"
             >
               View Platform

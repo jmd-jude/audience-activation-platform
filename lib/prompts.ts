@@ -211,7 +211,7 @@ Return ONLY valid JSON in this exact format (no markdown, no explanations):
 
 For semanticSignals: List 2-4 schema fields that are most central to this audience concept. Use the exact field name from the schema. For "meaning", draw from the marketing intelligence provided above (not just the field description). For "role", explain why this specific field matters for THIS audience concept specifically — not a generic definition.
 
-Generate 3 diverse audience ideas. Be creative and strategic.`;
+Generate 6 diverse audience ideas. Be creative and strategic.`;
 }
 
 /**
