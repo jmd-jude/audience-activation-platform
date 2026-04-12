@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.snowflake.com)",
+      "WebFetch(domain:bettrdata.io)",
+      "WebSearch",
+      "WebFetch(domain:docs.bettrdata.io)",
+      "WebFetch(domain:www.capterra.com)",
+      "WebFetch(domain:www.howdy.vc)"
+    ]
+  }
+}
