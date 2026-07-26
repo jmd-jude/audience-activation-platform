@@ -1,13 +1,10 @@
 // app/api/generate-segment/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
 import { createSnowflakeConnection } from '@/lib/snowflake';
 import { buildPromptWithContext } from '@/lib/prompts';
 import { validateSQL } from '@/lib/sql-validator';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
-});
+import { getAnthropicModel, createMessageWithTruncationRetry, extractText } from '@/lib/anthropic';
+import { GENERATE_SEGMENT_RESPONSE_SCHEMA } from '@/lib/response-schemas';
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,9 +37,11 @@ export async function POST(request: NextRequest) {
     );
 
     // Call Claude API
-    const message = await anthropic.messages.create({
-      model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929',
-      max_tokens: 2048,
+    const { message, truncated } = await createMessageWithTruncationRetry({
+      model: getAnthropicModel(),
+      max_tokens: 4096,
+      thinking: { type: 'adaptive' },
+      output_config: { format: { type: 'json_schema', schema: GENERATE_SEGMENT_RESPONSE_SCHEMA } },
       messages: [
         {
           role: 'user',
@@ -51,20 +50,22 @@ export async function POST(request: NextRequest) {
       ],
     });
 
-    // Extract response
-    const responseText =
-      message.content[0].type === 'text' ? message.content[0].text : '';
+    if (truncated) {
+      console.error('Claude response was truncated (max_tokens reached) even after retry.');
+      return NextResponse.json(
+        { error: 'AI response was truncated. Please try again.' },
+        { status: 500 }
+      );
+    }
 
-    // Parse JSON response
+    // Extract response
+    const responseText = extractText(message);
+
+    // Structured outputs guarantee schema-valid JSON — parse directly.
     let generatedSegment;
     try {
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        generatedSegment = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('No JSON found in response');
-      }
-    } catch (parseError) {
+      generatedSegment = JSON.parse(responseText);
+    } catch {
       console.error('Failed to parse Claude response:', responseText);
       return NextResponse.json(
         { error: 'Failed to parse AI response', details: responseText },

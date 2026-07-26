@@ -1,11 +1,8 @@
 // app/api/clarify-segment/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
 import { buildCompactSchemaContext } from '@/lib/schema-context';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
-});
+import { getAnthropicModel, createMessageWithTruncationRetry, extractText } from '@/lib/anthropic';
+import { CLARIFICATION_RESPONSE_SCHEMA } from '@/lib/response-schemas';
 
 const CLARIFICATION_SYSTEM_PROMPT_BASE = `You are a Consumer Intelligence Analyst helping users define audience segments. Your task is to analyze a user's audience description and determine if clarification would significantly improve the SQL generation.
 
@@ -115,9 +112,11 @@ Consider:
 Return your analysis as JSON (needsClarification and questions if applicable).`;
 
     // Call Claude API for clarification analysis
-    const message = await anthropic.messages.create({
-      model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929',
-      max_tokens: 1024,
+    const { message, truncated } = await createMessageWithTruncationRetry({
+      model: getAnthropicModel(),
+      max_tokens: 2048,
+      thinking: { type: 'adaptive' },
+      output_config: { format: { type: 'json_schema', schema: CLARIFICATION_RESPONSE_SCHEMA } },
       messages: [
         {
           role: 'user',
@@ -126,19 +125,21 @@ Return your analysis as JSON (needsClarification and questions if applicable).`;
       ],
     });
 
-    // Extract response
-    const responseText =
-      message.content[0].type === 'text' ? message.content[0].text : '';
+    if (truncated) {
+      // Clarification is a soft feature — degrade gracefully rather than error.
+      console.error('Claude clarification response was truncated even after retry.');
+      return NextResponse.json({
+        needsClarification: false,
+      });
+    }
 
-    // Parse JSON response
+    // Extract response
+    const responseText = extractText(message);
+
+    // Structured outputs guarantee schema-valid JSON — parse directly.
     let clarificationResult;
     try {
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        clarificationResult = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('No JSON found in response');
-      }
+      clarificationResult = JSON.parse(responseText);
     } catch {
       console.error('Failed to parse Claude clarification response:', responseText);
       // If parsing fails, default to no clarification needed

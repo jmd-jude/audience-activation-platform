@@ -1,11 +1,8 @@
 // app/api/discover-audiences/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
 import { buildDiscoveryPrompt } from '@/lib/prompts';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
-});
+import { getAnthropicModel, createMessageWithTruncationRetry, extractText } from '@/lib/anthropic';
+import { DISCOVERY_RESPONSE_SCHEMA } from '@/lib/response-schemas';
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,9 +30,11 @@ export async function POST(request: NextRequest) {
     const prompt = buildDiscoveryPrompt(businessGoal, useCase, additionalContext);
 
     // Call Claude API
-    const message = await anthropic.messages.create({
-      model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929',
+    const { message, truncated } = await createMessageWithTruncationRetry({
+      model: getAnthropicModel(),
       max_tokens: 8000,
+      thinking: { type: 'adaptive' },
+      output_config: { format: { type: 'json_schema', schema: DISCOVERY_RESPONSE_SCHEMA } },
       messages: [
         {
           role: 'user',
@@ -44,28 +43,21 @@ export async function POST(request: NextRequest) {
       ],
     });
 
-    // Extract response
-    const responseText =
-      message.content[0].type === 'text' ? message.content[0].text : '';
-
-    if (message.stop_reason === 'max_tokens') {
-      console.error('Claude response was truncated (max_tokens reached). Increase max_tokens.');
+    if (truncated) {
+      console.error('Claude response was truncated (max_tokens reached) even after retry.');
       return NextResponse.json(
         { error: 'AI response was truncated. Please try again.' },
         { status: 500 }
       );
     }
 
-    // Parse JSON response — strip markdown code fences if present
+    // Extract response
+    const responseText = extractText(message);
+
+    // Structured outputs guarantee schema-valid JSON — parse directly.
     let discoveryResult;
     try {
-      const stripped = responseText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '');
-      const jsonMatch = stripped.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        discoveryResult = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('No JSON found in response');
-      }
+      discoveryResult = JSON.parse(responseText);
     } catch {
       console.error('Failed to parse Claude response:', responseText);
       return NextResponse.json(
