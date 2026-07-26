@@ -31,15 +31,15 @@ CRITICAL ENUMERATED FIELD RULES:
   * "Young adults" → AGE BETWEEN 18 AND 35 (AGE is numeric, not enumerated)
   * "Millennials" → GENERATION = '1. Millennials and Gen Z (1982 and after)'
 
-CRITICAL - KEEP QUERIES SIMPLE:
-- MAXIMUM 4 WHERE conditions. This is a hard limit.
-- Extract only the PRIMARY audience definition (who they are at their core).
-- Ignore secondary qualifiers and nice-to-haves from the user's request.
-- A broad audience that can be narrowed later is BETTER than a tiny over-filtered one.
-- If the user mentions 6 attributes, pick the 2-3 most defining ones and omit the rest.
+CRITICAL - KEEP QUERIES SIMPLE, BUT ACTUALLY TARGETED:
+- Use 3-4 WHERE conditions. This is both the target and the hard limit — not "up to 4," aim for 4 whenever the request supports it.
+- Fewer than 3 conditions usually means the segment isn't actually defined — it's most of the file with a label on it. Treat 2 conditions as a signal you dropped a defining attribute you shouldn't have.
+- Extract the PRIMARY audience definition (who they are at their core), but a "core" made of only income or only one lifestyle signal is rarely precise enough on its own — combine it with the next most defining trait.
+- Ignore secondary qualifiers and nice-to-haves from the user's request, not primary ones. A well-scoped audience with 3-4 defining conditions beats both an unfiltered mega-segment and a tiny over-filtered niche.
+- If the user mentions 6 attributes, pick the 3-4 most defining ones and omit the rest — not 2.
 - Example: For "affluent married millennials in urban areas who travel and have premium cards":
-  ✓ USE: INCOME_HH IN (...high values...) AND GENERATION = '1. Millennials...' AND MARITAL_STATUS = 'Married'
-  ✗ SKIP: urbanicity, travel purchases, premium card - these are secondary
+  ✓ USE: INCOME_HH IN (...high values...) AND GENERATION = '1. Millennials...' AND MARITAL_STATUS = 'Married' AND URBANICITY_CODE = 'U'
+  ✗ SKIP: travel purchases, premium card - these are secondary; but urbanicity stays, it's core to "urban areas"
 
 EXAMPLE QUERY PATTERN:
 SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5
