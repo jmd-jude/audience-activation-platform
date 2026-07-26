@@ -25,8 +25,7 @@ CRITICAL ENUMERATED FIELD RULES:
 - **ONLY use EXACT values from the valid_values array - NEVER paraphrase, abbreviate, or invent values**
 - If a value doesn't match exactly, the query returns ZERO results
 - Copy values character-for-character from the schema, including prefixes like "A.", "B.", etc.
-- When mapping natural language to values:
-  * "Affluent/High income" → INCOME_HH IN ('K. $100,000-$149,999', 'L. $150,000-$174,999', 'M. $175,000-$199,999', 'N. $200,000-$249,999', 'P. $250-$299K', 'Q. $300-$399K', 'R. $400-$499K', 'S. $500-$699K', 'T. $700-$999K', 'U. $1MM +')
+- When mapping natural language to values (EXAMPLES ONLY. USED TO REINFORCE ENUMERATED FIELDS RULES):
   * "Middle income" → INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', 'H. $75,000-$99,999')
   * "Young adults" → AGE BETWEEN 18 AND 35 (AGE is numeric, not enumerated)
   * "Millennials" → GENERATION = '1. Millennials and Gen Z (1982 and after)'
