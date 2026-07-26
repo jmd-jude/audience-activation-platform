@@ -41,13 +41,11 @@ The platform validates queries in real-time against Snowflake, showing counts an
 2. **Segment Generation Flow** (`/api/generate-segment`):
    - User selects an audience concept (or enters custom description)
    - AI generates SQL query with `segmentName`, `description`, `sqlQuery`, `reasoning`, and `confidence`
-   - SQL validated client-side against schema using `lib/sql-validator.ts`
+   - No inline validation or Snowflake execution happens here — see the two validation points below
 
-3. **Snowflake Validation Flow** (`/api/snowflake/count`):
-   - User clicks "Validate Audience" to run query against live Snowflake
-   - Query is wrapped in CTE + COUNT(*) to get audience size without fetching all rows
-   - Separate LIMIT 10 query fetches sample data for preview
-   - Returns: audience size, execution time, sample rows with column metadata
+3. **Validation** happens in two separate places, not inline during generation:
+   - `/api/snowflake/count` — "Validate Audience" button on the generate page; live execution against Snowflake, query wrapped in CTE + COUNT(*) to get audience size without fetching all rows, plus a separate LIMIT 10 query for sample data. Returns audience size, execution time, sample rows with column metadata.
+   - `/api/validate-sql` — gates the approve/publish step on the review page (`app/review/[id]/page.tsx`), using `lib/sql-validator.ts`'s rule-based syntax/schema checks (dangerous keywords, balanced parens, valid tables/fields). Purely a linter — it does not run against Snowflake and does not feed back into the LLM for a rewrite.
 
 4. **Data Layer**:
    - Prisma ORM with SQLite database (`prisma/dev.db`)
@@ -107,8 +105,10 @@ lib/
 ├── data/
 │   ├── sig-schema.json     # Identity graph schema definition
 │   └── seed-segments.json  # Example segments for prompts
+├── anthropic.ts            # Anthropic client factory, model resolution, truncation-retry helper, extractText()
 ├── db.ts                   # Prisma client singleton
 ├── prompts.ts              # Prompt building functions
+├── response-schemas.ts     # JSON schemas for output_config.format (structured outputs), one per Claude route
 ├── schema-context.ts       # Schema formatting utilities
 ├── snowflake.ts            # Snowflake SDK connection class
 ├── sql-validator.ts        # SQL validation logic
@@ -130,7 +130,7 @@ Required environment variables in `.env.local`:
 
 **Anthropic API:**
 - `ANTHROPIC_API_KEY` - Anthropic API key for Claude access
-- `ANTHROPIC_MODEL` - Model to use (default: `claude-sonnet-4-5-20250929`)
+- `ANTHROPIC_MODEL` - Model to use (default: `claude-sonnet-5`)
 
 **Snowflake Connection:**
 - `SNOWFLAKE_ACCOUNT` - Snowflake account identifier
@@ -144,8 +144,12 @@ Required environment variables in `.env.local`:
 ## Important Implementation Notes
 
 ### When Working with Claude API Integration
-- Model responses must be parsed to extract JSON from text content
-- Use regex `\{[\s\S]*\}` to extract JSON from Claude responses
+- All three Claude call sites (`discover-audiences`, `generate-segment`, `clarify-segment`) go through `lib/anthropic.ts`, not the SDK directly:
+  - `getAnthropicModel()` resolves the model (env var, fallback `claude-sonnet-5`) — don't hardcode a model string in a route
+  - `createMessageWithTruncationRetry()` wraps `messages.create()`: checks `stop_reason === 'max_tokens'` and automatically retries once with `thinking: {type: 'disabled'}` and doubled `max_tokens` before giving up
+  - `extractText()` finds the first `text`-type content block — **don't assume `message.content[0]` is text**; with adaptive thinking on, index 0 is often a `thinking` block instead
+- Every call sets `thinking: {type: 'adaptive'}` explicitly. Sonnet 5 runs adaptive thinking by default if this is omitted, and thinking output shares the same `max_tokens` budget as the actual response — omitting it silently increases truncation risk.
+- JSON responses use structured outputs (`output_config: {format: {type: 'json_schema', schema: ...}}`), not regex extraction — schemas live in `lib/response-schemas.ts`, one per route, matching each route's response contract. Response text can be parsed directly with `JSON.parse()`; no need to search for a JSON substring.
 - Always include schema context in prompts to ensure valid SQL generation
 - Discovery endpoint (`/api/discover-audiences`) returns audience concepts with `targetingCriteria.naturalLanguageInput` for subsequent SQL generation
 
