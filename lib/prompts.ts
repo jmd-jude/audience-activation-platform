@@ -213,27 +213,3 @@ For semanticSignals: List 2-4 schema fields that are most central to this audien
 
 Generate 3 diverse audience ideas. Be creative and strategic.`;
 }
-
-/**
- * Prompt for SQL validation and improvement suggestions
- */
-export function buildValidationPrompt(sql: string): string {
-  return `Review the following SQL query for correctness and suggest improvements:
-
-${sql}
-
-Check for:
-1. SQL syntax correctness
-2. Use of DISTINCT for deduplication
-3. Proper JOIN conditions
-4. Appropriate WHERE clause filters
-5. Quality/compliance considerations
-
-Return a JSON response with:
-{
-  "isValid": boolean,
-  "issues": ["list of issues found"],
-  "suggestions": ["list of improvement suggestions"],
-  "improvedSQL": "improved version if issues found, or null"
-}`;
-}
