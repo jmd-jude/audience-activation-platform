@@ -39,14 +39,14 @@ export function DemoPromptDropdown({ onSelect, prompts = DEMO_PROMPTS }: DemoPro
           fontFamily: 'JetBrains Mono, monospace',
           fontSize: '0.7rem',
           letterSpacing: '0.05em',
-          color: open ? 'var(--orange, #D4532A)' : 'var(--gray-400, #9ca3af)',
+          color: open ? 'var(--orange, #7c8d44)' : 'var(--gray-400, #9ca3af)',
           background: 'none',
           border: 'none',
           cursor: 'pointer',
           padding: '2px 4px',
           textTransform: 'uppercase',
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--orange, #D4532A)')}
+        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--orange, #7c8d44)')}
         onMouseLeave={(e) => {
           if (!open) e.currentTarget.style.color = 'var(--gray-400, #9ca3af)';
         }}
@@ -62,7 +62,7 @@ export function DemoPromptDropdown({ onSelect, prompts = DEMO_PROMPTS }: DemoPro
             top: 'calc(100% + 4px)',
             zIndex: 50,
             background: 'white',
-            border: '1px solid var(--cream-dark, #e5e0d8)',
+            border: '1px solid var(--cream-dark, #dce2da)',
             borderRadius: '4px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             minWidth: '320px',
@@ -84,14 +84,14 @@ export function DemoPromptDropdown({ onSelect, prompts = DEMO_PROMPTS }: DemoPro
                 padding: '0.6rem 0.875rem',
                 fontFamily: 'DM Sans, sans-serif',
                 fontSize: '0.82rem',
-                color: 'var(--navy, #1C2333)',
+                color: 'var(--navy, #1e2a33)',
                 background: 'none',
                 border: 'none',
-                borderBottom: idx < prompts.length - 1 ? '1px solid var(--cream-dark, #e5e0d8)' : 'none',
+                borderBottom: idx < prompts.length - 1 ? '1px solid var(--cream-dark, #dce2da)' : 'none',
                 cursor: 'pointer',
                 lineHeight: '1.4',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--cream, #F0EDE6)')}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--cream, #ecf0ea)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
             >
               {prompt}

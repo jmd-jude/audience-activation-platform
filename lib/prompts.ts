@@ -132,15 +132,31 @@ The estimatedComplexity should be "low", "medium", or "high".`;
   return prompt;
 }
 
+export interface DiscoveryPromptInput {
+  useCase: string;
+  /** Manually typed goal (typed or "try an example" path). Omit when driven by a brief. */
+  businessGoal?: string;
+  /** Manually typed notes, only meaningful alongside businessGoal. */
+  additionalContext?: string;
+  /** Full text of an uploaded/pasted campaign brief (paste or .docx extraction). */
+  briefText?: string;
+  /** True when a PDF brief is attached as a document content block on the same message. */
+  hasAttachedBriefDocument?: boolean;
+}
+
 /**
  * Builds the discovery-focused prompt for Claude
- * Used to generate 3-6 audience suggestions from a business goal
+ * Used to generate 3-6 audience suggestions from a business goal — either
+ * typed directly, or read from a full campaign brief (pasted, .docx text,
+ * or a PDF attached alongside this prompt as a document content block).
  */
-export function buildDiscoveryPrompt(
-  businessGoal: string,
-  useCase: string,
-  additionalContext?: string
-): string {
+export function buildDiscoveryPrompt({
+  useCase,
+  businessGoal,
+  additionalContext,
+  briefText,
+  hasAttachedBriefDocument,
+}: DiscoveryPromptInput): string {
   const schemaContext = buildCompactSchemaContext();
   const optimizationRules = buildOptimizationRules();
   const semanticContext = buildSemanticContext();
@@ -163,13 +179,19 @@ For each audience, explain HOW it matches the seed profile's key signals (income
     : `Given a business goal, suggest 3-6 creative audience segments that could help achieve it.
 For each audience, provide a compelling marketing narrative and actionable targeting criteria.`;
 
+  const goalSection = briefText
+    ? `CAMPAIGN BRIEF:\n${briefText}\n\nRead the full brief above and identify the ${isLookalike ? 'customer profile' : 'business goal(s)'} driving this campaign — including any useful context on budget, timing, competitive positioning, tone, or constraints — then generate audiences accordingly.`
+    : hasAttachedBriefDocument
+      ? `A campaign brief is attached to this message as a document. Read it in full and identify the ${isLookalike ? 'customer profile' : 'business goal(s)'} driving this campaign — including any useful context on budget, timing, competitive positioning, tone, or constraints — then generate audiences accordingly.`
+      : `${isLookalike ? 'CUSTOMER PROFILE' : 'BUSINESS GOAL'}: ${businessGoal}
+${additionalContext ? `ADDITIONAL CONTEXT: ${additionalContext}` : ''}`;
+
   return `You are an expert Marketing Strategist with deep consumer intelligence expertise.
 
 ${modeInstructions}
 
-${isLookalike ? 'CUSTOMER PROFILE' : 'BUSINESS GOAL'}: ${businessGoal}
+${goalSection}
 USE CASE: ${useCase}
-${additionalContext ? `ADDITIONAL CONTEXT: ${additionalContext}` : ''}
 
 ${optimizationRules}
 

@@ -95,15 +95,14 @@ export function GenerateForm({ onGenerate, initialValues, isRegenerating = false
               value={naturalLanguageInput}
               onChange={(e) => setNaturalLanguageInput(e.target.value)}
               required
-              rows={4}
+              rows={6}
               className="resize-y"
             />
-            <p className="text-sm text-muted-foreground">
-              {useCase === 'Lookalike Audience'
-                ? "Describe demographics, behaviors, and characteristics of your ideal customer profile"
-                : "Be specific about demographics, behaviors, and contact requirements"
-              }
-            </p>
+            {useCase === 'Lookalike Audience' && (
+              <p className="text-sm text-muted-foreground">
+                Describe demographics, behaviors, and characteristics of your ideal customer profile
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -131,7 +130,7 @@ export function GenerateForm({ onGenerate, initialValues, isRegenerating = false
               placeholder="Any additional requirements or constraints..."
               value={additionalContext}
               onChange={(e) => setAdditionalContext(e.target.value)}
-              rows={2}
+              rows={4}
               className="resize-y"
             />
           </div>

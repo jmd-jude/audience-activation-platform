@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Sparkles, ArrowRight, Target, Users, Lightbulb, X } from 'lucide-react';
 import { USE_CASES } from '@/lib/constants';
 import { DemoPromptDropdown } from '@/components/DemoPromptDropdown';
+
+const MAX_BRIEF_FILE_BYTES = 8 * 1024 * 1024; // 8MB — conservative client-side guardrail
+const ACCEPTED_BRIEF_EXTENSIONS = ['.pdf', '.docx'];
 
 interface SemanticSignal {
   field: string;
@@ -39,10 +42,16 @@ export default function DiscoverPage() {
   const [businessGoal, setBusinessGoal] = useState('');
   const [useCase, setUseCase] = useState('');
   const [additionalContext, setAdditionalContext] = useState('');
+  const [briefFile, setBriefFile] = useState<File | null>(null);
+  const [briefPastedText, setBriefPastedText] = useState('');
+  const [briefError, setBriefError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [discoveredAudiences, setDiscoveredAudiences] = useState<DiscoveredAudience[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expandedSignals, setExpandedSignals] = useState<Set<string>>(new Set());
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const hasBrief = !!briefFile || !!briefPastedText.trim();
 
   useEffect(() => {
     const cached = sessionStorage.getItem('discover-results');
@@ -66,10 +75,64 @@ export default function DiscoverPage() {
     });
   };
 
+  const handleExampleSelect = (prompt: string) => {
+    setBusinessGoal(prompt);
+  };
+
+  const clearBrief = () => {
+    setBriefFile(null);
+    setBriefPastedText('');
+    setBriefError(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleBriefFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0] ?? null;
+    setBriefError(null);
+
+    if (!selected) {
+      setBriefFile(null);
+      return;
+    }
+
+    const hasValidExtension = ACCEPTED_BRIEF_EXTENSIONS.some((ext) =>
+      selected.name.toLowerCase().endsWith(ext)
+    );
+    if (!hasValidExtension) {
+      setBriefError('Upload a PDF or Word (.docx) document.');
+      setBriefFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    if (selected.size > MAX_BRIEF_FILE_BYTES) {
+      setBriefError('That file is too large — please upload a document under 8MB.');
+      setBriefFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    setBriefFile(selected);
+    setBriefPastedText('');
+    setBusinessGoal('');
+    setAdditionalContext('');
+  };
+
+  const handleBriefPastedTextChange = (value: string) => {
+    setBriefPastedText(value);
+    setBriefError(null);
+    if (value.trim()) {
+      setBriefFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setBusinessGoal('');
+      setAdditionalContext('');
+    }
+  };
+
   const handleDiscover = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!businessGoal || !useCase) {
+    if (!useCase || (!hasBrief && !businessGoal.trim())) {
       return;
     }
 
@@ -77,14 +140,20 @@ export default function DiscoverPage() {
     setIsGenerating(true);
 
     try {
+      const formData = new FormData();
+      formData.append('useCase', useCase);
+      if (briefFile) {
+        formData.append('file', briefFile);
+      } else if (briefPastedText.trim()) {
+        formData.append('briefText', briefPastedText.trim());
+      } else {
+        formData.append('businessGoal', businessGoal);
+        if (additionalContext) formData.append('additionalContext', additionalContext);
+      }
+
       const response = await fetch('/api/discover-audiences', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          businessGoal,
-          useCase,
-          additionalContext: additionalContext || undefined,
-        }),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -111,6 +180,7 @@ export default function DiscoverPage() {
     setDiscoveredAudiences(null);
     setBusinessGoal('');
     setUseCase('');
+    clearBrief();
   };
 
   const handleCreateSegment = (audience: DiscoveredAudience) => {
@@ -133,17 +203,14 @@ export default function DiscoverPage() {
           <Lightbulb className="h-8 w-8 text-primary" />
           Discover Audiences
         </h1>
-        <p className="text-muted-foreground">
-          Describe your business goal to discover audience segments.
-        </p>
       </div>
 
       {/* Input Form */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>What&apos;s Your Business Goal?</CardTitle>
+          <CardTitle>What&apos;s Your Campaign Objective?</CardTitle>
           <CardDescription>
-            Describe what you want to achieve. We suggest creative audience segments to help you get there
+            Describe what you want to achieve, or attach a campaign brief. We suggest creative audience segments to help you get there
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -151,9 +218,9 @@ export default function DiscoverPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="businessGoal">
-                  Business Goal <span className="text-destructive">*</span>
+                  Campaign Objective <span className="text-destructive">*</span>
                 </Label>
-                <DemoPromptDropdown onSelect={setBusinessGoal} />
+                {!hasBrief && <DemoPromptDropdown onSelect={handleExampleSelect} />}
               </div>
               <Textarea
                 id="businessGoal"
@@ -163,16 +230,60 @@ export default function DiscoverPage() {
                 }
                 value={businessGoal}
                 onChange={(e) => setBusinessGoal(e.target.value)}
-                required
+                disabled={hasBrief}
+                required={!hasBrief}
                 rows={3}
                 className="resize-none"
               />
-              <p className="text-sm text-muted-foreground">
-                {useCase === 'Lookalike Audience'
-                  ? "Be specific about demographics, behaviors, and purchase patterns of your ideal customers"
-                  : "Focus on outcomes and objectives rather than technical requirements"
-                }
-              </p>
+              {(hasBrief || useCase === 'Lookalike Audience') && (
+                <p className="text-sm text-muted-foreground">
+                  {hasBrief
+                    ? "Business goal will be read from your attached brief."
+                    : "Be specific about demographics, behaviors, and purchase patterns of your ideal customers"
+                  }
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="h-px flex-1 bg-border" />
+              or
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="briefFile">Attach a Campaign Brief</Label>
+                {hasBrief && (
+                  <Button type="button" variant="ghost" size="sm" onClick={clearBrief} className="h-auto py-0.5 text-muted-foreground hover:text-foreground">
+                    <X className="h-3.5 w-3.5 mr-1" />
+                    Clear
+                  </Button>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                id="briefFile"
+                type="file"
+                accept=".pdf,.docx"
+                onChange={handleBriefFileChange}
+                disabled={!!briefPastedText.trim()}
+                className="text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-2 file:text-sm file:font-medium file:cursor-pointer disabled:opacity-50"
+              />
+              <p className="text-sm text-muted-foreground">PDF or Word (.docx), up to 8MB</p>
+              <Textarea
+                placeholder="...or paste the full brief text here"
+                value={briefPastedText}
+                onChange={(e) => handleBriefPastedTextChange(e.target.value)}
+                disabled={!!briefFile}
+                rows={3}
+                className="resize-none"
+              />
+              {briefError && (
+                <Alert variant="destructive">
+                  <AlertDescription>{briefError}</AlertDescription>
+                </Alert>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -193,21 +304,23 @@ export default function DiscoverPage() {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="additionalContext">Additional Context (Optional)</Label>
-              <Textarea
-                id="additionalContext"
-                placeholder="Any specific requirements, constraints, or preferences..."
-                value={additionalContext}
-                onChange={(e) => setAdditionalContext(e.target.value)}
-                rows={2}
-                className="resize-none"
-              />
-            </div>
+            {!hasBrief && (
+              <div className="space-y-2">
+                <Label htmlFor="additionalContext">Additional Context (Optional)</Label>
+                <Textarea
+                  id="additionalContext"
+                  placeholder="Any specific requirements, constraints, or preferences..."
+                  value={additionalContext}
+                  onChange={(e) => setAdditionalContext(e.target.value)}
+                  rows={2}
+                  className="resize-none"
+                />
+              </div>
+            )}
 
             <Button
               type="submit"
-              disabled={!businessGoal || !useCase || isGenerating}
+              disabled={!useCase || (!hasBrief && !businessGoal.trim()) || isGenerating}
               className="w-full"
               size="lg"
             >
@@ -298,7 +411,7 @@ export default function DiscoverPage() {
                         style={{
                           fontFamily: 'JetBrains Mono, monospace',
                           fontSize: '0.7rem',
-                          color: expandedSignals.has(audience.id) ? 'var(--orange, #D4532A)' : 'var(--gray-400, #9ca3af)',
+                          color: expandedSignals.has(audience.id) ? 'var(--orange, #7c8d44)' : 'var(--gray-400, #9ca3af)',
                           textTransform: 'uppercase',
                           letterSpacing: '0.08em',
                           cursor: 'pointer',
@@ -310,8 +423,8 @@ export default function DiscoverPage() {
                           gap: '0.25rem',
                           transition: 'color 0.15s',
                         }}
-                        onMouseEnter={e => (e.currentTarget.style.color = 'var(--orange, #D4532A)')}
-                        onMouseLeave={e => (e.currentTarget.style.color = expandedSignals.has(audience.id) ? 'var(--orange, #D4532A)' : 'var(--gray-400, #9ca3af)')}
+                        onMouseEnter={e => (e.currentTarget.style.color = 'var(--orange, #7c8d44)')}
+                        onMouseLeave={e => (e.currentTarget.style.color = expandedSignals.has(audience.id) ? 'var(--orange, #7c8d44)' : 'var(--gray-400, #9ca3af)')}
                       >
                         Why this audience? {expandedSignals.has(audience.id) ? '▴' : '▾'}
                       </button>
@@ -326,8 +439,8 @@ export default function DiscoverPage() {
                         <div
                           style={{
                             marginTop: '0.5rem',
-                            background: 'var(--cream-dark, #e8e4dc)',
-                            border: '1px solid var(--cream-dark, #e8e4dc)',
+                            background: 'var(--cream-dark, #ecf0ea)',
+                            border: '1px solid var(--cream-dark, #ecf0ea)',
                             borderRadius: '4px',
                             padding: '1rem',
                             maxHeight: '360px',
@@ -340,16 +453,16 @@ export default function DiscoverPage() {
                               style={{
                                 paddingBottom: idx < audience.semanticSignals!.length - 1 ? '0.75rem' : 0,
                                 marginBottom: idx < audience.semanticSignals!.length - 1 ? '0.75rem' : 0,
-                                borderBottom: idx < audience.semanticSignals!.length - 1 ? '1px solid var(--cream-dark, #d1cdc4)' : 'none',
+                                borderBottom: idx < audience.semanticSignals!.length - 1 ? '1px solid var(--cream-dark, #dce2da)' : 'none',
                               }}
                             >
-                              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--black, #1C2333)', marginBottom: '0.25rem' }}>
+                              <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--black, #1e2a33)', marginBottom: '0.25rem' }}>
                                 {signal.field}
                               </div>
-                              <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '0.85rem', color: 'var(--gray-600, #4b5563)', marginBottom: '0.2rem' }}>
+                              <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '0.85rem', color: 'var(--gray-600, #5e6d78)', marginBottom: '0.2rem' }}>
                                 {signal.meaning}
                               </div>
-                              <div style={{ fontFamily: 'DM Sans, sans-serif', fontStyle: 'italic', fontSize: '0.82rem', color: 'var(--orange, #D4532A)' }}>
+                              <div style={{ fontFamily: 'DM Sans, sans-serif', fontStyle: 'italic', fontSize: '0.82rem', color: 'var(--orange, #7c8d44)' }}>
                                 {signal.role}
                               </div>
                             </div>

@@ -1,18 +1,34 @@
 // app/api/discover-audiences/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import mammoth from 'mammoth';
 import { buildDiscoveryPrompt } from '@/lib/prompts';
 import { getAnthropicModel, createMessageWithTruncationRetry, extractText } from '@/lib/anthropic';
 import { DISCOVERY_RESPONSE_SCHEMA } from '@/lib/response-schemas';
+import type Anthropic from '@anthropic-ai/sdk';
+
+// mammoth relies on Node internals (Buffer/zlib) and isn't Edge-compatible.
+export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { businessGoal, useCase, additionalContext } = body;
+    const formData = await request.formData();
+    const useCase = formData.get('useCase') as string | null;
+    const businessGoal = (formData.get('businessGoal') as string | null)?.trim();
+    const additionalContext = (formData.get('additionalContext') as string | null)?.trim();
+    const briefTextField = (formData.get('briefText') as string | null)?.trim();
+    const file = formData.get('file');
+    const hasFile = file instanceof File && file.size > 0;
 
-    // Validation
-    if (!businessGoal || !useCase) {
+    if (!useCase) {
       return NextResponse.json(
-        { error: 'Missing required fields: businessGoal and useCase' },
+        { error: 'Missing required field: useCase' },
+        { status: 400 }
+      );
+    }
+
+    if (!businessGoal && !briefTextField && !hasFile) {
+      return NextResponse.json(
+        { error: 'Provide a business goal or a campaign brief' },
         { status: 400 }
       );
     }
@@ -24,12 +40,60 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('Discovering audiences for:', { businessGoal, useCase });
+    let pdfBase64: string | undefined;
+    let briefText: string | undefined = briefTextField || undefined;
 
-    // Build discovery prompt
-    const prompt = buildDiscoveryPrompt(businessGoal, useCase, additionalContext);
+    if (hasFile) {
+      const uploadedFile = file as File;
+      const buffer = Buffer.from(await uploadedFile.arrayBuffer());
 
-    // Call Claude API
+      if (uploadedFile.type === 'application/pdf' || uploadedFile.name.toLowerCase().endsWith('.pdf')) {
+        pdfBase64 = buffer.toString('base64');
+      } else if (
+        uploadedFile.type.includes('wordprocessingml') ||
+        uploadedFile.name.toLowerCase().endsWith('.docx')
+      ) {
+        try {
+          const { value } = await mammoth.extractRawText({ buffer });
+          briefText = value;
+        } catch (err) {
+          console.error('Failed to parse .docx file:', err);
+          return NextResponse.json(
+            { error: 'Could not read the Word document. It may be corrupted or in an unsupported format.' },
+            { status: 400 }
+          );
+        }
+      } else {
+        return NextResponse.json(
+          { error: 'Unsupported file type. Upload a PDF or Word (.docx) document.' },
+          { status: 400 }
+        );
+      }
+    }
+
+    console.log('Discovering audiences for:', {
+      useCase,
+      source: pdfBase64 ? 'pdf' : briefText ? 'brief-text' : 'manual',
+    });
+
+    const prompt = buildDiscoveryPrompt({
+      useCase,
+      businessGoal: briefText || pdfBase64 ? undefined : businessGoal,
+      additionalContext: briefText || pdfBase64 ? undefined : additionalContext,
+      briefText: pdfBase64 ? undefined : briefText,
+      hasAttachedBriefDocument: !!pdfBase64,
+    });
+
+    const content: Anthropic.MessageParam['content'] = pdfBase64
+      ? [
+          {
+            type: 'document',
+            source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 },
+          },
+          { type: 'text', text: prompt },
+        ]
+      : prompt;
+
     const { message, truncated } = await createMessageWithTruncationRetry({
       model: getAnthropicModel(),
       max_tokens: 8000,
@@ -38,7 +102,7 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'user',
-          content: prompt,
+          content,
         },
       ],
     });
