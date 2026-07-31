@@ -71,9 +71,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Return response — validation and Snowflake execution happen separately
-    // via /api/validate-sql (approve/publish gate) and /api/snowflake/count
-    // ("Validate Audience" button), not inline here.
+    // Return response — audience counting happens separately via
+    // /api/snowflake/count ("Generate Counts" button), not inline here.
     return NextResponse.json({
       ...generatedSegment,
       timestamp: new Date().toISOString()

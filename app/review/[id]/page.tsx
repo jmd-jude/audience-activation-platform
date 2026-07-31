@@ -13,11 +13,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Save, AlertCircle, ArrowLeft, Rocket } from 'lucide-react';
+import { Loader2, Save, AlertCircle, ArrowLeft, Rocket, Database, CheckCircle2 } from 'lucide-react';
 import { ActivateSegmentDialog } from '@/components/ActivateSegmentDialog';
 import { ActivationCard } from '@/components/ActivationCard';
 import { PerformanceEntryForm } from '@/components/PerformanceEntryForm';
 import { USE_CASES, SEGMENT_STATUSES } from '@/lib/constants';
+import { formatNumber } from '@/lib/utils';
 
 interface Segment {
   id: string;
@@ -39,7 +40,18 @@ export default function ReviewPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Audience count-check state
+  const [isCheckingCount, setIsCheckingCount] = useState(false);
+  const [countResult, setCountResult] = useState<{
+    audienceSize: number;
+    executionTime: number;
+    sampleData: {
+      columns: Array<{ name: string; type: string }>;
+      rows: Array<Record<string, unknown>>;
+    };
+  } | null>(null);
+  const [countError, setCountError] = useState<string | null>(null);
 
   const [segmentName, setSegmentName] = useState('');
   const [description, setDescription] = useState('');
@@ -98,26 +110,32 @@ export default function ReviewPage() {
     }
   };
 
-  const handleValidate = async () => {
-    setValidationError(null);
+  const handleCheckCount = async () => {
+    if (!sqlQuery) return;
+
+    setIsCheckingCount(true);
+    setCountError(null);
+    setCountResult(null);
+
     try {
-      const response = await fetch('/api/validate-sql', {
+      const response = await fetch('/api/snowflake/count', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sqlQuery }),
       });
 
-      const validation = await response.json();
+      const data = await response.json();
 
-      if (!validation.isValid) {
-        setValidationError(validation.errors.join(', '));
-        return false;
+      if (!data.success) {
+        throw new Error(data.error || 'Count check failed');
       }
 
-      return true;
+      setCountResult(data.validation);
+      setEstimatedSize(data.validation.audienceSize.toString());
     } catch (err: any) {
-      setValidationError('Validation failed');
-      return false;
+      setCountError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setIsCheckingCount(false);
     }
   };
 
@@ -126,15 +144,6 @@ export default function ReviewPage() {
     setError(null);
 
     try {
-      // Validate SQL if approving or publishing
-      if (selectedStatus === 'approved' || selectedStatus === 'published') {
-        const isValid = await handleValidate();
-        if (!isValid) {
-          setIsSaving(false);
-          return;
-        }
-      }
-
       const response = await fetch(`/api/segments/${segmentId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -191,13 +200,6 @@ export default function ReviewPage() {
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {validationError && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{validationError}</AlertDescription>
         </Alert>
       )}
 
@@ -272,20 +274,105 @@ export default function ReviewPage() {
           <CardHeader>
             <CardTitle>SQL Query</CardTitle>
             <CardDescription>
-              Review and edit the SQL query. Make sure it follows best practices.
+              Edit the query and re-check the count as you go — try loosening or tightening it to see how the audience size responds.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <SQLEditor
               value={sqlQuery}
-              onChange={(value) => setSqlQuery(value || '')}
+              onChange={(value) => {
+                setSqlQuery(value || '');
+                // Clear stale count results when the SQL is edited
+                if (countResult) setCountResult(null);
+                if (countError) setCountError(null);
+              }}
               height="400px"
             />
             <div className="mt-4">
-              <Button variant="outline" onClick={handleValidate}>
-                Validate
+              <Button
+                variant="secondary"
+                onClick={handleCheckCount}
+                disabled={isCheckingCount || !sqlQuery}
+              >
+                {isCheckingCount ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Checking...
+                  </>
+                ) : (
+                  <>
+                    <Database className="h-4 w-4 mr-2" />
+                    Generate Counts
+                  </>
+                )}
               </Button>
             </div>
+
+            {countResult && (
+              <Card className="mt-4">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-green-600" />
+                    Count Results
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Actual Size</p>
+                      <p className="text-2xl font-bold">
+                        {formatNumber(countResult.audienceSize)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Query Time</p>
+                      <p className="text-2xl font-bold">
+                        {(countResult.executionTime / 1000).toFixed(2)}s
+                      </p>
+                    </div>
+                  </div>
+
+                  {countResult.sampleData.rows.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">
+                        Sample Records (first {countResult.sampleData.rows.length})
+                      </h4>
+                      <div className="border rounded-lg overflow-auto max-h-96">
+                        <table className="w-full text-sm">
+                          <thead className="bg-muted">
+                            <tr>
+                              {countResult.sampleData.columns.map((col) => (
+                                <th key={col.name} className="px-4 py-2 text-left font-medium whitespace-nowrap">
+                                  {col.name}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {countResult.sampleData.rows.map((row, idx) => (
+                              <tr key={idx} className="border-t hover:bg-muted/50">
+                                {countResult.sampleData.columns.map((col) => (
+                                  <td key={col.name} className="px-4 py-2 whitespace-nowrap">
+                                    {row[col.name]?.toString() || 'null'}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {countError && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{countError}</AlertDescription>
+              </Alert>
+            )}
           </CardContent>
         </Card>
 

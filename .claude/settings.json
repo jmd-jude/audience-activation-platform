@@ -40,7 +40,11 @@
       "Bash(curl -s -X POST http://localhost:3005/api/discover-audiences -F 'businessGoal=test')",
       "Bash(curl -s -X POST http://localhost:3005/api/discover-audiences -F 'useCase=Awareness')",
       "Bash(node ./screenshot-v3.js)",
-      "Bash(grep -rEo \"#[0-9a-fA-F]{3,6}\" --include=\"*.tsx\" --include=\"*.ts\" --include=\"*.css\" .)"
+      "Bash(grep -rEo \"#[0-9a-fA-F]{3,6}\" --include=\"*.tsx\" --include=\"*.ts\" --include=\"*.css\" .)",
+      "Bash(curl -s http://localhost:3005/api/segments)",
+      "Bash(curl -s http://localhost:3005/api/segments/cms29odb90000jx04hm76ej1v)",
+      "Bash(node ./review-count-check.js)",
+      "Bash(node ./review-count-check2.js)"
     ]
   }
 }
