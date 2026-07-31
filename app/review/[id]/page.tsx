@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Save, AlertCircle, ArrowLeft, Rocket, Database, CheckCircle2 } from 'lucide-react';
+import { Loader2, Save, AlertCircle, ArrowLeft, Rocket, Database, CheckCircle2, Wand2 } from 'lucide-react';
 import { ActivateSegmentDialog } from '@/components/ActivateSegmentDialog';
 import { ActivationCard } from '@/components/ActivationCard';
 import { PerformanceEntryForm } from '@/components/PerformanceEntryForm';
@@ -52,6 +52,12 @@ export default function ReviewPage() {
     };
   } | null>(null);
   const [countError, setCountError] = useState<string | null>(null);
+
+  // Audience adjustment state
+  const [adjustInstruction, setAdjustInstruction] = useState('');
+  const [isAdjusting, setIsAdjusting] = useState(false);
+  const [adjustError, setAdjustError] = useState<string | null>(null);
+  const [changeSummary, setChangeSummary] = useState<string | null>(null);
 
   const [segmentName, setSegmentName] = useState('');
   const [description, setDescription] = useState('');
@@ -110,8 +116,9 @@ export default function ReviewPage() {
     }
   };
 
-  const handleCheckCount = async () => {
-    if (!sqlQuery) return;
+  const handleCheckCount = async (queryOverride?: string) => {
+    const queryToCheck = queryOverride ?? sqlQuery;
+    if (!queryToCheck) return;
 
     setIsCheckingCount(true);
     setCountError(null);
@@ -121,7 +128,7 @@ export default function ReviewPage() {
       const response = await fetch('/api/snowflake/count', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sqlQuery }),
+        body: JSON.stringify({ sqlQuery: queryToCheck }),
       });
 
       const data = await response.json();
@@ -136,6 +143,47 @@ export default function ReviewPage() {
       setCountError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setIsCheckingCount(false);
+    }
+  };
+
+  const handleAdjustQuery = async () => {
+    if (!sqlQuery || !adjustInstruction.trim()) return;
+
+    setIsAdjusting(true);
+    setAdjustError(null);
+    setChangeSummary(null);
+    setCountResult(null);
+    setCountError(null);
+
+    try {
+      const response = await fetch('/api/adjust-segment-query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sqlQuery,
+          currentCount: countResult?.audienceSize ?? null,
+          description,
+          useCase: targetUseCase,
+          instruction: adjustInstruction.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to adjust query');
+      }
+
+      const data = await response.json();
+      setSqlQuery(data.sqlQuery);
+      setChangeSummary(data.changeSummary);
+      setAdjustInstruction('');
+
+      // Immediately re-check the count against the revised query
+      await handleCheckCount(data.sqlQuery);
+    } catch (err: any) {
+      setAdjustError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setIsAdjusting(false);
     }
   };
 
@@ -282,16 +330,17 @@ export default function ReviewPage() {
               value={sqlQuery}
               onChange={(value) => {
                 setSqlQuery(value || '');
-                // Clear stale count results when the SQL is edited
+                // Clear stale results when the SQL is hand-edited
                 if (countResult) setCountResult(null);
                 if (countError) setCountError(null);
+                if (changeSummary) setChangeSummary(null);
               }}
               height="400px"
             />
             <div className="mt-4">
               <Button
                 variant="secondary"
-                onClick={handleCheckCount}
+                onClick={() => handleCheckCount()}
                 disabled={isCheckingCount || !sqlQuery}
               >
                 {isCheckingCount ? (
@@ -307,6 +356,53 @@ export default function ReviewPage() {
                 )}
               </Button>
             </div>
+
+            <div className="mt-4 space-y-2">
+              <Label htmlFor="adjustInstruction">Adjust This Audience</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="adjustInstruction"
+                  value={adjustInstruction}
+                  onChange={(e) => setAdjustInstruction(e.target.value)}
+                  placeholder="e.g. grow this a bit but keep it focused on high-income households"
+                  disabled={isAdjusting}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !isAdjusting && adjustInstruction.trim()) {
+                      e.preventDefault();
+                      handleAdjustQuery();
+                    }
+                  }}
+                />
+                <Button
+                  variant="secondary"
+                  onClick={handleAdjustQuery}
+                  disabled={isAdjusting || !adjustInstruction.trim()}
+                >
+                  {isAdjusting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Wand2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Describe how you'd like the audience to change — the query updates and re-checks the count automatically.
+              </p>
+            </div>
+
+            {changeSummary && (
+              <Alert className="mt-4">
+                <Wand2 className="h-4 w-4" />
+                <AlertDescription>{changeSummary}</AlertDescription>
+              </Alert>
+            )}
+
+            {adjustError && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{adjustError}</AlertDescription>
+              </Alert>
+            )}
 
             {countResult && (
               <Card className="mt-4">

@@ -74,6 +74,16 @@ export const GENERATE_SEGMENT_RESPONSE_SCHEMA = {
   additionalProperties: false,
 };
 
+export const ADJUST_QUERY_RESPONSE_SCHEMA = {
+  type: 'object',
+  properties: {
+    sqlQuery: { type: 'string' },
+    changeSummary: { type: 'string' },
+  },
+  required: ['sqlQuery', 'changeSummary'],
+  additionalProperties: false,
+};
+
 export const CLARIFICATION_RESPONSE_SCHEMA = {
   type: 'object',
   properties: {

@@ -121,7 +121,7 @@ Generate a complete audience segment with metadata. Return ONLY valid JSON in th
   "segmentName": "Business-friendly segment name (under 60 chars)",
   "description": "Clear description of who this targets and why (75-150 chars)",
   "sqlQuery": "SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5 FROM DATA d LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID WHERE...",
-  "reasoning": "Brief explanation of your query approach, key filters used, and expected audience size range (e.g., '50K-200K households')",
+  "reasoning": "Brief explanation of your query approach and key filters used",
   "confidence": 0.85,
   "estimatedComplexity": "low"
 }
@@ -130,6 +130,55 @@ The confidence score should be between 0 and 1, where 1 is highest confidence.
 The estimatedComplexity should be "low", "medium", or "high".`;
 
   return prompt;
+}
+
+/**
+ * Builds the prompt used to revise an existing audience query in response to
+ * a plain-language adjustment request (e.g. "grow this a bit but keep it
+ * focused on high-income households"). Reuses the same rules and schema
+ * context as original generation — this is an edit, not a fresh build, and
+ * should stay under the same discipline (3-4 conditions, no mega-segment,
+ * parenthesized OR groups).
+ */
+export function buildQueryAdjustmentPrompt(
+  currentQuery: string,
+  currentCount: number | null,
+  description: string,
+  useCase: string,
+  userInstruction: string
+): string {
+  const schemaContext = buildCompactSchemaContext();
+  const optimizationRules = buildOptimizationRules();
+  const semanticContext = buildSemanticContext();
+
+  return `${SEGMENT_GENERATION_SYSTEM_PROMPT}
+
+TASK:
+A marketer is reviewing an existing audience query and wants it adjusted. Revise the query to follow their instruction below while staying true to the audience's original intent — do not drop the query's defining conditions just to hit a bigger number, and do not drift into a fundamentally different audience than the one described.
+
+EXISTING AUDIENCE:
+Description: ${description}
+Use Case: ${useCase}
+Current SQL: ${currentQuery}
+Current Audience Size: ${currentCount !== null ? currentCount.toLocaleString() : 'not yet checked'}
+
+USER'S REQUESTED ADJUSTMENT:
+${userInstruction}
+
+${optimizationRules}
+
+DATABASE SCHEMA:
+${schemaContext}
+
+${semanticContext}
+
+Return ONLY valid JSON in this exact format:
+{
+  "sqlQuery": "SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5 FROM DATA d LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID WHERE...",
+  "changeSummary": "One or two plain sentences, written for a non-technical marketer, describing what changed and why."
+}
+
+If the requested adjustment doesn't map to a clear structural change (e.g. it's unrelated to audience targeting, or already satisfied), return the query unchanged and explain why in changeSummary.`;
 }
 
 export interface DiscoveryPromptInput {

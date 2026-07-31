@@ -43,12 +43,10 @@ The platform validates queries in real-time against Snowflake, showing counts an
    - AI generates SQL query with `segmentName`, `description`, `sqlQuery`, `reasoning`, and `confidence`
    - No inline validation or Snowflake execution happens here — see the two validation points below
 
-3. **Validation** happens in two separate places, not inline during generation:
-   - `/api/snowflake/count` — "Validate Audience" button on the generate page; live execution against Snowflake, query wrapped in CTE + COUNT(*) to get audience size without fetching all rows, plus a separate LIMIT 10 query for sample data. Returns audience size, execution time, sample rows with column metadata.
-   - `/api/validate-sql` — gates the approve/publish step on the review page (`app/review/[id]/page.tsx`), using `lib/sql-validator.ts`'s rule-based syntax/schema checks (dangerous keywords, balanced parens, valid tables/fields). Purely a linter — it does not run against Snowflake and does not feed back into the LLM for a rewrite.
+3. **Audience sizing** happens via `/api/snowflake/count` — the "Generate Counts" button, present on both the generate page and the review page (`app/review/[id]/page.tsx`). Live execution against Snowflake, query wrapped in CTE + COUNT(*) to get audience size without fetching all rows, plus a separate LIMIT 10 query for sample data. Returns audience size, execution time, sample rows with column metadata. The review page also lets a query be adjusted in plain language via `/api/adjust-segment-query`, which revises the SQL and immediately re-runs the count. There is no rule-based SQL linter gating approve/publish — that early-POC concept (`lib/sql-validator.ts`, `/api/validate-sql`) was removed as functionally redundant with live count checks.
 
 4. **Data Layer**:
-   - Prisma ORM with SQLite database (`prisma/dev.db`)
+   - Prisma ORM with Prisma Postgres (a hosted database, accessed both directly and via Prisma Accelerate — see `DATABASE_URL`/`PRISMA_DATABASE_URL` in Environment Setup)
    - Single `Segment` model tracks generated segments with status workflow (draft → approved → published)
    - Segments include metadata: `usageCount`, `estimatedSize`, `approvedBy`, `approvedAt`
 
@@ -86,7 +84,7 @@ app/
 ├── api/
 │   ├── discover-audiences/ # AI-powered audience ideation
 │   ├── generate-segment/   # Claude AI SQL generation
-│   ├── validate-sql/       # Client-side SQL validation
+│   ├── adjust-segment-query/ # Plain-language query adjustment (review page)
 │   ├── snowflake/
 │   │   ├── count/          # Get audience size + sample data (primary validation)
 │   │   ├── validate/       # EXPLAIN-based query validation
@@ -111,7 +109,6 @@ lib/
 ├── response-schemas.ts     # JSON schemas for output_config.format (structured outputs), one per Claude route
 ├── schema-context.ts       # Schema formatting utilities
 ├── snowflake.ts            # Snowflake SDK connection class
-├── sql-validator.ts        # SQL validation logic
 └── utils.ts                # Utility functions (formatNumber, formatDate, cn)
 
 components/
@@ -119,9 +116,8 @@ components/
 └── [custom components]     # Business logic components
 
 prisma/
-├── schema.prisma           # Prisma schema (SQLite)
-├── seed.ts                 # Database seeding script
-└── dev.db                  # SQLite database file
+├── schema.prisma           # Prisma schema (Postgres)
+└── seed.ts                 # Database seeding script
 ```
 
 ## Environment Setup
@@ -181,10 +177,5 @@ Required environment variables in `.env.local`:
 3. Run `npx prisma db push` to push changes to database
 4. Update seed script if needed and re-run `npx prisma db seed`
 
-### SQL Validation Rules
-- Only SELECT queries allowed
-- Must include FROM clause
-- Must reference valid tables from `sig-schema.json`
-- Field references validated against schema
-- Warns if DISTINCT not used (deduplication best practice)
-- Blocks dangerous keywords: DROP, DELETE, UPDATE, INSERT, TRUNCATE, ALTER, CREATE
+### SQL Query Trust Model
+There is no rule-based linter enforcing SELECT-only, dangerous-keyword blocking, or schema compliance — that existed early on (`lib/sql-validator.ts`, removed) and was judged not a meaningful trust signal for this POC phase. Query correctness is judged by the live "Generate Counts" check (`/api/snowflake/count`) — real audience size, real sample rows — not by static analysis. Enforcing SELECT-only and similar guardrails at the database/service-account level (not app-level linting) is flagged as real work for the post-funding hardening phase.

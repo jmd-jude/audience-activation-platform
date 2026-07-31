@@ -44,7 +44,9 @@
       "Bash(curl -s http://localhost:3005/api/segments)",
       "Bash(curl -s http://localhost:3005/api/segments/cms29odb90000jx04hm76ej1v)",
       "Bash(node ./review-count-check.js)",
-      "Bash(node ./review-count-check2.js)"
+      "Bash(node ./review-count-check2.js)",
+      "Bash(curl -s -X POST http://localhost:3005/api/adjust-segment-query -H 'Content-Type: application/json' -d '{ *)",
+      "Bash(node ./review-adjust.js)"
     ]
   }
 }
