@@ -10,7 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CheckCircle2, AlertCircle, Save, Sparkles, Database } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Loader2, CheckCircle2, AlertCircle, Save, Sparkles, Database, Wand2 } from 'lucide-react';
 import { formatNumber } from '@/lib/utils';
 import { SEGMENT_STATUSES } from '@/lib/constants';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -74,6 +75,12 @@ function GeneratePageContent() {
     };
   } | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Adjust-audience state
+  const [adjustInstruction, setAdjustInstruction] = useState('');
+  const [isAdjusting, setIsAdjusting] = useState(false);
+  const [adjustError, setAdjustError] = useState<string | null>(null);
+  const [changeSummary, setChangeSummary] = useState<string | null>(null);
 
   // Check for discovery parameter on mount
   useEffect(() => {
@@ -194,8 +201,9 @@ function GeneratePageContent() {
     await generateSegment(originalInput);
   };
 
-  const handleValidate = async () => {
-    if (!generatedSegment?.sqlQuery) return;
+  const handleValidate = async (queryOverride?: string) => {
+    const queryToCheck = queryOverride ?? generatedSegment?.sqlQuery;
+    if (!queryToCheck) return;
 
     setIsValidating(true);
     setValidationError(null);
@@ -206,7 +214,7 @@ function GeneratePageContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sqlQuery: generatedSegment.sqlQuery
+          sqlQuery: queryToCheck
         })
       });
 
@@ -221,6 +229,47 @@ function GeneratePageContent() {
       setValidationError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setIsValidating(false);
+    }
+  };
+
+  const handleAdjustQuery = async () => {
+    if (!generatedSegment?.sqlQuery || !adjustInstruction.trim()) return;
+
+    setIsAdjusting(true);
+    setAdjustError(null);
+    setChangeSummary(null);
+    setValidationResults(null);
+    setValidationError(null);
+
+    try {
+      const response = await fetch('/api/adjust-segment-query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sqlQuery: generatedSegment.sqlQuery,
+          currentCount: validationResults?.audienceSize ?? null,
+          description: generatedSegment.description,
+          useCase: generatedSegment.useCase,
+          instruction: adjustInstruction.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to adjust query');
+      }
+
+      const data = await response.json();
+      setGeneratedSegment(prev => prev ? { ...prev, sqlQuery: data.sqlQuery } : null);
+      setChangeSummary(data.changeSummary);
+      setAdjustInstruction('');
+
+      // Immediately re-check the count against the revised query
+      await handleValidate(data.sqlQuery);
+    } catch (err) {
+      setAdjustError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setIsAdjusting(false);
     }
   };
 
@@ -433,9 +482,12 @@ function GeneratePageContent() {
                   onChange={(newSql) => {
                     if (newSql !== undefined) {
                       setGeneratedSegment(prev => prev ? { ...prev, sqlQuery: newSql } : null);
-                      // Clear stale validation results when SQL is edited
+                      // Clear stale validation/adjust results when SQL is edited
                       if (validationResults) {
                         setValidationResults(null);
+                      }
+                      if (changeSummary) {
+                        setChangeSummary(null);
                       }
                     }
                   }}
@@ -445,7 +497,7 @@ function GeneratePageContent() {
               {/* Actions */}
               <div className="space-y-4">
                 <Button
-                  onClick={handleValidate}
+                  onClick={() => handleValidate()}
                   disabled={isValidating}
                   variant="secondary"
                   className="w-full"
@@ -462,6 +514,53 @@ function GeneratePageContent() {
                     </>
                   )}
                 </Button>
+
+                <div className="space-y-2">
+                  <Label htmlFor="adjustInstruction">Adjust This Audience</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="adjustInstruction"
+                      value={adjustInstruction}
+                      onChange={(e) => setAdjustInstruction(e.target.value)}
+                      placeholder="e.g. grow this a bit but keep it focused on high-income households"
+                      disabled={isAdjusting}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !isAdjusting && adjustInstruction.trim()) {
+                          e.preventDefault();
+                          handleAdjustQuery();
+                        }
+                      }}
+                    />
+                    <Button
+                      variant="secondary"
+                      onClick={handleAdjustQuery}
+                      disabled={isAdjusting || !adjustInstruction.trim()}
+                    >
+                      {isAdjusting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Wand2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Describe how you'd like the audience to change — the query updates and re-checks the count automatically.
+                  </p>
+                </div>
+
+                {changeSummary && (
+                  <Alert>
+                    <Wand2 className="h-4 w-4" />
+                    <AlertDescription>{changeSummary}</AlertDescription>
+                  </Alert>
+                )}
+
+                {adjustError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{adjustError}</AlertDescription>
+                  </Alert>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
