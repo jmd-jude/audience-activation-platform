@@ -62,8 +62,14 @@ export function isValidField(tableName: string, fieldName: string): boolean {
 }
 
 /**
- * Builds a compact schema summary for prompts with token limits
- * Includes valid_values for fields that have them defined
+ * Builds a compact schema summary for prompts.
+ * Includes the full valid_values list for every enumerated field -- the
+ * largest field in this schema has 18 values, trivial against the prompt's
+ * token budget, so there's no real case for truncating any of them. A prior
+ * version truncated fields with >5 values to first-3/last-2, which silently
+ * dropped the exact bracket the model needed for common requests (e.g.
+ * INCOME_HH's middle brackets, the "affluent" range) and caused it to
+ * fabricate plausible-looking values that don't exist in the real data.
  */
 export function buildCompactSchemaContext(): string {
   let context = 'Available Tables:\n';
@@ -78,17 +84,9 @@ export function buildCompactSchemaContext(): string {
       // Include field name and type
       context += `  - ${fieldName} (${fieldInfo.type})`;
 
-      // Include valid_values if they exist
+      // Include the full valid_values list if it exists
       if (fieldInfo.valid_values && fieldInfo.valid_values.length > 0) {
-        // For short lists (≤5 values), show all values inline
-        if (fieldInfo.valid_values.length <= 5) {
-          context += `: [${fieldInfo.valid_values.map(v => `"${v}"`).join(', ')}]`;
-        } else {
-          // For longer lists, show first 3 and last 2 with count
-          const firstThree = fieldInfo.valid_values.slice(0, 3).map(v => `"${v}"`);
-          const lastTwo = fieldInfo.valid_values.slice(-2).map(v => `"${v}"`);
-          context += `: [${firstThree.join(', ')}, ... (${fieldInfo.valid_values.length} values) ..., ${lastTwo.join(', ')}]`;
-        }
+        context += `: [${fieldInfo.valid_values.map(v => `"${v}"`).join(', ')}]`;
       }
 
       context += '\n';
