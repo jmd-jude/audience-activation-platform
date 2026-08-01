@@ -9,7 +9,7 @@
   --color-card-foreground: hsl(206 26% 16%);
   --color-popover: hsl(0 0% 100%);
   --color-popover-foreground: hsl(206 26% 16%);
-  --color-primary: hsl(74 35% 41%);
+  --color-primary: hsl(152 25% 30%); /* Empower Green #3a604e, per Audience Acuity brand guidelines -- preview, not yet confirmed */
   --color-primary-foreground: hsl(0 0% 100%);
   --color-secondary: hsl(105 15% 93%);
   --color-secondary-foreground: hsl(206 26% 16%);
@@ -21,7 +21,7 @@
   --color-destructive-foreground: hsl(210 40% 98%);
   --color-border: hsl(105 12% 87%);
   --color-input: hsl(105 12% 87%);
-  --color-ring: hsl(74 35% 41%);
+  --color-ring: hsl(152 25% 30%);
   --radius: 0.5rem;
 }
 
