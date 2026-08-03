@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Graphent
 
-## Getting Started
+Marketers articulate what they want in plain language, whether to their in-house or agency teams: "eco-conscious luxury car shoppers." Turning that into a live campaign usually means a five-day round trip through an analyst, a SQL query, and a vendor's black-box "similar audience." The opportunity is to cut that to minutes by having LLM's do the translating, and doing it with actual strategic judgment instead of keyword matching.
 
-First, run the development server:
+## How it Works
+
+1. **Discover.** Describe a business goal, get back 3-6 audience concepts. Not "affluent millennials." Things like "Green Home + Premium Auto Crossover," environmental donation history crossed with luxury automotive signals.
+2. **Generate.** Pick a concept, it becomes a SQL query against the identity graph, validated live against Snowflake before anyone spends a dollar on it. Real counts, real sample rows, no vendor estimate to take on faith.
+
+Step one works because of [`lib/data/sig-schema.json`](lib/data/sig-schema.json), a field-level marketing intelligence layer over the identity graph schema. Every field carries what it signals strategically, what creative angles it opens up, and what it correlates with. `GOLF_AFFINITY` is flagged as an affluence and executive-network signal. `DOG_OWNER` correlates with outdoor lifestyle and home ownership. That intelligence feeds every Claude call through [`lib/prompts.ts`](lib/prompts.ts) and [`lib/schema-context.ts`](lib/schema-context.ts). It's why the AI proposes psychographic intersections instead of demographic buckets. Anyone can point an LLM at a schema. Encoding years of marketing strategy at the field level doesn't happen by prompting harder.
+
+## Current State
+
+Working POC.
+
+Exists today: discovery and generation end to end (`/discover` to `/generate`), backed by Claude and live against a real Snowflake identity graph. Live validation on every candidate query, count and sample rows, before a segment gets saved. A segment library with draft/approved/published status, search, filtering, cloning. Manual activation and performance tracking against Meta, Google, TikTok, LinkedIn, MNTN, and Pinterest, rolled up into ROAS, CPA, and CTR on the dashboard.
+
+Not built yet: No platform activations. No auth or multi-tenancy, it runs as a single demo user. No scheduled refresh, segments are point-in-time snapshots. No performance API integrations. POC data models exist.
+
+## Running it
 
 ```bash
+npm install
+npx prisma generate
+npx prisma db push
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Runs at `http://localhost:3005`. You'll need `ANTHROPIC_API_KEY` and Snowflake credentials in `.env.local`. See [`CLAUDE.md`](CLAUDE.md) for the full environment variable list and architecture notes.

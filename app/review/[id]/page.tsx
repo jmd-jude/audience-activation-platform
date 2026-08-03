@@ -256,7 +256,6 @@ export default function ReviewPage() {
         <Card>
           <CardHeader>
             <CardTitle>Segment Metadata</CardTitle>
-            <CardDescription>Basic information about the segment</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -321,9 +320,6 @@ export default function ReviewPage() {
         <Card>
           <CardHeader>
             <CardTitle>SQL Query</CardTitle>
-            <CardDescription>
-              Edit the query and re-check the count as you go — try loosening or tightening it to see how the audience size responds.
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <SQLEditor
@@ -358,7 +354,7 @@ export default function ReviewPage() {
             </div>
 
             <div className="mt-4 space-y-2">
-              <Label htmlFor="adjustInstruction">Adjust This Audience</Label>
+              <Label htmlFor="adjustInstruction">Modify This Audience</Label>
               <div className="flex gap-2">
                 <Input
                   id="adjustInstruction"
@@ -479,9 +475,6 @@ export default function ReviewPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Activations & Performance</CardTitle>
-                  <CardDescription>
-                    Platform activations and their performance metrics
-                  </CardDescription>
                 </div>
                 <Button onClick={() => setIsActivateDialogOpen(true)}>
                   <Rocket className="h-4 w-4 mr-2" />
