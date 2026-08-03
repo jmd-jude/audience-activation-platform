@@ -16,6 +16,8 @@ import { formatNumber } from '@/lib/utils';
 import { SEGMENT_STATUSES } from '@/lib/constants';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
+import { ChevronDown, Code2 } from 'lucide-react';
 
 interface GeneratedSegment {
   segmentName: string;
@@ -63,6 +65,9 @@ function GeneratePageContent() {
 
   // Status selection
   const [selectedStatus, setSelectedStatus] = useState<'draft' | 'approved' | 'published'>('draft');
+
+  // SQL panel visibility — collapsed by default, de-emphasizing the raw query
+  const [isSqlOpen, setIsSqlOpen] = useState(false);
 
   // Validation state
   const [isValidating, setIsValidating] = useState(false);
@@ -165,6 +170,7 @@ function GeneratePageContent() {
 
       const result = await response.json();
       setGeneratedSegment({ ...result, useCase: data.useCase });
+      setIsSqlOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     }
@@ -314,7 +320,7 @@ function GeneratePageContent() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Generate Audience Segment</h1>
+        <h1 className="text-3xl font-bold mb-2">Generate an Audience</h1>
       </div>
 
       {/* Discovery Banner */}
@@ -475,24 +481,35 @@ function GeneratePageContent() {
               </Card>
 
               {/* SQL Query */}
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold">Generated SQL Query</h3>
-                <SQLEditor
-                  value={generatedSegment.sqlQuery}
-                  onChange={(newSql) => {
-                    if (newSql !== undefined) {
-                      setGeneratedSegment(prev => prev ? { ...prev, sqlQuery: newSql } : null);
-                      // Clear stale validation/adjust results when SQL is edited
-                      if (validationResults) {
-                        setValidationResults(null);
+              <Collapsible open={isSqlOpen} onOpenChange={setIsSqlOpen}>
+                <CollapsibleTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <ChevronDown className={`h-4 w-4 transition-transform ${isSqlOpen ? 'rotate-180' : ''}`} />
+                    <Code2 className="h-4 w-4" />
+                    {isSqlOpen ? 'Hide SQL query' : 'View SQL query'}
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pt-2">
+                  <SQLEditor
+                    value={generatedSegment.sqlQuery}
+                    onChange={(newSql) => {
+                      if (newSql !== undefined) {
+                        setGeneratedSegment(prev => prev ? { ...prev, sqlQuery: newSql } : null);
+                        // Clear stale validation/adjust results when SQL is edited
+                        if (validationResults) {
+                          setValidationResults(null);
+                        }
+                        if (changeSummary) {
+                          setChangeSummary(null);
+                        }
                       }
-                      if (changeSummary) {
-                        setChangeSummary(null);
-                      }
-                    }
-                  }}
-                />
-              </div>
+                    }}
+                  />
+                </CollapsibleContent>
+              </Collapsible>
 
               {/* Actions */}
               <div className="space-y-4">
@@ -664,8 +681,8 @@ function GeneratePageContent() {
           )}
 
           {!generatedSegment && !error && !clarificationState && (
-            <Card className="border-dashed">
-              <CardContent className="flex items-center justify-center h-96">
+            <Card className="border-dashed h-full">
+              <CardContent className="flex items-center justify-center h-full">
                 <div className="text-center text-muted-foreground">
                   {isCheckingClarification ? (
                     <>
@@ -673,7 +690,7 @@ function GeneratePageContent() {
                       <p>Analyzing your request...</p>
                     </>
                   ) : (
-                    <p>Generated segment will appear here</p>
+                    <p>Audience Workspace</p>
                   )}
                 </div>
               </CardContent>

@@ -143,12 +143,12 @@ export function GenerateForm({ onGenerate, initialValues, isRegenerating = false
             {isGenerating ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {isRegenerating ? 'Regenerating SQL...' : 'Generating Segment...'}
+                {isRegenerating ? 'Regenerating SQL...' : 'Generating Audience...'}
               </>
             ) : (
               <>
                 <Sparkles className="h-4 w-4 mr-2" />
-                {isRegenerating ? 'Regenerate SQL' : 'Generate Segment'}
+                {isRegenerating ? 'Regenerate SQL' : 'Generate Audience'}
               </>
             )}
           </Button>

@@ -43,7 +43,6 @@ export default function DiscoverPage() {
   const [useCase, setUseCase] = useState('');
   const [additionalContext, setAdditionalContext] = useState('');
   const [briefFile, setBriefFile] = useState<File | null>(null);
-  const [briefPastedText, setBriefPastedText] = useState('');
   const [briefError, setBriefError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [discoveredAudiences, setDiscoveredAudiences] = useState<DiscoveredAudience[] | null>(null);
@@ -51,7 +50,7 @@ export default function DiscoverPage() {
   const [expandedSignals, setExpandedSignals] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const hasBrief = !!briefFile || !!briefPastedText.trim();
+  const hasBrief = !!briefFile;
 
   useEffect(() => {
     const cached = sessionStorage.getItem('discover-results');
@@ -81,7 +80,6 @@ export default function DiscoverPage() {
 
   const clearBrief = () => {
     setBriefFile(null);
-    setBriefPastedText('');
     setBriefError(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -113,20 +111,8 @@ export default function DiscoverPage() {
     }
 
     setBriefFile(selected);
-    setBriefPastedText('');
     setBusinessGoal('');
     setAdditionalContext('');
-  };
-
-  const handleBriefPastedTextChange = (value: string) => {
-    setBriefPastedText(value);
-    setBriefError(null);
-    if (value.trim()) {
-      setBriefFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      setBusinessGoal('');
-      setAdditionalContext('');
-    }
   };
 
   const handleDiscover = async (e: React.FormEvent) => {
@@ -144,8 +130,6 @@ export default function DiscoverPage() {
       formData.append('useCase', useCase);
       if (briefFile) {
         formData.append('file', briefFile);
-      } else if (briefPastedText.trim()) {
-        formData.append('briefText', briefPastedText.trim());
       } else {
         formData.append('businessGoal', businessGoal);
         if (additionalContext) formData.append('additionalContext', additionalContext);
@@ -208,10 +192,7 @@ export default function DiscoverPage() {
       {/* Input Form */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>What&apos;s Your Campaign Objective?</CardTitle>
-          <CardDescription>
-            Describe what you want to achieve, or attach a campaign brief. We suggest creative audience segments to help you get there
-          </CardDescription>
+          <CardTitle>Describe campaign goals or attach a brief.</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleDiscover} className="space-y-4">
@@ -245,46 +226,31 @@ export default function DiscoverPage() {
               )}
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="h-px flex-1 bg-border" />
-              or
-              <div className="h-px flex-1 bg-border" />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="briefFile">Attach a Campaign Brief</Label>
-                {hasBrief && (
-                  <Button type="button" variant="ghost" size="sm" onClick={clearBrief} className="h-auto py-0.5 text-muted-foreground hover:text-foreground">
-                    <X className="h-3.5 w-3.5 mr-1" />
-                    Clear
-                  </Button>
-                )}
-              </div>
+            <div className="flex items-center gap-3 text-sm">
+              <Label htmlFor="briefFile" className="text-muted-foreground whitespace-nowrap">
+                Or attach a brief instead:
+              </Label>
               <input
                 ref={fileInputRef}
                 id="briefFile"
                 type="file"
                 accept=".pdf,.docx"
                 onChange={handleBriefFileChange}
-                disabled={!!briefPastedText.trim()}
-                className="text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-2 file:text-sm file:font-medium file:cursor-pointer disabled:opacity-50"
+                title="PDF or Word (.docx), up to 8MB"
+                className="text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-2 file:text-sm file:font-medium file:cursor-pointer"
               />
-              <p className="text-sm text-muted-foreground">PDF or Word (.docx), up to 8MB</p>
-              <Textarea
-                placeholder="...or paste the full brief text here"
-                value={briefPastedText}
-                onChange={(e) => handleBriefPastedTextChange(e.target.value)}
-                disabled={!!briefFile}
-                rows={3}
-                className="resize-none"
-              />
-              {briefError && (
-                <Alert variant="destructive">
-                  <AlertDescription>{briefError}</AlertDescription>
-                </Alert>
+              {hasBrief && (
+                <Button type="button" variant="ghost" size="sm" onClick={clearBrief} className="h-auto py-0.5 text-muted-foreground hover:text-foreground">
+                  <X className="h-3.5 w-3.5 mr-1" />
+                  Clear
+                </Button>
               )}
             </div>
+            {briefError && (
+              <Alert variant="destructive">
+                <AlertDescription>{briefError}</AlertDescription>
+              </Alert>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="useCase">
