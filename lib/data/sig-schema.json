@@ -773,9 +773,6 @@
   "business_context": {
     "description": "Enterprise identity management platform for deterministic identity resolution and customer intelligence. Enables brands to identify and contextually engage consumers across all channels and devices through a proprietary identity graph, supporting identity resolution, data enrichment, customer profiling, audience activation, and measurement attribution in both cookied and cookieless environments.",
     "key_concepts": [
-      "deterministic_identity_resolution",
-      "cross_channel_attribution",
-      "cookieless_targeting",
       "audience_activation",
       "consumer_intelligence",
       "behavioral_prediction"
@@ -791,8 +788,6 @@
   },
   "query_guidelines": {
     "optimization_rules": [
-      "Honor ALL explicit user constraints as hard filters — geography (states, cities, metros), demographics, and channel requirements must be preserved",
-      "Target 10,000–500,000 households for viable campaign scale — balance specificity with reach",
       "Always SELECT d.ID, d.HOUSEHOLD_ID, e.MD5 for full cross-channel activation capabilities",
       "Always LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID to capture MD5 for digital activation",
       "Use HOUSEHOLD_ID for all table joins — it links DATA, PII, and EMAIL",

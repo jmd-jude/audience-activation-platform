@@ -68,9 +68,8 @@ export const GENERATE_SEGMENT_RESPONSE_SCHEMA = {
     sqlQuery: { type: 'string' },
     reasoning: { type: 'string' },
     confidence: { type: 'number' },
-    estimatedComplexity: { type: 'string', enum: ['low', 'medium', 'high'] },
   },
-  required: ['segmentName', 'description', 'sqlQuery', 'reasoning', 'confidence', 'estimatedComplexity'],
+  required: ['segmentName', 'description', 'sqlQuery', 'reasoning', 'confidence'],
   additionalProperties: false,
 };
 

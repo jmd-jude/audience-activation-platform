@@ -34,7 +34,6 @@ CRITICAL - KEEP QUERIES SIMPLE, BUT ACTUALLY TARGETED:
 - Use 3-4 WHERE conditions. This is both the target and the hard limit — not "up to 4," aim for 4 whenever the request supports it.
 - Fewer than 3 conditions usually means the segment isn't actually defined — it's most of the file with a label on it. Treat 2 conditions as a signal you dropped a defining attribute you shouldn't have.
 - Extract the PRIMARY audience definition (who they are at their core), but a "core" made of only income or only one lifestyle signal is rarely precise enough on its own — combine it with the next most defining trait.
-- Ignore secondary qualifiers and nice-to-haves from the user's request, not primary ones. A well-scoped audience with 3-4 defining conditions beats both an unfiltered mega-segment and a tiny over-filtered niche.
 - If the user mentions 6 attributes, pick the 3-4 most defining ones and omit the rest — not 2.
 - Example: For "affluent married millennials in urban areas who travel and have premium cards":
   ✓ USE: INCOME_HH IN (...high values...) AND GENERATION = '1. Millennials...' AND MARITAL_STATUS = 'Married' AND URBANICITY_CODE = 'U'
@@ -79,21 +78,7 @@ export function buildPromptWithContext(
   const strategicPatterns = buildStrategicPatternsContext();
   const targetingPhilosophy = getTargetingPhilosophy();
 
-  const isLookalike = useCase === 'Lookalike Audience';
-
-  const taskContext = isLookalike
-    ? `The user has described their IDEAL CUSTOMER PROFILE. Generate SQL to find LOOKALIKE audiences - households that share similar demographic, behavioral, and lifestyle characteristics but represent net-new prospects.
-
-LOOKALIKE STRATEGY:
-- Identify the core defining signals from the profile (income level, lifestyle indicators, purchase behaviors)
-- Build queries that capture these patterns but cast a slightly wider net
-- Focus on households with similar "signal clusters" not exact matches
-- Frame the segment name and description as "Similar to..." or "Lookalike..."`
-    : '';
-
   const prompt = `${SEGMENT_GENERATION_SYSTEM_PROMPT}
-
-${taskContext}
 
 ${optimizationRules}
 
@@ -107,7 +92,7 @@ ${strategicPatterns}
 ${targetingPhilosophy ? `TARGETING PHILOSOPHY:\n${targetingPhilosophy}\n` : ''}
 
 USER REQUEST:
-${isLookalike ? 'Customer Profile' : 'Target Description'}: ${userInput}
+Target Description: ${userInput}
 Use Case: ${useCase}
 ${additionalContext ? `Additional Context: ${additionalContext}` : ''}
 ${clarificationQA && clarificationQA.length > 0 ? `
@@ -121,13 +106,11 @@ Generate a complete audience segment with metadata. Return ONLY valid JSON in th
   "segmentName": "Business-friendly segment name (under 60 chars)",
   "description": "Clear description of who this targets and why (75-150 chars)",
   "sqlQuery": "SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5 FROM DATA d LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID WHERE...",
-  "reasoning": "Brief explanation of your query approach and key filters used",
-  "confidence": 0.85,
-  "estimatedComplexity": "low"
+  "reasoning": "Brief explanation of your query approach",
+  "confidence": 0.85
 }
 
-The confidence score should be between 0 and 1, where 1 is highest confidence.
-The estimatedComplexity should be "low", "medium", or "high".`;
+The confidence score should be between 0 and 1, where 1 is highest confidence.`;
 
   return prompt;
 }
