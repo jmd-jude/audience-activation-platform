@@ -4,10 +4,8 @@
  * global strategic config (business_context, query_guidelines) from the
  * singleton SchemaGlobalContext row. No dependency on lib/data/sig-schema.json.
  */
-import { PrismaClient } from '@prisma/client';
 import type { Schema } from './schema-context';
-
-const prisma = new PrismaClient();
+import { prisma } from './db';
 
 // Simple process-level cache -- this is read on every discover/generate
 // request, and the registry doesn't change often enough to justify a DB

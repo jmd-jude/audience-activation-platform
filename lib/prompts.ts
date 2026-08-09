@@ -35,8 +35,8 @@ CRITICAL - KEEP QUERIES SIMPLE, BUT ACTUALLY TARGETED:
 
 CRITICAL - OPERATOR PRECEDENCE:
 - SQL evaluates AND before OR. Any OR condition combined with AND conditions MUST be wrapped in parentheses.
-- WRONG: WHERE INCOME_HH IN (...) AND GOLF_AFFINITY = 1 OR LUXURY_LIFE = 1
-- RIGHT: WHERE INCOME_HH IN (...) AND (GOLF_AFFINITY = 1 OR LUXURY_LIFE = 1)
+- WRONG: WHERE INCOME_HH IN (...) AND SIGNAL_A = 1 OR SIGNAL_B = 1
+- RIGHT: WHERE INCOME_HH IN (...) AND (SIGNAL_A = 1 OR SIGNAL_B = 1)
 - If a segment combines a required attribute (income, generation, geography) with a set of interchangeable "OR" signals (any one of several affinities), the OR group must always be parenthesized as its own unit. Getting this wrong silently returns a mega-segment (nearly the whole file) instead of the intended narrow audience.
 
 EXAMPLE QUERY PATTERN (AND-only):
@@ -49,12 +49,12 @@ WHERE d.GENERATION = '1. Millennials and Gen Z (1982 and after)'
   AND d.INCOME_HH IN ('F. $50,000-$59,999', 'G. $60,000-$74,999', 'H. $75,000-$99,999')
 
 EXAMPLE QUERY PATTERN (required attribute AND a parenthesized OR group):
-For "affluent households interested in golf, financial news, or luxury living":
+For "affluent households matching any of several interchangeable lifestyle signals":
 SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5
 FROM DATA d
 LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID
 WHERE d.INCOME_HH IN ('S. $500-$699K', 'T. $700-$999K', 'U. $1MM +')
-  AND (d.GOLF_AFFINITY = 1 OR d.READING_FINANCE = 1 OR d.LUXURY_LIFE = 1)`;
+  AND (d.SIGNAL_A = 1 OR d.SIGNAL_B = 1 OR d.SIGNAL_C = 1)`;
 
 /**
  * Builds a complete prompt with schema context and semantic intelligence
@@ -227,7 +227,7 @@ IMPORTANT GUIDELINES:
 1. Think beyond simple demographic cuts - create audiences with compelling stories
 2. Ensure diversity in your suggestions (different strategies, not just variations)
 3. Focus on actionable, measurable criteria from the available data
-4. Consider email quality (EMAILQUALITYLEVEL >= 7)
+4. Consider email quality (EMAILQUALITYLEVEL is inverted — 0 is highest quality, 0-4 range, prefer low values)
 5. Think about compliance (EMAILOPTIN, DNC flags)
 6. Each audience should be meaningfully different from the others
 

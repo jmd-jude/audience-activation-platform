@@ -6,15 +6,11 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GenerateForm } from '@/components/GenerateForm';
 import { SQLEditor } from '@/components/SQLEditor';
+import { AudienceCountPanel } from '@/components/AudienceCountPanel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input';
-import { Loader2, CheckCircle2, AlertCircle, Save, Sparkles, Database, Wand2 } from 'lucide-react';
-import { formatNumber } from '@/lib/utils';
-import { SEGMENT_STATUSES } from '@/lib/constants';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+import { Loader2, AlertCircle, Save, Sparkles } from 'lucide-react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { ChevronDown, Code2 } from 'lucide-react';
 
@@ -60,9 +56,7 @@ function GeneratePageContent() {
   // Clarification state
   const [clarificationState, setClarificationState] = useState<ClarificationState | null>(null);
   const [isCheckingClarification, setIsCheckingClarification] = useState(false);
-
-  // Status selection
-  const [selectedStatus, setSelectedStatus] = useState<'draft' | 'approved' | 'published'>('draft');
+  const [isGeneratingSegment, setIsGeneratingSegment] = useState(false);
 
   // SQL panel visibility — collapsed by default, de-emphasizing the raw query
   const [isSqlOpen, setIsSqlOpen] = useState(false);
@@ -151,6 +145,7 @@ function GeneratePageContent() {
     },
     clarificationQA?: Array<{ question: string; answer: string }>
   ) => {
+    setIsGeneratingSegment(true);
     try {
       const response = await fetch('/api/generate-segment', {
         method: 'POST',
@@ -171,6 +166,8 @@ function GeneratePageContent() {
       setIsSqlOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setIsGeneratingSegment(false);
     }
   };
 
@@ -394,7 +391,7 @@ function GeneratePageContent() {
                                 },
                               });
                             }}
-                            className="justify-start text-left h-auto whitespace-normal py-3"
+                            className="justify-start text-left h-auto whitespace-normal break-words py-3"
                           >
                             {option}
                           </Button>
@@ -438,13 +435,23 @@ function GeneratePageContent() {
                 </div>
 
                 <div className="flex gap-2 pt-4">
-                  <Button onClick={handleClarificationSubmit} className="flex-1">
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Generate with Clarifications
+                  <Button onClick={handleClarificationSubmit} disabled={isGeneratingSegment} className="flex-1">
+                    {isGeneratingSegment ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Generate with Clarifications
+                      </>
+                    )}
                   </Button>
                   <Button
                     variant="outline"
                     onClick={handleSkipClarification}
+                    disabled={isGeneratingSegment}
                   >
                     Skip
                   </Button>
@@ -503,171 +510,36 @@ function GeneratePageContent() {
               </Collapsible>
 
               {/* Actions */}
-              <div className="space-y-4">
-                <Button
-                  onClick={() => handleValidate()}
-                  disabled={isValidating}
-                  variant="secondary"
-                  className="w-full"
-                >
-                  {isValidating ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Validating...
-                    </>
-                  ) : (
-                    <>
-                      <Database className="h-4 w-4 mr-2" />
-                      Generate Counts
-                    </>
-                  )}
-                </Button>
+              <AudienceCountPanel
+                isChecking={isValidating}
+                onCheck={() => handleValidate()}
+                checkingLabel="Validating..."
+                result={validationResults}
+                resultError={validationError}
+                resultsTitle="Audience Validated"
+                adjustInstruction={adjustInstruction}
+                onAdjustInstructionChange={setAdjustInstruction}
+                onAdjust={handleAdjustQuery}
+                isAdjusting={isAdjusting}
+                adjustError={adjustError}
+                changeSummary={changeSummary}
+              />
 
-                <div className="space-y-2">
-                  <Label htmlFor="adjustInstruction">Adjust This Audience</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="adjustInstruction"
-                      value={adjustInstruction}
-                      onChange={(e) => setAdjustInstruction(e.target.value)}
-                      placeholder="e.g. grow this a bit but keep it focused on high-income households"
-                      disabled={isAdjusting}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !isAdjusting && adjustInstruction.trim()) {
-                          e.preventDefault();
-                          handleAdjustQuery();
-                        }
-                      }}
-                    />
-                    <Button
-                      variant="secondary"
-                      onClick={handleAdjustQuery}
-                      disabled={isAdjusting || !adjustInstruction.trim()}
-                    >
-                      {isAdjusting ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Wand2 className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Describe how you'd like the audience to change — the query updates and re-checks the count automatically.
-                  </p>
-                </div>
-
-                {changeSummary && (
-                  <Alert>
-                    <Wand2 className="h-4 w-4" />
-                    <AlertDescription>{changeSummary}</AlertDescription>
-                  </Alert>
+              {/* Segments are always saved as drafts here — approving or
+                  publishing happens on the review page, after a count check
+                  has actually run. */}
+              <Button
+                onClick={() => handleSave('draft')}
+                disabled={isSaving}
+                className="w-full"
+              >
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4 mr-2" />
                 )}
-
-                {adjustError && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{adjustError}</AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select value={selectedStatus} onValueChange={(value: any) => setSelectedStatus(value)}>
-                    <SelectTrigger id="status">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SEGMENT_STATUSES.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status.charAt(0).toUpperCase() + status.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button
-                  onClick={() => handleSave(selectedStatus)}
-                  disabled={isSaving}
-                  className="w-full"
-                >
-                  {isSaving ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Save className="h-4 w-4 mr-2" />
-                  )}
-                  Save Segment
-                </Button>
-              </div>
-
-              {/* Audience Validation Results */}
-              {validationResults && (
-                <Card className="mt-4">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
-                      Audience Validated
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Actual Size</p>
-                        <p className="text-2xl font-bold">
-                          {formatNumber(validationResults.audienceSize)}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Query Time</p>
-                        <p className="text-2xl font-bold">
-                          {(validationResults.executionTime / 1000).toFixed(2)}s
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Sample Data Table */}
-                    {validationResults.sampleData.rows.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">
-                          Sample Records (first {validationResults.sampleData.rows.length})
-                        </h4>
-                        <div className="border rounded-lg overflow-auto max-h-96">
-                          <table className="w-full text-sm">
-                            <thead className="bg-muted">
-                              <tr>
-                                {validationResults.sampleData.columns.map((col) => (
-                                  <th key={col.name} className="px-4 py-2 text-left font-medium whitespace-nowrap">
-                                    {col.name}
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {validationResults.sampleData.rows.map((row, idx) => (
-                                <tr key={idx} className="border-t hover:bg-muted/50">
-                                  {validationResults.sampleData.columns.map((col) => (
-                                    <td key={col.name} className="px-4 py-2 whitespace-nowrap">
-                                      {row[col.name]?.toString() || 'null'}
-                                    </td>
-                                  ))}
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-
-              {validationError && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{validationError}</AlertDescription>
-                </Alert>
-              )}
+                Save as Draft
+              </Button>
             </>
           )}
 
@@ -679,6 +551,11 @@ function GeneratePageContent() {
                     <>
                       <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
                       <p>Analyzing your request...</p>
+                    </>
+                  ) : isGeneratingSegment ? (
+                    <>
+                      <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                      <p>Generating your audience...</p>
                     </>
                   ) : (
                     <p>Audience Workspace</p>

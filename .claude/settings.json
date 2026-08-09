@@ -46,7 +46,27 @@
       "Bash(node ./review-count-check.js)",
       "Bash(node ./review-count-check2.js)",
       "Bash(curl -s -X POST http://localhost:3005/api/adjust-segment-query -H 'Content-Type: application/json' -d '{ *)",
-      "Bash(node ./review-adjust.js)"
+      "Bash(node ./review-adjust.js)",
+      "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/sync-valid-values.ts --table=DATA)",
+      "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/check-parity.ts)",
+      "Bash(node --env-file=.env.local -e ' *)",
+      "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/sync-valid-values.ts --apply --binary-only --table=EMAIL)",
+      "Bash(grep -v \"privateKey\\\\|BEGIN PRIVATE\\\\|END PRIVATE\\\\|^[A-Za-z0-9+/=]\\\\{40,\\\\}$\\\\|\\\\\"level\\\\\":\\\\\"INFO\\\\\"\\\\|Connecting to Snowflake\\\\|account:\\\\|username:\\\\|database:\\\\|warehouse:\\\\|schema:\\\\|authenticator:\\\\|timeout:\\\\|^}$\\\\|DeprecationWarning\\\\|trace-deprecation\\\\|Query executed successfully\")",
+      "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/sync-valid-values.ts --apply --binary-only --table=PII)",
+      "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/sync-valid-values.ts --apply --binary-only --table=DATA)",
+      "Bash(grep -c \"applied$\" /private/tmp/claude-501/-Users-JudeHoffner-dev-ai-data-activation-platform/d43b2364-1d23-4f39-9b0b-49abc97558e2/scratchpad/data-valid-values-apply-binary.log)",
+      "Bash(grep -c \"needs review\\)$\" /private/tmp/claude-501/-Users-JudeHoffner-dev-ai-data-activation-platform/d43b2364-1d23-4f39-9b0b-49abc97558e2/scratchpad/data-valid-values-apply-binary.log)",
+      "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/draft-marketing-meaning.ts --table=DATA --limit=15)",
+      "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/draft-marketing-meaning.ts --apply)",
+      "Bash(grep -v \"privateKey\\\\|BEGIN PRIVATE\\\\|END PRIVATE\\\\|^[A-Za-z0-9+/=]\\\\{40,\\\\}$\\\\|\\\\\"level\\\\\":\\\\\"INFO\\\\\"\\\\|Connecting to Snowflake\\\\|account:\\\\|username:\\\\|database:\\\\|warehouse:\\\\|schema:\\\\|authenticator:\\\\|timeout:\\\\|^}$\\\\|DeprecationWarning\\\\|trace-deprecation\\\\|Query executed successfully\" /private/tmp/claude-501/-Users-JudeHoffner-dev-ai-data-activation-platform/d43b2364-1d23-4f39-9b0b-49abc97558e2/tasks/b1z9sic70.output)",
+      "Bash(grep -c \"applied$\" /private/tmp/claude-501/-Users-JudeHoffner-dev-ai-data-activation-platform/d43b2364-1d23-4f39-9b0b-49abc97558e2/scratchpad/data-valid-values-binary-rerun.log)",
+      "Bash(grep -B2 \"applied$\" /private/tmp/claude-501/-Users-JudeHoffner-dev-ai-data-activation-platform/d43b2364-1d23-4f39-9b0b-49abc97558e2/scratchpad/data-valid-values-binary-rerun.log)",
+      "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/ingest-data-dictionary.ts)",
+      "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/ingest-data-dictionary.ts --apply)",
+      "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/ingest-data-dictionary.ts --table=EMAIL --file=/Users/JudeHoffner/dev/ai-data-activation-platform/consumer_email.csv)",
+      "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/ingest-data-dictionary.ts --table=PII --file=/Users/JudeHoffner/dev/ai-data-activation-platform/consumer_pii.csv)",
+      "Bash(awk -F'\",\"|,' '{print}')",
+      "Bash(node -e \"console.log\\(JSON.stringify\\(require\\('/Users/JudeHoffner/dev/ai-data-activation-platform/package.json'\\).scripts, null, 2\\)\\)\")"
     ]
   }
 }

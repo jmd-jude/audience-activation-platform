@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { SQLEditor } from '@/components/SQLEditor';
+import { AudienceCountPanel } from '@/components/AudienceCountPanel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,12 +14,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Save, AlertCircle, ArrowLeft, Rocket, Database, CheckCircle2, Wand2 } from 'lucide-react';
+import { Loader2, Save, AlertCircle, ArrowLeft, Rocket } from 'lucide-react';
 import { ActivateSegmentDialog } from '@/components/ActivateSegmentDialog';
 import { ActivationCard } from '@/components/ActivationCard';
 import { PerformanceEntryForm } from '@/components/PerformanceEntryForm';
 import { USE_CASES, SEGMENT_STATUSES } from '@/lib/constants';
-import { formatNumber } from '@/lib/utils';
 
 interface Segment {
   id: string;
@@ -303,13 +303,13 @@ export default function ReviewPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="estimatedSize">Estimated Size (Optional)</Label>
+                <Label htmlFor="estimatedSize">Audience Size</Label>
                 <Input
                   id="estimatedSize"
                   type="number"
                   value={estimatedSize}
-                  onChange={(e) => setEstimatedSize(e.target.value)}
-                  placeholder="e.g., 2500000"
+                  disabled
+                  placeholder="Not yet checked"
                 />
               </div>
             </div>
@@ -334,137 +334,21 @@ export default function ReviewPage() {
               height="400px"
             />
             <div className="mt-4">
-              <Button
-                variant="secondary"
-                onClick={() => handleCheckCount()}
-                disabled={isCheckingCount || !sqlQuery}
-              >
-                {isCheckingCount ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Checking...
-                  </>
-                ) : (
-                  <>
-                    <Database className="h-4 w-4 mr-2" />
-                    Generate Counts
-                  </>
-                )}
-              </Button>
+              <AudienceCountPanel
+                isChecking={isCheckingCount}
+                onCheck={() => handleCheckCount()}
+                checkDisabled={!sqlQuery}
+                result={countResult}
+                resultError={countError}
+                resultsTitle="Count Results"
+                adjustInstruction={adjustInstruction}
+                onAdjustInstructionChange={setAdjustInstruction}
+                onAdjust={handleAdjustQuery}
+                isAdjusting={isAdjusting}
+                adjustError={adjustError}
+                changeSummary={changeSummary}
+              />
             </div>
-
-            <div className="mt-4 space-y-2">
-              <Label htmlFor="adjustInstruction">Modify This Audience</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="adjustInstruction"
-                  value={adjustInstruction}
-                  onChange={(e) => setAdjustInstruction(e.target.value)}
-                  placeholder="e.g. grow this a bit but keep it focused on high-income households"
-                  disabled={isAdjusting}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !isAdjusting && adjustInstruction.trim()) {
-                      e.preventDefault();
-                      handleAdjustQuery();
-                    }
-                  }}
-                />
-                <Button
-                  variant="secondary"
-                  onClick={handleAdjustQuery}
-                  disabled={isAdjusting || !adjustInstruction.trim()}
-                >
-                  {isAdjusting ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Wand2 className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Describe how you'd like the audience to change — the query updates and re-checks the count automatically.
-              </p>
-            </div>
-
-            {changeSummary && (
-              <Alert className="mt-4">
-                <Wand2 className="h-4 w-4" />
-                <AlertDescription>{changeSummary}</AlertDescription>
-              </Alert>
-            )}
-
-            {adjustError && (
-              <Alert variant="destructive" className="mt-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{adjustError}</AlertDescription>
-              </Alert>
-            )}
-
-            {countResult && (
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
-                    Count Results
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Actual Size</p>
-                      <p className="text-2xl font-bold">
-                        {formatNumber(countResult.audienceSize)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Query Time</p>
-                      <p className="text-2xl font-bold">
-                        {(countResult.executionTime / 1000).toFixed(2)}s
-                      </p>
-                    </div>
-                  </div>
-
-                  {countResult.sampleData.rows.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium mb-2">
-                        Sample Records (first {countResult.sampleData.rows.length})
-                      </h4>
-                      <div className="border rounded-lg overflow-auto max-h-96">
-                        <table className="w-full text-sm">
-                          <thead className="bg-muted">
-                            <tr>
-                              {countResult.sampleData.columns.map((col) => (
-                                <th key={col.name} className="px-4 py-2 text-left font-medium whitespace-nowrap">
-                                  {col.name}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {countResult.sampleData.rows.map((row, idx) => (
-                              <tr key={idx} className="border-t hover:bg-muted/50">
-                                {countResult.sampleData.columns.map((col) => (
-                                  <td key={col.name} className="px-4 py-2 whitespace-nowrap">
-                                    {row[col.name]?.toString() || 'null'}
-                                  </td>
-                                ))}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {countError && (
-              <Alert variant="destructive" className="mt-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{countError}</AlertDescription>
-              </Alert>
-            )}
           </CardContent>
         </Card>
 
@@ -530,12 +414,17 @@ export default function ReviewPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {SEGMENT_STATUSES.map((status) => (
-                    <SelectItem key={status} value={status}>
+                    <SelectItem key={status} value={status} disabled={status !== 'draft' && !estimatedSize}>
                       {status.charAt(0).toUpperCase() + status.slice(1)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {!estimatedSize && (
+                <p className="text-xs text-muted-foreground">
+                  Run Generate Counts above before approving or publishing.
+                </p>
+              )}
             </div>
 
             <Button
