@@ -50,3 +50,9 @@ next-env.d.ts
 
 # logs
 snowflake.log
+
+# AA data dictionary exports (proprietary, local-only reference for
+# scripts/schema-registry/ingest-data-dictionary.ts)
+/consumer_data.csv
+/consumer_email.csv
+/consumer_pii.csv

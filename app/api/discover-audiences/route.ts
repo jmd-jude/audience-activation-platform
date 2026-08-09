@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       source: pdfBase64 ? 'pdf' : briefText ? 'brief-text' : 'manual',
     });
 
-    const prompt = buildDiscoveryPrompt({
+    const prompt = await buildDiscoveryPrompt({
       useCase,
       businessGoal: briefText || pdfBase64 ? undefined : businessGoal,
       additionalContext: briefText || pdfBase64 ? undefined : additionalContext,

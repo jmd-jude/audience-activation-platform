@@ -29,7 +29,7 @@ interface BusinessContext {
   targeting_philosophy?: string;
 }
 
-interface Schema {
+export interface Schema {
   version: string;
   tables: Record<string, SchemaTable>;
   business_context?: BusinessContext;
@@ -61,6 +61,12 @@ export function isValidField(tableName: string, fieldName: string): boolean {
   return fieldName in table.fields;
 }
 
+// Every render function below takes an optional Schema, defaulting to the
+// static JSON import, so the exact same rendering logic can run against a
+// registry-sourced Schema object (see lib/schema-context-db.ts) without
+// duplicating any of this formatting. Existing zero-arg call sites are
+// unaffected.
+
 /**
  * Builds a compact schema summary for prompts.
  * Includes the full valid_values list for every enumerated field -- the
@@ -71,12 +77,12 @@ export function isValidField(tableName: string, fieldName: string): boolean {
  * INCOME_HH's middle brackets, the "affluent" range) and caused it to
  * fabricate plausible-looking values that don't exist in the real data.
  */
-export function buildCompactSchemaContext(): string {
+export function buildCompactSchemaContext(source: Schema = schema): string {
   let context = 'Available Tables:\n';
 
-  const tables = Object.keys(schema.tables);
+  const tables = Object.keys(source.tables);
   for (const tableName of tables) {
-    const table = schema.tables[tableName];
+    const table = source.tables[tableName];
     context += `\n${tableName}:\n`;
 
     const fields = Object.entries(table.fields);
@@ -98,31 +104,24 @@ export function buildCompactSchemaContext(): string {
 
 /**
  * Builds semantic intelligence context from schema
- * Extracts marketing_meaning and creative_potential for key fields
+ * Extracts marketing_meaning for key fields. creative_potential is stored in
+ * the registry but deliberately not rendered here -- no output contract
+ * consumes it today, and it's reserved for a possible future
+ * creative-inspiration feature rather than ambient prompt seasoning.
  */
-export function buildSemanticContext(): string {
+export function buildSemanticContext(source: Schema = schema): string {
   let context = 'FIELD INTELLIGENCE (What these fields mean for targeting):\n\n';
 
-  const tables = Object.keys(schema.tables);
+  const tables = Object.keys(source.tables);
   for (const tableName of tables) {
-    const table = schema.tables[tableName];
+    const table = source.tables[tableName];
     const fieldsWithMeaning: string[] = [];
 
     const fields = Object.entries(table.fields);
     for (const [fieldName, fieldInfo] of fields) {
       // Only include fields that have marketing_meaning
       if (fieldInfo.marketing_meaning) {
-        let fieldContext = `${fieldName}: ${fieldInfo.marketing_meaning}`;
-
-        // Add creative_potential if it exists and is an object with value mappings
-        if (fieldInfo.creative_potential && typeof fieldInfo.creative_potential === 'object') {
-          const mappings = Object.entries(fieldInfo.creative_potential)
-            .map(([key, value]) => `  • ${key}: ${value}`)
-            .join('\n');
-          fieldContext += `\n${mappings}`;
-        }
-
-        fieldsWithMeaning.push(fieldContext);
+        fieldsWithMeaning.push(`${fieldName}: ${fieldInfo.marketing_meaning}`);
       }
     }
 
@@ -138,16 +137,16 @@ export function buildSemanticContext(): string {
  * Gets strategic query combinations from schema
  * These are proven patterns for common targeting scenarios
  */
-export function getStrategicCombinations(): string[] {
-  return schema.query_guidelines?.strategic_combinations || [];
+export function getStrategicCombinations(source: Schema = schema): string[] {
+  return source.query_guidelines?.strategic_combinations || [];
 }
 
 /**
  * Builds strategic patterns context for prompts
  * Shows proven query patterns that work well together
  */
-export function buildStrategicPatternsContext(): string {
-  const combinations = getStrategicCombinations();
+export function buildStrategicPatternsContext(source: Schema = schema): string {
+  const combinations = getStrategicCombinations(source);
 
   if (combinations.length === 0) {
     return '';
@@ -166,8 +165,8 @@ export function buildStrategicPatternsContext(): string {
  * Builds universal optimization rules from schema
  * These apply to all query generation regardless of use case
  */
-export function buildOptimizationRules(): string {
-  const rules = schema.query_guidelines?.optimization_rules || [];
+export function buildOptimizationRules(source: Schema = schema): string {
+  const rules = source.query_guidelines?.optimization_rules || [];
 
   if (rules.length === 0) {
     return '';

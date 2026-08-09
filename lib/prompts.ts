@@ -1,10 +1,4 @@
-import {
-  buildCompactSchemaContext,
-  buildOptimizationRules,
-  buildSemanticContext,
-  buildStrategicPatternsContext,
-  getTargetingPhilosophy
-} from './schema-context';
+import { resolveSchemaContext } from './schema-context-resolver';
 
 /**
  * Main system prompt for segment generation
@@ -66,17 +60,14 @@ WHERE d.INCOME_HH IN ('S. $500-$699K', 'T. $700-$999K', 'U. $1MM +')
  * Builds a complete prompt with schema context and semantic intelligence
  * Uses schema-derived patterns instead of separate example files
  */
-export function buildPromptWithContext(
+export async function buildPromptWithContext(
   userInput: string,
   useCase: string,
   additionalContext?: string,
   clarificationQA?: Array<{ question: string; answer: string }>
-): string {
-  const schemaContext = buildCompactSchemaContext();
-  const optimizationRules = buildOptimizationRules();
-  const semanticContext = buildSemanticContext();
-  const strategicPatterns = buildStrategicPatternsContext();
-  const targetingPhilosophy = getTargetingPhilosophy();
+): Promise<string> {
+  const { schemaContext, optimizationRules, semanticContext, strategicPatterns, targetingPhilosophy } =
+    await resolveSchemaContext();
 
   const prompt = `${SEGMENT_GENERATION_SYSTEM_PROMPT}
 
@@ -106,11 +97,8 @@ Generate a complete audience segment with metadata. Return ONLY valid JSON in th
   "segmentName": "Business-friendly segment name (under 60 chars)",
   "description": "Clear description of who this targets and why (75-150 chars)",
   "sqlQuery": "SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5 FROM DATA d LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID WHERE...",
-  "reasoning": "Brief explanation of your query approach",
-  "confidence": 0.85
-}
-
-The confidence score should be between 0 and 1, where 1 is highest confidence.`;
+  "reasoning": "Brief explanation of your query approach"
+}`;
 
   return prompt;
 }
@@ -123,16 +111,14 @@ The confidence score should be between 0 and 1, where 1 is highest confidence.`;
  * should stay under the same discipline (3-4 conditions, no mega-segment,
  * parenthesized OR groups).
  */
-export function buildQueryAdjustmentPrompt(
+export async function buildQueryAdjustmentPrompt(
   currentQuery: string,
   currentCount: number | null,
   description: string,
   useCase: string,
   userInstruction: string
-): string {
-  const schemaContext = buildCompactSchemaContext();
-  const optimizationRules = buildOptimizationRules();
-  const semanticContext = buildSemanticContext();
+): Promise<string> {
+  const { schemaContext, optimizationRules, semanticContext } = await resolveSchemaContext();
 
   return `${SEGMENT_GENERATION_SYSTEM_PROMPT}
 
@@ -182,16 +168,14 @@ export interface DiscoveryPromptInput {
  * typed directly, or read from a full campaign brief (pasted, .docx text,
  * or a PDF attached alongside this prompt as a document content block).
  */
-export function buildDiscoveryPrompt({
+export async function buildDiscoveryPrompt({
   useCase,
   businessGoal,
   additionalContext,
   briefText,
   hasAttachedBriefDocument,
-}: DiscoveryPromptInput): string {
-  const schemaContext = buildCompactSchemaContext();
-  const optimizationRules = buildOptimizationRules();
-  const semanticContext = buildSemanticContext();
+}: DiscoveryPromptInput): Promise<string> {
+  const { schemaContext, optimizationRules, semanticContext } = await resolveSchemaContext();
 
   const isLookalike = useCase === 'Lookalike Audience';
 

@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = buildQueryAdjustmentPrompt(
+    const prompt = await buildQueryAdjustmentPrompt(
       sqlQuery,
       typeof currentCount === 'number' ? currentCount : null,
       description || '',

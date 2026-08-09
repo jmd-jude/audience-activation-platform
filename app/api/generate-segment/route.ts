@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     console.log('Generating segment:', { naturalLanguageInput, useCase });
 
     // Step 1: Generate SQL using Claude
-    const prompt = buildPromptWithContext(
+    const prompt = await buildPromptWithContext(
       naturalLanguageInput,
       useCase,
       additionalContext,

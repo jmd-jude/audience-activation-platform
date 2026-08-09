@@ -7,6 +7,66 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// --- Schema registry (spike/schema-registry) ---
+// Decouples lib/data/sig-schema.json into Postgres so structural facts
+// (name/type/nullable/primaryKey/validValues) can be synced from Snowflake
+// INFORMATION_SCHEMA, while marketingMeaning stays hand-authored. See
+// scripts/schema-registry/ for the migration and introspection scripts.
+model SchemaTable {
+  id          String       @id @default(cuid())
+  name        String       @unique // e.g. "DATA", "PII", "EMAIL"
+  description String?
+  fields      SchemaField[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model SchemaField {
+  id                 String      @id @default(cuid())
+  tableId            String
+  table              SchemaTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  name               String
+  type               String
+  nullable           Boolean     @default(true)
+  primaryKey         Boolean     @default(false)
+  validValues        Json?
+  marketingMeaning   String?
+  creativePotential  Json?
+  combinationSignals String?
+  // "auto" = last written by Snowflake introspection, "manual" = hand-edited and
+  // should not be silently overwritten by a future sync without review
+  source             String      @default("manual")
+  // "approved" = a human has signed off on marketingMeaning (or it's the
+  // original hand-authored content); "draft" = LLM-generated, not yet
+  // reviewed. resolveSchemaContext only renders "approved" fields into a
+  // live prompt -- see lib/schema-context-db.ts.
+  reviewStatus       String      @default("approved")
+  // Fields whose values are cryptic/proprietary-looking (e.g. AA's own
+  // segment codes) get excluded from LLM drafting entirely -- guessing at
+  // these is the confabulation risk this whole registry exists to prevent.
+  needsDomainKnowledge Boolean   @default(false)
+  lastSyncedAt       DateTime?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@unique([tableId, name])
+}
+
+// Global strategic config -- not per-table/per-field facts, so it doesn't
+// belong in SchemaTable/SchemaField. Singleton: exactly one row expected,
+// callers take the first. Replaces sig-schema.json's business_context and
+// query_guidelines blocks so the registry no longer needs the JSON file at all.
+model SchemaGlobalContext {
+  id                      String   @id @default(cuid())
+  description             String?
+  keyConcepts             Json? // string[]
+  uniqueValuePropositions Json? // string[]
+  targetingPhilosophy     String?
+  optimizationRules       Json? // string[]
+  strategicCombinations   Json? // string[]
+  updatedAt               DateTime @updatedAt
+}
+
 model Segment {
   id            String       @id @default(cuid())
   segmentName   String

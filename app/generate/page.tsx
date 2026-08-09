@@ -8,7 +8,6 @@ import { GenerateForm } from '@/components/GenerateForm';
 import { SQLEditor } from '@/components/SQLEditor';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Loader2, CheckCircle2, AlertCircle, Save, Sparkles, Database, Wand2 } from 'lucide-react';
@@ -24,7 +23,6 @@ interface GeneratedSegment {
   description: string;
   sqlQuery: string;
   reasoning?: string;
-  confidence?: number;
   useCase?: string;
 }
 
@@ -460,14 +458,7 @@ function GeneratePageContent() {
               {/* Segment Metadata */}
               <Card>
                 <CardHeader>
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle>{generatedSegment.segmentName}</CardTitle>
-                    {generatedSegment.confidence && (
-                      <Badge variant="outline">
-                        Confidence: {Math.round(generatedSegment.confidence * 100)}%
-                      </Badge>
-                    )}
-                  </div>
+                  <CardTitle>{generatedSegment.segmentName}</CardTitle>
                   <CardDescription>{generatedSegment.description}</CardDescription>
                 </CardHeader>
                 {generatedSegment.reasoning && (
@@ -489,7 +480,7 @@ function GeneratePageContent() {
                   >
                     <ChevronDown className={`h-4 w-4 transition-transform ${isSqlOpen ? 'rotate-180' : ''}`} />
                     <Code2 className="h-4 w-4" />
-                    {isSqlOpen ? 'Hide SQL query' : 'View SQL query'}
+                    {isSqlOpen ? 'Hide query' : 'View query'}
                   </button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-2">

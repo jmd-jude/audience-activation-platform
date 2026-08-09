@@ -190,7 +190,6 @@ export class SnowflakeConnection {
     const query = `
       SELECT
         table_name,
-        table_type,
         column_name,
         data_type,
         is_nullable,
@@ -210,7 +209,6 @@ export class SnowflakeConnection {
 
       if (!schemaInfo[tableName]) {
         schemaInfo[tableName] = {
-          type: row.TABLE_TYPE,
           columns: []
         };
       }
