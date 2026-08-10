@@ -392,7 +392,7 @@ export default function DiscoverPage() {
                         onMouseEnter={e => (e.currentTarget.style.color = 'var(--orange, #7c8d44)')}
                         onMouseLeave={e => (e.currentTarget.style.color = expandedSignals.has(audience.id) ? 'var(--orange, #7c8d44)' : 'var(--gray-400, #9ca3af)')}
                       >
-                        Why this audience? {expandedSignals.has(audience.id) ? '▴' : '▾'}
+                        Data Signals {expandedSignals.has(audience.id) ? '▴' : '▾'}
                       </button>
 
                       <div
