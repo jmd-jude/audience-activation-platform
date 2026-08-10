@@ -28,6 +28,7 @@ interface Segment {
   sqlQuery: string;
   status: string;
   estimatedSize?: number | null;
+  reasoning?: string | null;
   createdAt: Date | string;
   updatedAt: Date | string;
 }
@@ -63,6 +64,7 @@ export default function ReviewPage() {
   const [description, setDescription] = useState('');
   const [targetUseCase, setTargetUseCase] = useState('');
   const [sqlQuery, setSqlQuery] = useState('');
+  const [reasoning, setReasoning] = useState<string | null>(null);
   const [estimatedSize, setEstimatedSize] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<'draft' | 'approved' | 'published'>('draft');
   const [isActivateDialogOpen, setIsActivateDialogOpen] = useState(false);
@@ -86,6 +88,7 @@ export default function ReviewPage() {
       setDescription(segment.description);
       setTargetUseCase(segment.targetUseCase);
       setSqlQuery(segment.sqlQuery);
+      setReasoning(segment.reasoning || null);
       setEstimatedSize(segment.estimatedSize?.toString() || '');
       setSelectedStatus(segment.status as 'draft' | 'approved' | 'published');
     } catch (err: any) {
@@ -322,6 +325,9 @@ export default function ReviewPage() {
             <CardTitle>SQL Query</CardTitle>
           </CardHeader>
           <CardContent>
+            {reasoning && (
+              <p className="text-sm text-muted-foreground mb-4">{reasoning}</p>
+            )}
             <SQLEditor
               value={sqlQuery}
               onChange={(value) => {

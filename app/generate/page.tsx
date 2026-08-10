@@ -468,14 +468,6 @@ function GeneratePageContent() {
                   <CardTitle>{generatedSegment.segmentName}</CardTitle>
                   <CardDescription>{generatedSegment.description}</CardDescription>
                 </CardHeader>
-                {generatedSegment.reasoning && (
-                  <CardContent>
-                    <div className="text-sm">
-                      <p className="font-medium mb-1">Reasoning:</p>
-                      <p className="text-muted-foreground">{generatedSegment.reasoning}</p>
-                    </div>
-                  </CardContent>
-                )}
               </Card>
 
               {/* SQL Query */}
@@ -490,7 +482,10 @@ function GeneratePageContent() {
                     {isSqlOpen ? 'Hide query' : 'View query'}
                   </button>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="pt-2">
+                <CollapsibleContent className="pt-2 space-y-2">
+                  {generatedSegment.reasoning && (
+                    <p className="text-sm text-muted-foreground">{generatedSegment.reasoning}</p>
+                  )}
                   <SQLEditor
                     value={generatedSegment.sqlQuery}
                     onChange={(newSql) => {

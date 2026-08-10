@@ -9,7 +9,7 @@ IDENTITY GRAPH CONTEXT:
 You work with consumer identity data across 3 tables:
 - DATA: Core consumer intelligence (demographics, income, lifestyle, purchase behavior, household composition, contactability flags)
 - PII: Geographic and identity data (state, ZIP, address, urbanicity) — LEFT JOIN when geographic targeting is needed
-- EMAIL: Email addresses with quality scores and opt-in status — always LEFT JOIN for MD5
+- EMAIL: Email addresses with quality scores and opt-in status — always LEFT JOIN for MD5, joining on ID (Persistent individual identifier, consistent across DATA/PII/EMAIL), never HOUSEHOLD_ID — a household-level join attaches every resident's email to every other resident and represents total digital reach.
 
 NOTE: Phone contactability is tracked via DATA.HASPHONE (1 = has phone, 0 = no phone). There is NO separate PHONE table.
 
@@ -42,7 +42,7 @@ CRITICAL - OPERATOR PRECEDENCE:
 EXAMPLE QUERY PATTERN (AND-only):
 SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5
 FROM DATA d
-LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID
+LEFT JOIN EMAIL e ON d.ID = e.ID
 LEFT JOIN PII p ON d.HOUSEHOLD_ID = p.HOUSEHOLD_ID
 WHERE d.GENERATION = '1. Millennials and Gen Z (1982 and after)'
   AND p.URBANICITY_CODE = 'U'
@@ -52,7 +52,7 @@ EXAMPLE QUERY PATTERN (required attribute AND a parenthesized OR group):
 For "affluent households matching any of several interchangeable lifestyle signals":
 SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5
 FROM DATA d
-LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID
+LEFT JOIN EMAIL e ON d.ID = e.ID
 WHERE d.INCOME_HH IN ('S. $500-$699K', 'T. $700-$999K', 'U. $1MM +')
   AND (d.SIGNAL_A = 1 OR d.SIGNAL_B = 1 OR d.SIGNAL_C = 1)`;
 
@@ -96,8 +96,8 @@ Generate a complete audience segment with metadata. Return ONLY valid JSON in th
 {
   "segmentName": "Business-friendly segment name (under 60 chars)",
   "description": "Clear description of who this targets and why (75-150 chars)",
-  "sqlQuery": "SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5 FROM DATA d LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID WHERE...",
-  "reasoning": "Brief explanation of your query approach"
+  "sqlQuery": "SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5 FROM DATA d LEFT JOIN EMAIL e ON d.ID = e.ID WHERE...",
+  "reasoning": "2-3 short sentences, 40 words max. Plain business language, no field names or SQL syntax. Explain why you made the key targeting choices, and note which are flexible (could loosen for more reach) vs core to the audience's identity (loosening would change who this is)."
 }`;
 
   return prompt;
@@ -143,7 +143,7 @@ ${semanticContext}
 
 Return ONLY valid JSON in this exact format:
 {
-  "sqlQuery": "SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5 FROM DATA d LEFT JOIN EMAIL e ON d.HOUSEHOLD_ID = e.HOUSEHOLD_ID WHERE...",
+  "sqlQuery": "SELECT DISTINCT d.ID, d.HOUSEHOLD_ID, e.MD5 FROM DATA d LEFT JOIN EMAIL e ON d.ID = e.ID WHERE...",
   "changeSummary": "One or two plain sentences, written for a non-technical marketer, describing what changed and why."
 }
 

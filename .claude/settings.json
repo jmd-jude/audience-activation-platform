@@ -66,7 +66,10 @@
       "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/ingest-data-dictionary.ts --table=EMAIL --file=/Users/JudeHoffner/dev/ai-data-activation-platform/consumer_email.csv)",
       "Bash(node --env-file=.env.local --import tsx scripts/schema-registry/ingest-data-dictionary.ts --table=PII --file=/Users/JudeHoffner/dev/ai-data-activation-platform/consumer_pii.csv)",
       "Bash(awk -F'\",\"|,' '{print}')",
-      "Bash(node -e \"console.log\\(JSON.stringify\\(require\\('/Users/JudeHoffner/dev/ai-data-activation-platform/package.json'\\).scripts, null, 2\\)\\)\")"
+      "Bash(node -e \"console.log\\(JSON.stringify\\(require\\('/Users/JudeHoffner/dev/ai-data-activation-platform/package.json'\\).scripts, null, 2\\)\\)\")",
+      "Bash(node --env-file=.env.local --import tsx /private/tmp/claude-501/-Users-JudeHoffner-dev-ai-data-activation-platform/7d94bc9d-9d26-4f7f-a3f7-8aacc0c7cb33/scratchpad/check-fanout.ts)",
+      "Bash(grep -v \"Connecting to Snowflake\\\\|privateKey\\\\|account:\\\\|username:\\\\|database:\\\\|warehouse:\\\\|schema:\\\\|authenticator:\\\\|timeout:\\\\|^}$\\\\|Successfully connected\\\\|Executing\\\\|Query executed\\\\|Connection closed\\\\|DeprecationWarning\\\\|trace-deprecation\\\\|level.:.INFO\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('reasoning:', d.get\\('reasoning'\\)\\); print\\('word count:', len\\(d.get\\('reasoning',''\\).split\\(\\)\\)\\)\")"
     ]
   }
 }
