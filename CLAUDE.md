@@ -60,8 +60,9 @@ The platform validates queries in real-time against Snowflake, showing counts an
 
 **Schema Context System**:
 - Identity graph has 3 core tables: PII, DATA, EMAIL
-- Tables typically join on `HOUSEHOLD_ID` or `ADDRESS_ID`
+- DATA and PII join on `HOUSEHOLD_ID` (or `ADDRESS_ID`) — same-household/address facts. EMAIL joins on `ID`, not `HOUSEHOLD_ID` — see below.
 - `EMAILQUALITYLEVEL` is inverted from what the name suggests: **0 is the highest quality**, ranging 0-4, higher numbers are progressively worse. This was wrong in the original hand-authored schema content (implied higher = better) and was corrected after being caught during the schema registry work below — don't assume `>= N` means "better" for this field.
+- `ID` is Audience Acuity's **persistent individual identifier**, consistent across DATA, PII, and EMAIL (confirmed against AA's own data dictionary and live data, not just column naming). Always join EMAIL on `d.ID = e.ID`, never `HOUSEHOLD_ID` — a household-level join attaches every resident's email to every other resident, which measured out to ~5x inflation on audience-size counts before this was caught and corrected in `lib/prompts.ts` and the Postgres registry's `optimizationRules`.
 - Compliance fields: `DNC` (Do Not Call), `EMAILOPTIN`
 
 **Schema Registry** (Postgres-backed, replacing static JSON):
