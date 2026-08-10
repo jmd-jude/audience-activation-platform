@@ -28,7 +28,7 @@ interface DiscoveredAudience {
   audienceName: string;
   description: string;
   keyCharacteristics: string[];
-  marketingOpportunity: string;
+  campaignConcept: string;
   targetingCriteria: {
     naturalLanguageInput: string;
     useCase: string;
@@ -359,11 +359,11 @@ export default function DiscoverPage() {
                       </ul>
                     </div>
 
-                    {/* Marketing Opportunity */}
+                    {/* Campaign Concepts */}
                     <div>
-                      <h4 className="font-semibold text-sm mb-2">Marketing Opportunity:</h4>
+                      <h4 className="font-semibold text-sm mb-2">Campaign Concepts:</h4>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        {audience.marketingOpportunity}
+                        {audience.campaignConcept}
                       </p>
                     </div>
                   </div>

@@ -19,7 +19,7 @@ export const DISCOVERY_RESPONSE_SCHEMA = {
             type: 'array',
             items: { type: 'string' },
           },
-          marketingOpportunity: { type: 'string' },
+          campaignConcept: { type: 'string' },
           targetingCriteria: {
             type: 'object',
             properties: {
@@ -48,7 +48,7 @@ export const DISCOVERY_RESPONSE_SCHEMA = {
           'audienceName',
           'description',
           'keyCharacteristics',
-          'marketingOpportunity',
+          'campaignConcept',
           'targetingCriteria',
           'semanticSignals',
         ],

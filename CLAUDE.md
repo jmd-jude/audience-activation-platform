@@ -35,7 +35,7 @@ The platform validates queries in real-time against Snowflake, showing counts an
 1. **Audience Discovery Flow** (`/api/discover-audiences`):
    - User provides business goal and use case
    - AI acts as "Marketing Strategist" suggesting 3-6 creative audience concepts
-   - Each concept includes: name, description, key characteristics, marketing opportunity, and natural language targeting criteria
+   - Each concept includes: name, description, key characteristics, campaign concept, and natural language targeting criteria
    - AI is schema-aware and only suggests audiences achievable with available data
 
 2. **Segment Generation Flow** (`/api/generate-segment`):

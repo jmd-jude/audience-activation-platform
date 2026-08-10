@@ -243,7 +243,7 @@ Return ONLY valid JSON in this exact format (no markdown, no explanations):
         "Specific demographic or behavioral characteristic 3",
         "Specific demographic or behavioral characteristic 4"
       ],
-      "marketingOpportunity": "Clear explanation of why this audience matters for the business goal and how to engage them effectively",
+      "campaignConcept": "1-2 sentences, 30 words max. A concrete campaign angle for reaching this audience — the channel, message, or creative hook you'd actually use. Not why they matter, that's already covered by the description above.",
       "targetingCriteria": {
         "naturalLanguageInput": "A clear, natural language description of this audience written from a marketing perspective. Describe WHO they are as people using everyday language (e.g., 'affluent professionals aged 40-60 who enjoy luxury travel') rather than database fields (e.g., 'AGE >= 40, INCOME >= 150000'). Focus on their demographics, lifestyle, interests, and behaviors in human terms.",
         "useCase": "${useCase}",
@@ -261,6 +261,8 @@ Return ONLY valid JSON in this exact format (no markdown, no explanations):
 }
 
 For semanticSignals: List 2-4 schema fields that are most central to this audience concept. Use the exact field name from the schema. For "meaning", draw from the marketing intelligence provided above (not just the field description). For "role", explain why this specific field matters for THIS audience concept specifically — not a generic definition.
+
+Keep keyCharacteristics thematically consistent with whatever you name in semanticSignals — if a characteristic implies a specific signal (e.g. "avid fitness enthusiasts"), that signal should generally show up in semanticSignals too.
 
 Generate 3 diverse audience ideas. Be creative and strategic.`;
 }
