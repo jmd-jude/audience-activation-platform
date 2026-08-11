@@ -55,7 +55,9 @@ The platform validates queries in real-time against Snowflake, showing counts an
 
 **Prompt Engineering Strategy**:
 - System prompt in `lib/prompts.ts` defines role, schema rules, and quality guidelines
-- `buildPromptWithContext()`, `buildQueryAdjustmentPrompt()`, and `buildDiscoveryPrompt()` are all `async` (required to support the DB-backed schema source below) and call `resolveSchemaContext()` to get the schema/semantic/optimization/strategic-pattern text blocks
+- `buildPromptWithContext()`, `buildQueryAdjustmentPrompt()`, `buildDiscoveryPrompt()`, and `clarify-segment/route.ts`'s `buildClarificationPrompt()` are all `async` (required to support the DB-backed schema source below) and call `resolveSchemaContext()` to get the schema/semantic/optimization/strategic-pattern text blocks
+- `clarify-segment` didn't call `resolveSchemaContext()` until this was caught as a live bug: it called `buildCompactSchemaContext()` with no arg, silently defaulting to the ~52-field static JSON subset instead of the ~355-field live registry regardless of `SCHEMA_SOURCE`, so it confidently told users real fields (e.g. `TV_MOVIES_AFFINITY`) "don't exist." Fixed, but a reminder that **the four prompt-building call sites have drifted independently more than once and nothing enforces they stay in sync** — check all four when changing shared prompt behavior, not just the ones you're actively touching.
+- The `POPULATION COVERAGE` guidance paragraph (see below) was only added to `SEGMENT_GENERATION_SYSTEM_PROMPT`, so it reaches `generate-segment` and `adjust-segment-query` but **not** `discovery` or `clarify-segment` — both of those render the same coverage-annotated schema block but have no instruction on what to do with it. Confirmed live: `clarify-segment`'s `rationale` field (rendered verbatim to the user in `app/generate/page.tsx`) has already surfaced a raw population percentage to an end user. Known gap, not yet fixed — deliberate per-session decision to leave it for now rather than keep adding prompt-guidance surface area.
 - Prompts enforce JSON response format with specific schema
 
 **Schema Context System**:
@@ -67,17 +69,22 @@ The platform validates queries in real-time against Snowflake, showing counts an
 
 **Schema Registry** (Postgres-backed, replacing static JSON):
 - `lib/data/sig-schema.json` was the original single source of schema/semantic content — hand-authored, compiled into the app bundle, editing it required a code deploy
-- It's being decoupled into Postgres: `SchemaTable`/`SchemaField` (per-table/per-field facts: type, nullable, `valid_values`, `marketing_meaning`, `creative_potential`) and `SchemaGlobalContext` (singleton row holding `business_context`/`query_guidelines`, the non-per-field strategic config)
+- It's being decoupled into Postgres: `SchemaTable`/`SchemaField` (per-table/per-field facts: type, nullable, `valid_values`, `populationCoverage`, `marketing_meaning`, `creative_potential`) and `SchemaGlobalContext` (singleton row holding `business_context`/`query_guidelines`, the non-per-field strategic config)
+- `SchemaField.populationCoverage` (`Float?`) is selectivity, not "fill rate" — % of population that would survive filtering to this field/value. Measured live from Snowflake (not AA's own data-dictionary CSV export, which mixes row grains and is a stale snapshot), via `sync-population-coverage.ts`. For low-cardinality fields (≤65 distinct values — raised from an initial 30 specifically to capture `STATE`'s 62 legitimate values: 50 states + DC + territories + military/COFA codes, verified live, not dirty data), `valid_values` holds `{value, pctOfPopulation}[]` per-value selectivity and `populationCoverage` is their sum; for continuous/high-cardinality fields, `valid_values` stays `null` and `populationCoverage` is the only signal. No `reviewStatus` gate — it's measured, not LLM-guessed, same reasoning as `valid_values`.
+- **Known limitation**: `populationCoverage` for a table's own fields is computed against that table's own row count, which is correct for same-table filters but wrong for join risk on tables with fan-out. `EMAIL` has ~1.86B rows vs. `PII`'s ~498M (many email records per person), so `EMAIL.ID`'s same-table coverage (40.54%) understates the number that actually matters — the % of `PII` individuals with a matching `EMAIL` row (60.47%, the real join-coverage figure). `EMAIL.ID.populationCoverage` was manually hand-corrected to 60.47% with a note in `combinationSignals`; this is a one-off patch, not a general solve — no other EMAIL fields or general fan-out cases are corrected, and re-running `sync-population-coverage.ts --apply` on EMAIL will overwrite the manual correction back to the (wrong for join purposes) same-table number.
 - Gated behind `SCHEMA_SOURCE` env var (see Environment Setup) via `lib/schema-context-resolver.ts` — `db` reads entirely from Postgres via `lib/schema-context-db.ts` (zero dependency on the JSON file in this mode); anything else (including unset) uses the original static JSON path in `lib/schema-context.ts`, i.e. **current production behavior is unchanged until this flag is explicitly set**
 - `SchemaField.reviewStatus` (`draft` | `approved`) gates whether `marketing_meaning` reaches a live prompt — `draft` (e.g. LLM-generated content) is invisible to `buildSemanticContext()` until a human flips it to `approved` in Prisma Studio. `valid_values` has no such gate; it's written directly, since a wrong enum value is a correctness bug (silent zero-result or wrong-direction queries), not a taste call.
+- `SchemaField.source` (`'auto'`/`'manual'`) is judged overengineered and effectively unused — nothing in the app reads it. It's a row-level column trying to describe provenance, but provenance is really per-column once a row holds both hand-authored `marketing_meaning` (manual) and machine-synced facts like `populationCoverage` (auto) side by side; a single enum can't represent that. New sync scripts should not write to it. If the registry gets real investment, the right fix is per-field last-synced tracking, not a row-level enum.
 - `creative_potential` is stored per-field but **deliberately not rendered** into any prompt — unmeasured effect on output quality, no output schema consumes it, reserved for a possible future "creative inspiration" feature rather than ambient seasoning on every discover/generate call
 - Registry-building tooling lives in `scripts/schema-registry/` (all read-only by default, require `--apply` to write, run via `node --env-file=.env.local --import tsx scripts/schema-registry/<script>.ts`):
   - `sync-structural-facts.ts` — introspects live Snowflake `INFORMATION_SCHEMA.COLUMNS`, diffs against the registry, `--apply` writes new/changed fields with `source: 'auto'`
   - `sync-valid-values.ts` — discovers real enum values via batched `APPROX_COUNT_DISTINCT` + `SELECT DISTINCT`; `--binary-only` restricts writes to fields whose real values are a subset of `{0,1}`, the low-risk case safe to bulk-apply without review
+  - `sync-population-coverage.ts` — writes `populationCoverage` and enriched `valid_values` selectivity (see above); scoped to only those two columns, deliberately never touches `source` (see below) or any other field
   - `draft-marketing-meaning.ts` — batches structural-only fields to Claude for a first-pass `marketing_meaning`, always writes `reviewStatus: 'draft'`
   - `ingest-data-dictionary.ts` — ingests AA's own data dictionary CSVs (table-scoped exports, gitignored, local-only) as ground truth in preference to LLM guesses; this is what caught `GOLF_AFFINITY`'s real values being `{2,3}` not `{1}`, and `EMAILQUALITYLEVEL`'s inverted scale, both previously live in the hand-authored JSON
   - `migrate-json-to-registry.ts` / `check-parity.ts` — one-time seeding and JSON-vs-DB output comparison; only meaningful while both sources coexist, retire once fully cut over
-- **Future cleanup once confidently cut over to `SCHEMA_SOURCE=db` in production** (don't do this immediately after flipping the flag — the JSON path is the rollback plan until the DB path has proven itself in real production use): delete `schema-context-resolver.ts`, make the `schema-context.ts` render functions require a `Schema` arg instead of defaulting to the JSON import, delete `sig-schema.json`, remove the `SCHEMA_SOURCE` conditional entirely, retire `migrate-json-to-registry.ts` and `check-parity.ts`. The other four scripts remain permanent tooling.
+- Admin viewer/editor at `/admin/schema` (`app/admin/schema/page.tsx`, backed by `app/api/schema-fields/`) — browse all tables/fields, edit `marketing_meaning`, approve/unapprove `reviewStatus`. Renders `populationCoverage` as a badge (red under 50%) and `valid_values` as `value (pct%)` chips. This page was previously undocumented here — wasn't added to CLAUDE.md when first built.
+- **Future cleanup once confidently cut over to `SCHEMA_SOURCE=db` in production** (don't do this immediately after flipping the flag — the JSON path is the rollback plan until the DB path has proven itself in real production use): delete `schema-context-resolver.ts`, make the `schema-context.ts` render functions require a `Schema` arg instead of defaulting to the JSON import, delete `sig-schema.json`, remove the `SCHEMA_SOURCE` conditional entirely, retire `migrate-json-to-registry.ts` and `check-parity.ts`. The other five scripts remain permanent tooling.
 
 **Component Architecture**:
 - shadcn/ui components in `components/ui/` (New York style, using Tailwind CSS variables)
@@ -99,6 +106,8 @@ app/
 │   ├── discover-audiences/ # AI-powered audience ideation
 │   ├── generate-segment/   # Claude AI SQL generation
 │   ├── adjust-segment-query/ # Plain-language query adjustment (review page)
+│   ├── clarify-segment/    # Pre-generation clarifying questions when input is ambiguous
+│   ├── schema-fields/      # CRUD backing /admin/schema
 │   ├── snowflake/
 │   │   ├── count/          # Get audience size + sample data (primary validation)
 │   │   ├── validate/       # EXPLAIN-based query validation
@@ -109,6 +118,7 @@ app/
 ├── generate/               # Generate new segment page
 ├── library/                # Browse all segments page
 ├── review/[id]/            # Review/edit individual segment
+├── admin/schema/           # Schema registry viewer/editor — see Schema Registry section
 ├── page.tsx                # Landing page (marketing homepage)
 ├── layout.tsx              # Root layout with Navigation
 └── globals.css             # Global styles with CSS variables
@@ -162,7 +172,7 @@ Required environment variables in `.env.local`:
 ## Important Implementation Notes
 
 ### When Working with Claude API Integration
-- All three Claude call sites (`discover-audiences`, `generate-segment`, `clarify-segment`) go through `lib/anthropic.ts`, not the SDK directly:
+- All four Claude call sites (`discover-audiences`, `generate-segment`, `adjust-segment-query`, `clarify-segment`) go through `lib/anthropic.ts`, not the SDK directly:
   - `getAnthropicModel()` resolves the model (env var, fallback `claude-sonnet-5`) — don't hardcode a model string in a route
   - `createMessageWithTruncationRetry()` wraps `messages.create()`: checks `stop_reason === 'max_tokens'` and automatically retries once with `thinking: {type: 'disabled'}` and doubled `max_tokens` before giving up
   - `extractText()` finds the first `text`-type content block — **don't assume `message.content[0]` is text**; with adaptive thinking on, index 0 is often a `thinking` block instead
