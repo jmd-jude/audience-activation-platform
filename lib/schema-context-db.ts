@@ -41,7 +41,12 @@ export async function loadSchemaFromRegistry(forceRefresh = false): Promise<Sche
                 type: field.type,
                 nullable: field.nullable,
                 primary_key: field.primaryKey,
-                valid_values: (field.validValues as string[] | null) ?? undefined,
+                valid_values:
+                  (field.validValues as Array<{ value: string; pctOfPopulation: number }> | null)?.map((v) => ({
+                    value: v.value,
+                    pct_of_population: v.pctOfPopulation,
+                  })) ?? undefined,
+                population_coverage: field.populationCoverage ?? undefined,
                 // Draft (LLM-written, unreviewed) marketing_meaning never
                 // reaches a live prompt -- only approved content renders.
                 marketing_meaning:

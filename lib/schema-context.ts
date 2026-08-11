@@ -1,10 +1,23 @@
 import sigSchema from './data/sig-schema.json';
 
+interface SchemaFieldValue {
+  value: string;
+  pct_of_population: number;
+}
+
 interface SchemaField {
   type: string;
   nullable: boolean;
   primary_key: boolean;
-  valid_values?: string[];
+  // Plain strings from the static JSON path (no selectivity data), or
+  // enriched objects from the registry path (lib/schema-context-db.ts) --
+  // both render correctly, see buildCompactSchemaContext.
+  valid_values?: Array<string | SchemaFieldValue>;
+  // % of population that would survive filtering to this field at all (not
+  // a specific value -- see valid_values for per-value selectivity). Only
+  // populated via the registry path; measured live from Snowflake by
+  // scripts/schema-registry/sync-population-coverage.ts, not LLM-guessed.
+  population_coverage?: number;
   marketing_meaning?: string;
   creative_potential?: string | Record<string, string>;
   semantic_hints?: string[];
@@ -70,12 +83,22 @@ export function isValidField(tableName: string, fieldName: string): boolean {
 /**
  * Builds a compact schema summary for prompts.
  * Includes the full valid_values list for every enumerated field -- the
- * largest field in this schema has 18 values, trivial against the prompt's
- * token budget, so there's no real case for truncating any of them. A prior
- * version truncated fields with >5 values to first-3/last-2, which silently
- * dropped the exact bracket the model needed for common requests (e.g.
- * INCOME_HH's middle brackets, the "affluent" range) and caused it to
+ * largest field in this schema has 62 values (STATE), trivial against the
+ * prompt's token budget, so there's no real case for truncating any of them.
+ * A prior version truncated fields with >5 values to first-3/last-2, which
+ * silently dropped the exact bracket the model needed for common requests
+ * (e.g. INCOME_HH's middle brackets, the "affluent" range) and caused it to
  * fabricate plausible-looking values that don't exist in the real data.
+ *
+ * When available (registry path only), also annotates each value with its
+ * selectivity -- % of population that would survive filtering to exactly
+ * that value -- and each field with its overall population_coverage. This
+ * is deliberately just a number placed next to the value, not a warning or
+ * instruction: the model has repeatedly shown it reasons well about
+ * selectivity tradeoffs on its own (e.g. correctly hedging on "top 5 most
+ * populous states" style requests) once it has the number, and rigid
+ * "don't use fields under X%" rules would block legitimate narrow-but-valid
+ * audience requests along with the risky ones.
  */
 export function buildCompactSchemaContext(source: Schema = schema): string {
   let context = 'Available Tables:\n';
@@ -88,11 +111,19 @@ export function buildCompactSchemaContext(source: Schema = schema): string {
     const fields = Object.entries(table.fields);
     for (const [fieldName, fieldInfo] of fields) {
       // Include field name and type
-      context += `  - ${fieldName} (${fieldInfo.type})`;
+      context += `  - ${fieldName} (${fieldInfo.type}`;
+      if (fieldInfo.population_coverage !== undefined) {
+        context += `, ${fieldInfo.population_coverage}% populated`;
+      }
+      context += ')';
 
-      // Include the full valid_values list if it exists
+      // Include the full valid_values list if it exists, annotated with
+      // per-value selectivity when the registry provides it
       if (fieldInfo.valid_values && fieldInfo.valid_values.length > 0) {
-        context += `: [${fieldInfo.valid_values.map(v => `"${v}"`).join(', ')}]`;
+        const rendered = fieldInfo.valid_values.map((v) =>
+          typeof v === 'string' ? `"${v}"` : `"${v.value}" (${v.pct_of_population}%)`
+        );
+        context += `: [${rendered.join(', ')}]`;
       }
 
       context += '\n';

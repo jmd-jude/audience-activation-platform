@@ -12,6 +12,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Save, Check, Undo2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+interface SchemaFieldValue {
+  value: string;
+  pctOfPopulation: number;
+}
+
 interface SchemaFieldRow {
   id: string;
   tableId: string;
@@ -19,7 +24,8 @@ interface SchemaFieldRow {
   type: string;
   nullable: boolean;
   primaryKey: boolean;
-  validValues: string[] | null;
+  validValues: SchemaFieldValue[] | null;
+  populationCoverage: number | null;
   marketingMeaning: string | null;
   reviewStatus: string;
 }
@@ -322,6 +328,11 @@ function FieldDetail({
             <Badge variant="outline">{field.type}</Badge>
             {field.primaryKey && <Badge variant="outline">PK</Badge>}
             {!field.nullable && <Badge variant="outline">not null</Badge>}
+            {field.populationCoverage !== null && (
+              <Badge variant={field.populationCoverage < 50 ? 'destructive' : 'outline'}>
+                {field.populationCoverage}% populated
+              </Badge>
+            )}
             <Badge variant={field.reviewStatus === 'approved' ? 'default' : 'secondary'}>
               {field.reviewStatus}
             </Badge>
@@ -336,8 +347,8 @@ function FieldDetail({
             </p>
             <div className="flex flex-wrap gap-1">
               {field.validValues.map((v) => (
-                <span key={v} className="rounded border bg-muted px-2 py-0.5 font-mono text-[10px]">
-                  {v}
+                <span key={v.value} className="rounded border bg-muted px-2 py-0.5 font-mono text-[10px]">
+                  {v.value} ({v.pctOfPopulation}%)
                 </span>
               ))}
             </div>

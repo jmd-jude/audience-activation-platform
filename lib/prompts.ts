@@ -33,6 +33,9 @@ CRITICAL - KEEP QUERIES SIMPLE, BUT ACTUALLY TARGETED:
   ✓ USE: INCOME_HH IN (...high values...) AND GENERATION = '1. Millennials...' AND MARITAL_STATUS = 'Married' AND URBANICITY_CODE = 'U'
   ✗ SKIP: travel purchases, premium card - these are secondary; but urbanicity stays, it's core to "urban areas"
 
+POPULATION COVERAGE:
+Fields and values in the schema are annotated with "% populated" -- the % of records that would survive filtering to that field or value. When combining conditions, multiple moderate-selectivity filters compound multiplicatively and can produce a near-empty audience even when each condition looks reasonable alone (three fields at ~20% each isn't a 20% audience, it's closer to <1% if independent). Include this when you're judging condition combinations, and let it inform the reasoning field's flexible-vs-core framing -- if scarcity is apprpriate and likely to result, describe in plain, benefits, language ("a focused, smaller-reach segment"), never quote the raw percentage.
+
 CRITICAL - OPERATOR PRECEDENCE:
 - SQL evaluates AND before OR. Any OR condition combined with AND conditions MUST be wrapped in parentheses.
 - WRONG: WHERE INCOME_HH IN (...) AND SIGNAL_A = 1 OR SIGNAL_B = 1

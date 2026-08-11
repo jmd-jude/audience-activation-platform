@@ -1,6 +1,6 @@
 // app/api/clarify-segment/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { buildCompactSchemaContext } from '@/lib/schema-context';
+import { resolveSchemaContext } from '@/lib/schema-context-resolver';
 import { getAnthropicModel, createMessageWithTruncationRetry, extractText } from '@/lib/anthropic';
 import { CLARIFICATION_RESPONSE_SCHEMA } from '@/lib/response-schemas';
 
@@ -46,7 +46,7 @@ If clarification IS needed:
       "id": "q1",
       "question": "Which income brackets define 'affluent' for this campaign?",
       "options": ["$100K-$150K", "$150K-$250K", "$250K-$500K", "$500K+"],
-      "rationale": "INCOME_HH field drives precision - affects audience size 2-10x"
+      "rationale": "INCOME_HH field drives precision"
     }
   ]
 }
@@ -55,13 +55,14 @@ Guidelines for questions:
 - Keep questions concise (under 100 chars)
 - Provide 3-4 concrete options when possible (use actual schema values)
 - Include brief rationale explaining why this matters
-- Focus on decisions that change the query structure or filters`;
+- Focus on decisions that impact the query structure or filters`;
 
 /**
- * Builds the clarification prompt with schema context
+ * Builds the clarification prompt with schema context. Goes through
+ * resolveSchemaContext().
  */
-function buildClarificationPrompt(): string {
-  const schemaContext = buildCompactSchemaContext();
+async function buildClarificationPrompt(): Promise<string> {
+  const { schemaContext } = await resolveSchemaContext();
 
   return `${CLARIFICATION_SYSTEM_PROMPT_BASE}
 
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
     console.log('Analyzing input for clarification needs:', { naturalLanguageInput, useCase });
 
     // Build the full prompt with schema context
-    const systemPrompt = buildClarificationPrompt();
+    const systemPrompt = await buildClarificationPrompt();
 
     // Build the user request
     const userPrompt = `Analyze this audience segment request and determine if clarification would significantly improve SQL generation:

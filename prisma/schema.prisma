@@ -30,6 +30,14 @@ model SchemaField {
   nullable           Boolean     @default(true)
   primaryKey         Boolean     @default(false)
   validValues        Json?
+  // Selectivity: % of population that would survive filtering on this field.
+  // For low-cardinality fields, validValues holds per-value pctOfPopulation
+  // and this is their sum (true non-null rate). For continuous/high-cardinality
+  // fields, this is the only signal -- validValues stays null. Written by
+  // scripts/schema-registry/sync-population-coverage.ts, sourced live from
+  // Snowflake (not AA's CSV export -- see script header). Deliberately not
+  // gated by reviewStatus: it's measured, not LLM-guessed.
+  populationCoverage Float?
   marketingMeaning   String?
   creativePotential  Json?
   combinationSignals String?
