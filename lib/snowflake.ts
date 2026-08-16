@@ -29,6 +29,15 @@ interface ValidationResult {
 export class SnowflakeConnection {
   private config: SnowflakeConfig;
   private connection: any = null;
+  // executeQuery() is called concurrently (count + sample queries via
+  // Promise.all) on the same instance. Without memoizing the in-flight
+  // promise, the second concurrent call would see `this.connection` already
+  // set (assigned synchronously by createConnection(), before the handshake
+  // actually completes) and treat it as ready, executing a query before
+  // connect() finished -- "Unable to perform operation because a connection
+  // was never established" (Snowflake SDK code 407001). Caching the promise
+  // instead means concurrent callers await the same pending handshake.
+  private connectingPromise: Promise<any> | null = null;
 
   constructor(config: SnowflakeConfig) {
     this.config = {
@@ -45,7 +54,11 @@ export class SnowflakeConnection {
       return this.connection;
     }
 
-    return new Promise((resolve, reject) => {
+    if (this.connectingPromise) {
+      return this.connectingPromise;
+    }
+
+    this.connectingPromise = new Promise((resolve, reject) => {
       try {
         // Process private key similar to Cylyndyr's approach
         let privateKeyContent = this.config.privateKey;
@@ -73,22 +86,27 @@ export class SnowflakeConnection {
           privateKey: '[REDACTED]'
         });
 
-        this.connection = snowflake.createConnection(connectionParams);
+        const pendingConnection: any = snowflake.createConnection(connectionParams);
 
-        this.connection.connect((err: Error, conn: any) => {
+        pendingConnection.connect((err: Error, conn: any) => {
+          this.connectingPromise = null;
           if (err) {
             console.error('Failed to connect to Snowflake:', err);
             reject(new Error(`Snowflake connection failed: ${err.message}`));
           } else {
             console.log('Successfully connected to Snowflake');
+            this.connection = conn;
             resolve(conn);
           }
         });
 
       } catch (error: any) {
+        this.connectingPromise = null;
         reject(new Error(`Connection setup failed: ${error.message || 'Unknown error'}`));
       }
     });
+
+    return this.connectingPromise;
   }
 
   /**
