@@ -3,10 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Home, Sparkles, Library, BarChart3, Lightbulb } from 'lucide-react';
+import { Sparkles, Library, BarChart3, Lightbulb } from 'lucide-react';
 
 const navItems = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Library', href: '/library', icon: Library },
   { name: 'Discover', href: '/discover', icon: Lightbulb },
   { name: 'Generate', href: '/generate', icon: Sparkles },
@@ -25,7 +24,7 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
-            <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
+            <Link href="/library" className="flex items-center gap-2 font-semibold">
               <BarChart3 className="h-6 w-6 text-primary" />
               <span className="text-xl">Graphent</span>
             </Link>

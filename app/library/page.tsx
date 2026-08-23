@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Search, AlertCircle } from 'lucide-react';
 import { SEGMENT_STATUSES } from '@/lib/constants';
+import { cn, formatNumber } from '@/lib/utils';
 
 interface SegmentMetrics {
   impressions: number;
@@ -176,7 +177,19 @@ export default function LibraryPage() {
     }
   };
 
-  const statuses = ['all', ...SEGMENT_STATUSES];
+  const stats = {
+    total: segments.length,
+    totalAudienceSize: segments.reduce((sum, s) => sum + (s.estimatedSize || 0), 0),
+    byStatus: SEGMENT_STATUSES.reduce<Record<string, number>>((acc, status) => {
+      acc[status] = segments.filter((s) => s.status === status).length;
+      return acc;
+    }, {}),
+  };
+
+  const toggleStatusFilter = (status: string) => {
+    setStatusFilter((current) => (current === status ? 'all' : status));
+  };
+
   const sortOptions = [
     { value: 'createdAt', label: 'Newest' },
     { value: 'updatedAt', label: 'Recently Updated' },
@@ -193,6 +206,39 @@ export default function LibraryPage() {
         </p>
       </div>
 
+      {/* Stat Tiles — click to filter */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        <button
+          onClick={() => setStatusFilter('all')}
+          className={cn(
+            'rounded-lg border p-4 text-left transition-colors hover:bg-accent',
+            statusFilter === 'all' && 'border-primary bg-accent'
+          )}
+        >
+          <div className="text-2xl font-bold">{stats.total}</div>
+          <div className="text-sm text-muted-foreground">Total</div>
+        </button>
+
+        {SEGMENT_STATUSES.map((status) => (
+          <button
+            key={status}
+            onClick={() => toggleStatusFilter(status)}
+            className={cn(
+              'rounded-lg border p-4 text-left transition-colors hover:bg-accent',
+              statusFilter === status && 'border-primary bg-accent'
+            )}
+          >
+            <div className="text-2xl font-bold">{stats.byStatus[status] || 0}</div>
+            <div className="text-sm text-muted-foreground capitalize">{status}</div>
+          </button>
+        ))}
+
+        <div className="rounded-lg border p-4 text-left bg-muted/30">
+          <div className="text-2xl font-bold">{formatNumber(stats.totalAudienceSize)}</div>
+          <div className="text-sm text-muted-foreground">Audience Size</div>
+        </div>
+      </div>
+
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
@@ -201,7 +247,7 @@ export default function LibraryPage() {
       )}
 
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -220,19 +266,6 @@ export default function LibraryPage() {
             {useCases.map((uc) => (
               <SelectItem key={uc} value={uc}>
                 {uc === 'all' ? 'All Use Cases' : uc}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger>
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            {statuses.map((status) => (
-              <SelectItem key={status} value={status}>
-                {status === 'all' ? 'All Statuses' : status.charAt(0).toUpperCase() + status.slice(1)}
               </SelectItem>
             ))}
           </SelectContent>
